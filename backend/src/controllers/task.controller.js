@@ -5,26 +5,32 @@ import { Task } from "../models/Task.model.js";
 import mongoose from "mongoose";
 import { User } from "../models/user.model.js";
 
-
+// @desc    Create a new task (Admin only)
+// @route   POST /api/v1/task
+// @access  Private (admin)
 const createTask = asyncHandler(async (req, res) => {
-    const adminId = req.admin._id;
-
     const errors = validationResult(req)
     if (!errors) return res.status(400).json(ApiResponse.error(400, errors.array(), 'Validation error'));
-    const { title, description, date, assignedTo, priority } = req.body
-    console.log(title, description)
+    const { title, description, date, assignedTo, attachments, todoList, priority } = req.body
 
-    const user = await User.findOne({ username: assignedTo });
-    if (!user) return res.status(200).json(ApiResponse.error(404, 'User not found'))
+    if (!Array.isArray(assignedTo)) {
+        return res.status(400).json(ApiResponse.error(400, 'assignedTo to should be a array of user IDs'));
+    }
+    const isValidId = assignedTo.every(id => mongoose.isValidObjectId(id));
+    if (!isValidId) {
+        return res.status(400).json(ApiResponse.error(400, 'Invalid user ID(s) in assignedTo array'));
+    }
 
-    const isTaskExists = await Task.findOne({ title, createdBy: adminId, assignedTo: user._id, isDeleted: false })
-    if (isTaskExists) return res.status(400).json(ApiResponse.error(404, 'Task already exist'))
+    const TaskExists = await Task.findOne({ title, createdBy: req.user._id, assignedTo: assignedTo, isDeleted: false })
+    if (TaskExists) return res.status(400).json(ApiResponse.error(404, 'Task already exist'))
 
     const newTask = await Task.create({
         title,
         description,
-        createdBy: adminId,
-        assignedTo: user._id,
+        todoList,
+        attachments,
+        createdBy: req.user._id,
+        assignedTo: assignedTo,
         priority,
         dueTo: date
     })
@@ -34,18 +40,19 @@ const createTask = asyncHandler(async (req, res) => {
     return res.status(201).json(ApiResponse.success(201, newTask, 'Task successfully created'))
 })
 
+// @desc    Update a task (Admin only)
+// @route   POST /api/v1/task
+// @access  Private (admin)
 const updateTask = asyncHandler(async (req, res) => {
-    const { TaskId } = req.params
+    const { taskId } = req.params
     const { title, description, status, priority, completedAt, dueTo } = req.body
-    if (!TaskId) return res.status(400).json(ApiResponse.error(400, 'Task id is required'))
+    if (!taskId) return res.status(400).json(ApiResponse.error(400, 'Task id is required'))
 
-    const TaskMongooseId = new mongoose.Types.ObjectId(TaskId)
-
-    const isTaskExists = await Task.findOne({ _id: TaskMongooseId, isDeleted: false, })
-    if (!isTaskExists) return res.status(400).json(ApiResponse.error(400, "Task doesn't exist"))
+    const TaskExists = await Task.findOne({ _id: taskId, isDeleted: false, })
+    if (!TaskExists) return res.status(400).json(ApiResponse.error(400, "Task doesn't exist"))
 
     const updatedTask = await Task.findByIdAndUpdate(
-        TaskMongooseId,
+        taskId,
         {
             description,
             title,
@@ -62,6 +69,9 @@ const updateTask = asyncHandler(async (req, res) => {
     return res.status(200).json(ApiResponse.success(200, updatedTask, 'Task successfully updated'))
 })
 
+// @desc    Update task's status
+// @route   POST /api/v1/task
+// @access  Private 
 const updateTaskStatus = asyncHandler(async (req, res) => {
     const { TaskId } = req.params;
     const { status } = req.body;
@@ -77,15 +87,17 @@ const updateTaskStatus = asyncHandler(async (req, res) => {
     return res.status(200).json(ApiResponse.success(200, Task, 'Task status updated successfully'));
 })
 
+// @desc    Delete a task (Admin only)
+// @route   POST /api/v1/task/:taskId
+// @access  Private (admin)
 const toggleDeleteTask = asyncHandler(async (req, res) => {
     const { TaskId } = req.params;
-    const TaskMongooseId = new mongoose.Types.ObjectId(TaskId)
 
     const Task = await Task.findById(TaskMongooseId);
     if (!Task) return res.status(404).json(ApiResponse.error(404, "no Task found "));
 
     const deletedTask = await Task.findByIdAndUpdate(
-        TaskMongooseId,
+        TaskId,
         { isDeleted: !Task.isDeleted },
         { new: true }
     );
@@ -96,40 +108,69 @@ const toggleDeleteTask = asyncHandler(async (req, res) => {
 
 })
 
-const getAllTasks = asyncHandler(async (req, res) => {
-    const adminId = req.admin._id
-    const { page = 1, limit = 10 } = req.query;
+// @desc    get all tasks (Admin only)
+// @route   POST /api/v1/task
+// @access  Private (admin)
+const getTasks = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+    const { status } = req.query;
 
-    const options = {
-        page: Number(page),
-        limit: Number(limit)
-    }
+    const isAdmin = req.user.role === 'admin';
 
-    const AdminTaskAggregate = [
-        {
-            $match: { createdBy: adminId, isDeleted: false, }
-        },
-        {
-            $lookup: {
-                from: 'users',
-                foreignField: '_id',
-                localField: 'assignedTo',
-                as: 'Employees',
-                pipeline: [{
-                    $project: {
-                        avatar: 1,
-                        coverImage: 1,
-                        fullName: 1
-                    }
-                }]
+    const taskFilter = {
+        isDeleted: false,
+        ...(status && { status }),
+        ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
+    };
+
+    let tasks = await Task.find(taskFilter)
+        .populate(isAdmin ? 'assignedTo' : 'createdBy', 'fullName email profileImageUrl');
+
+    // Add completed todoList count
+    tasks = await Promise.all(
+        tasks.map(task => {
+            const completedCount = task.todoList.filter(todo => todo.completed).length;
+            return { ...task._doc, completedTodoCount: completedCount };
+        })
+    );
+
+    // Status Summary Count Filters
+    const summaryBaseFilter = {
+        isDeleted: false,
+        ...(isAdmin ? {} : { assignedTo: userId }) // Admin sees all, users only their tasks
+    };
+
+    const [allTasks, pendingTasks, inProgress, completedTasks] = await Promise.all([
+        Task.countDocuments(summaryBaseFilter),
+        Task.countDocuments({ ...summaryBaseFilter, status: 'pending' }),
+        Task.countDocuments({ ...summaryBaseFilter, status: 'in-progress' }),
+        Task.countDocuments({ ...summaryBaseFilter, status: 'completed' }),
+    ]);
+
+    return res.status(200).json(
+        ApiResponse.success(200, {
+            tasks,
+            statusSummary: {
+                all: allTasks,
+                pendingTasks,
+                inProgress,
+                completedTasks
             }
-        },
-    ]
+        }, 'Successfully fetched all tasks')
+    );
+});
 
-    const TaskPaginate = await Task.aggregatePaginate(Task.aggregate(AdminTaskAggregate), options)
-    if (!TaskPaginate) return res.status(400).json(ApiResponse.error(400, 'No Task found'))
 
-    return res.status(200).json(ApiResponse.success(200, TaskPaginate, 'Successfully all Taskes are fetched'))
+// @desc    Get a task by id
+// @route   POST /api/v1/task/:taskId
+// @access  Private 
+const getTaskById = asyncHandler(async (req, res) => {
+    const { taskId } = req.params;
+    const task = await Task.findById(taskId).populate('assignedTo', 'fullName avatar coverImage');
+    if (!task) {
+        return res.status(404).json(ApiResponse.error(404, 'Task not found'));
+    }
+    return res.status(200).json(ApiResponse.success(200, task, 'Task fetched successfully'));
 })
 
 export {
@@ -137,5 +178,6 @@ export {
     updateTask,
     updateTaskStatus,
     toggleDeleteTask,
-    getAllTasks
+    getTasks,
+    getTaskById,
 }

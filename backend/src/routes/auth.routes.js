@@ -1,8 +1,15 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 import { upload } from '../middlewares/multer.middleware.js';
-import { loginUser, registerUser, logoutUser, getUserProfile, updateUserProfile, updateUserProfileImage } from '../controllers/auth.controller.js'
-import { authorization, adminOnly } from '../middlewares/auth.middleware.js';
+import {
+    loginUser,
+    registerUser,
+    logoutUser,
+    getUserProfile,
+    updateUserProfile,
+    updateUserProfileImage
+} from '../controllers/auth.controller.js'
+import { isAuthenticated, adminOnly } from '../middlewares/auth.middleware.js';
 
 
 const router = Router();
@@ -34,15 +41,15 @@ router
     )
 
 // Private routes
-router.route('/logout').get(authorization, logoutUser)
+router.route('/logout').get(isAuthenticated, logoutUser)
 router
     .route('/profile')
-    .get(authorization, getUserProfile)
-    .put(authorization, updateUserProfile)
+    .get(isAuthenticated, getUserProfile)
+    .put(isAuthenticated, updateUserProfile)
 
 router
     .route('/profile-image')
-    .patch(authorization, upload.single('profileImage'), updateUserProfileImage)
+    .patch(isAuthenticated, upload.single('profileImage'), updateUserProfileImage)
 
 
 

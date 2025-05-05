@@ -10,7 +10,7 @@ const TaskSchema = new Schema({
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
     todoList: [todoSchema],
-    assignedTo: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    assignedTo: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }],
     createdBy: { type: Schema.Types.ObjectId, ref: 'Admin', required: true },
     attachments: [{ type: String }],
     dueTo: { type: Date, default: new Date },
