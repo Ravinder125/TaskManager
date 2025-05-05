@@ -1,27 +1,27 @@
 import { Router } from 'express'
 import { body } from 'express-validator'
-import { createTodo, updateTodo, updateTodoStatus, toggleDeleteTodo, getAllTodos } from '../controllers/todo.controller.js'
-import { authUser, authAdmin } from '../middlewares/auth.middleware.js';
+import { createTask, updateTask, updateTaskStatus, toggleDeleteTask, getAllTasks } from '../controllers/task.controller.js'
+import { authorization } from '../middlewares/auth.middleware.js';
 
 
 
 const router = Router();
 
-router.route('/').get(authAdmin, getAllTodos)
+router.route('/').get(authorization, getAllTasks)
 
 router
     .route('/create')
-    .post(authAdmin,
+    .post(authorization,
         [
             body('title').notEmpty().withMessage('Title is required'),
             body('description').notEmpty().withMessage('Description is required')
         ],
-        createTodo)
+        createTask)
 
-router.route('/:todoId')
-    .put(authAdmin, updateTodo)
-    .patch(authUser, updateTodoStatus)
-    .delete(authAdmin, toggleDeleteTodo)
+router.route('/:taskId')
+    .put(authorization, updateTask)
+    .patch(authorization, updateTaskStatus)
+    .delete(authorization, toggleDeleteTask)
 
 
 export default router

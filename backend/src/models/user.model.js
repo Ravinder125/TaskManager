@@ -16,12 +16,46 @@ const userSchema = new Schema(
         role: { type: String, enum: ['admin', 'employee'], default: 'employee' },
     }, { timestamps: true });
 
-userSchema.pre('save', async function (next) { if (!this.isModified('password')) return next(); try { this.password = await bcryptjs.hash(this.password, 10); next(); } catch (error) { next(error) } });
+// Hash the password before saving the user document
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    try {
+        this.password = await bcryptjs.hash(this.password, 10);
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 
-userSchema.methods.isPasswordCorrect = async function (password) { return await bcryptjs.compare(password, this.password); };
+// Method to check if the provided password is correct
+userSchema.methods.isPasswordCorrect = async function (password) {
+    return await bcryptjs.compare(password, this.password);
+};
 
-userSchema.methods.generateRefreshToken = async function () { try { return jwt.sign({ _id: this._id, email: this.email }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }) } catch (error) { console.error('Error while generating Refresh Token'); } };
+// Method to generate a refresh token
+userSchema.methods.generateRefreshToken = async function () {
+    try {
+        return jwt.sign(
+            { _id: this._id, email: this.email, role: this.role },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
+        );
+    } catch (error) {
+        console.error('Error while generating Refresh Token');
+    }
+};
 
-userSchema.methods.generateAccessToken = async function () { try { return jwt.sign({ _id: this._id, email: this.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }) } catch (error) { console.error('Error while generating Refresh Token'); } };
+// Method to generate an access token
+userSchema.methods.generateAccessToken = async function () {
+    try {
+        return jwt.sign(
+            { _id: this._id, email: this.email, role: this.role },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+        );
+    } catch (error) {
+        console.error('Error while generating Access Token');
+    }
+};
 
 export const User = mongoose.model('User', userSchema);

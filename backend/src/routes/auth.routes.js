@@ -1,16 +1,18 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 import { upload } from '../middlewares/multer.middleware.js';
-import { loginUser, registerUser, getProfile, logoutUser } from '../controllers/user.controller.js'
-import { authorization } from '../middlewares/auth.middleware.js';
+import { loginUser, registerUser, logoutUser, getUserProfile, updateUserProfile, updateUserProfileImage } from '../controllers/auth.controller.js'
+import { authorization, adminOnly } from '../middlewares/auth.middleware.js';
 
 
 const router = Router();
 
+
+// Public routes
 router
     .route('/register')
     .post(
-        upload.single('image'),
+        upload.single('profileImage'),
         [
             body('email').isEmail().withMessage('Email is invalid'),
             // body('AdminEmail').isEmail().withMessage('Admin email is invalid'),
@@ -31,8 +33,17 @@ router
         loginUser
     )
 
-router.route('/logout').get(authUser, logoutUser)
-router.route('/profile').get(authUser, getProfile)
+// Private routes
+router.route('/logout').get(authorization, logoutUser)
+router
+    .route('/profile')
+    .get(authorization, getUserProfile)
+    .put(authorization, updateUserProfile)
+
+router
+    .route('/profile-image')
+    .patch(authorization, upload.single('profileImage'), updateUserProfileImage)
+
 
 
 export default router

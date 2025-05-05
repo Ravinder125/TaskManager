@@ -7,10 +7,10 @@ import cors from 'cors';
 const app = express();
 
 
-const whitelist = ['http://localhost:5173', 'http://localhost:4000', 'http://localhost:5000', 'https://01d2swjl-5173.inc1.devtunnels.ms/', 'https://01d2swjl-5173.inc1.devtunnels.ms', 'https://01d2swjl-5173.devtunnels.ms/'];
+const whitelist = ['http://localhost:5173', 'http://localhost:4000', 'http://localhost:5000', 'https://01d2swjl-5173.inc1.devtunnels.ms/', 'https://01d2swjl-5173.inc1.devtunnels.ms', 'https://01d2swjl-5173.devtunnels.ms/', undefined];
 const corsOptions = {
     origin: function (origin, callback) {
-        if (whitelist.indexOf(origin) !== -1) {
+        if (whitelist.indexOf(origin) !== -1 || !origin) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -24,13 +24,13 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 
+import authRoutes from './routes/auth.routes.js'
 import userRoutes from './routes/user.routes.js'
-import adminRoutes from './routes/admin.routes.js'
-import todoRoutes from './routes/todo.routes.js'
+import taskRoutes from './routes/task.routes.js'
 
+app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/users', userRoutes)
-app.use('/api/v1/admins', adminRoutes)
-app.use('/api/v1/todos', todoRoutes)
+app.use('/api/v1/todos', taskRoutes)
 
 
 export default app
