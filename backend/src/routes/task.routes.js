@@ -13,6 +13,7 @@ import {
     getTaskById,
 } from '../controllers/task.controller.js'
 import { adminOnly, isAuthenticated } from '../middlewares/auth.middleware.js';
+import { validateParams } from '../middlewares/validateParams.middleware.js';
 
 
 const router = Router();
@@ -29,9 +30,9 @@ router
         createTask)
 
 router.route('/:taskId')
-    .get(isAuthenticated, getTaskById)
-    .put(isAuthenticated, adminOnly, updateTask) // update task
-    .delete(isAuthenticated, adminOnly, toggleDeleteTask) /// delete task
+    .get(isAuthenticated, validateParams, getTaskById)
+    .put(isAuthenticated, adminOnly, validateParams, updateTask) // update task
+    .delete(isAuthenticated, adminOnly, validateParams, toggleDeleteTask) /// delete task
 
 router
     .route('/:taskId/status')
@@ -40,21 +41,23 @@ router
             body('status')
                 .isIn(['completed', 'pending', 'in-progress'])
                 .withMessage('Only completed, pending or in-progress values are allowed')
-        ]
-        , updateTaskStatus) // update tasks status
+        ],
+        validateParams,
+        updateTaskStatus) // update tasks status
 router
     .route('/:taskId/todos/')
     .post(isAuthenticated, adminOnly,
         [
             body('todos').isArray().withMessage('Todo must be an array of todos')
         ],
+        validateParams,
         addTodoToTask
     ) // add new todo to task
 router.route('/:taskId/todos/:todoId/status').patch(isAuthenticated, updateTodoStatus) // update todo's status
 router
     .route('/:taskId/todos/:todoId')
-    .delete(isAuthenticated, adminOnly, removeTodoFromTask) // remove todo from the task
-    .patch(isAuthenticated, adminOnly, updateTodoText) // update todo text
+    .delete(isAuthenticated, adminOnly, validateParams, removeTodoFromTask) // remove todo from the task
+    .patch(isAuthenticated, adminOnly, validateParams, updateTodoText) // update todo text
 
 
 

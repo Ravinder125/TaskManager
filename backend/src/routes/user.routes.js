@@ -6,6 +6,7 @@ import {
     getUserById,
     deletedUser
 } from "../controllers/user.controller.js";
+import { validateParams } from "../middlewares/validateParams.middleware.js";
 
 const router = Router();
 
@@ -13,8 +14,8 @@ const router = Router();
 router.route('/').get(isAuthenticated, adminOnly, getUsers); // Get all users
 router
     .route('/:userId')
-    .get(isAuthenticated, adminOnly, getUserById) // Get user by ID
-    .delete(isAuthenticated, adminOnly, deletedUser) // Delete user
+    .get(isAuthenticated, adminOnly, validateParams, getUserById) // Get user by ID
+    .delete(isAuthenticated, adminOnly, validateParams, deletedUser) // Delete user
 
 
 export default router;
