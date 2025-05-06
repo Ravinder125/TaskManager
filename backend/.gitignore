@@ -31,3 +31,13 @@ out/
 # OS generated files
 .DS_Store
 Thumbs.db
+*.bak
+*.tmp
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# Additional exclusions
+coverage/
