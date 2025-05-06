@@ -13,6 +13,8 @@ logs/
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
 
 # Build outputs
 dist/
@@ -31,13 +33,15 @@ out/
 # OS generated files
 .DS_Store
 Thumbs.db
-*.bak
-*.tmp
 
 # Temporary files
 *.tmp
-*.temp
+*.temp/
 ~$*
 
 # Additional exclusions
 coverage/
+
+# Upload directories
+uploads/
+public/uploads/
