@@ -10,7 +10,9 @@ import { User } from "../models/user.model.js";
 // @access  Private (admin)
 const createTask = asyncHandler(async (req, res) => {
     const errors = validationResult(req)
-    if (!errors) return res.status(400).json(ApiResponse.error(400, errors.array(), 'Validation error'));
+    if (!errors.isEmpty) {
+        return res.status(400).json(ApiResponse.error(400, errors.array().map((e => e.msg)).join()))
+    }
     const { title, description, date, assignedTo, attachments, todoList, priority } = req.body
 
     if (!Array.isArray(assignedTo)) {
@@ -41,13 +43,21 @@ const createTask = asyncHandler(async (req, res) => {
 })
 
 // @desc    Update a task (Admin only)
-// @route   POST /api/v1/task
+// @route   POST /api/v1/task/:taskId
 // @access  Private (admin)
 const updateTask = asyncHandler(async (req, res) => {
     const { taskId } = req.params
     const { title, description, status, priority, completedAt, dueTo } = req.body
     if (!taskId) return res.status(400).json(ApiResponse.error(400, 'Task id is required'))
-
+    if (
+        !title &&
+        !description &&
+        !status &&
+        !priority &&
+        !completedAt &&
+        !dueTo) {
+        return res.status(400).json(ApiResponse.error(400, 'At least one field is required'))
+    }
     const TaskExists = await Task.findOne({ _id: taskId, isDeleted: false, })
     if (!TaskExists) return res.status(400).json(ApiResponse.error(400, "Task doesn't exist"))
 
@@ -70,35 +80,42 @@ const updateTask = asyncHandler(async (req, res) => {
 })
 
 // @desc    Update task's status
-// @route   POST /api/v1/task
+// @route   POST /api/v1/task/:taskId/status
 // @access  Private 
 const updateTaskStatus = asyncHandler(async (req, res) => {
-    const { TaskId } = req.params;
+    const { taskId } = req.params;
     const { status } = req.body;
-    console.log(TaskId)
-    const TaskMongooseId = mongoose.Types.ObjectId.createFromHexString(TaskId);
-    console.log(TaskMongooseId)
-    const Task = await Task.findByIdAndUpdate(
-        { _id: TaskMongooseId, isDeleted: false, status: 'pending' },
-        { status },
-        { new: true }
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(400).json(ApiResponse.error(400, errors.array().map((e => e.msg)).join()))
+    }
+    const task = await Task.findOne(
+        { _id: taskId, isDeleted: false, status: 'pending' },
     )
-    if (!Task) return res.status(404).json(ApiResponse.error(404, 'No Task found'));
-    return res.status(200).json(ApiResponse.success(200, Task, 'Task status updated successfully'));
+    console.log(task)
+    if (!task) return res.status(404).json(ApiResponse.error(404, 'No Task found'));
+    if (status === 'completed') {
+        const todoCompleted = task?.todoList.map((todo) => todo.completed)
+        if (!todoCompleted?.some(t => t === 'false')) return res.status(400).json(ApiResponse.error(400, 'Every todo must be completed'))
+    }
+    task.status = status;
+    await task.save()
+
+    return res.status(200).json(ApiResponse.success(200, task, 'Task status updated successfully'));
 })
 
 // @desc    Delete a task (Admin only)
 // @route   POST /api/v1/task/:taskId
 // @access  Private (admin)
 const toggleDeleteTask = asyncHandler(async (req, res) => {
-    const { TaskId } = req.params;
+    const { taskId } = req.params;
 
-    const Task = await Task.findById(TaskMongooseId);
-    if (!Task) return res.status(404).json(ApiResponse.error(404, "no Task found "));
+    const task = await Task.findById(taskId);
+    if (!task) return res.status(404).json(ApiResponse.error(404, "no Task found "));
 
     const deletedTask = await Task.findByIdAndUpdate(
-        TaskId,
-        { isDeleted: !Task.isDeleted },
+        taskId,
+        { isDeleted: !task.isDeleted },
         { new: true }
     );
 
@@ -162,7 +179,7 @@ const getTasks = asyncHandler(async (req, res) => {
 
 
 // @desc    Get a task by id
-// @route   POST /api/v1/task/:taskId
+// @route   GET /api/v1/tasks/:taskId
 // @access  Private 
 const getTaskById = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
@@ -173,6 +190,108 @@ const getTaskById = asyncHandler(async (req, res) => {
     return res.status(200).json(ApiResponse.success(200, task, 'Task fetched successfully'));
 })
 
+// @desc    Add new todo to task (Admin only)
+// @route   POST /api/v1/tasks/:taskId/todos/:todoId
+// @access  Private (admin)
+const addTodoToTask = asyncHandler(async (req, res) => {
+    const { taskId } = req.params;
+    const { todos } = req.body;
+    if (!taskId || !mongoose.isValidObjectId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Task id is required'));
+    if (!Array.isArray(todos) && todos?.length === 0) {
+        return res.status(400).json(ApiResponse.error(400, 'Todos must an array of todos'));
+    };
+
+    const task = await Task.findById(taskId);
+    if (!task) return res.status(404).json(ApiResponse.error(404, 'No task found'));
+
+    // Loop to check if todo already exit or not
+    for (const todo of task.todoList) {
+        for (const key in todos) {
+            const text = todos[key];
+            if (text.text === todo.text) {
+                return res.status(400).json(ApiResponse.error(400, 'Todo already exist in the todo list'))
+            }
+        }
+    }
+
+    task.todoList.push(...todos)
+    await task.save();
+
+    return res.status(200).json(ApiResponse.success(200, task, 'Todo successfully added to the task'))
+
+})
+
+
+// @desc    Remove todo from task (Admin only)
+// @route   DELETE /api/v1/tasks/:taskId/todos/:todoId
+// @access  Private (admin)
+const removeTodoFromTask = asyncHandler(async (req, res) => {
+    const { todoId, taskId } = req.params;
+    if (!todoId, !taskId) return res.status(400).json(ApiResponse.error(400, 'Both ID(s) are required'))
+
+    if (!mongoose.isValidObjectId(todoId) && !mongoose.isValidObjectId()) {
+        return res.status(400).json(ApiResponse.error(400, 'Todo and task ID(s) must be mongoose object id'));
+    }
+    const task = await Task.findByIdAndUpdate(
+        taskId,
+        {
+            $pull: {
+                todoList: { _id: todoId }
+            }
+        },
+        { new: true }
+    )
+    if (!task) return res.status(404).json(ApiResponse.error(404, 'To task found'))
+    return res.status(200).json(ApiResponse.success(200, task, 'Todo successfully removed from the task'))
+})
+
+
+// @desc    Add new todo to task (Admin only)
+// @route   PATCH /api/v1/tasks/:taskId/todos/:todoId/status
+// @access  Private (admin)
+const updateTodoStatus = asyncHandler(async (req, res) => {
+    const { todoId, taskId } = req.params;
+    const { completed } = req.body;
+    if (!todoId, !taskId) return res.status(400).json(ApiResponse.error(400, 'Both ID(s) are required'))
+
+    if (!mongoose.isValidObjectId(todoId) && !mongoose.isValidObjectId()) {
+        return res.status(400).json(ApiResponse.error(400, 'Todo and task ID(s) must be mongoose object id'));
+    }
+
+    const task = await Task.findOneAndUpdate(
+        { _id: taskId, 'todoList._id': todoId },
+        { $set: { 'todoList.$.completed': completed } },
+        { new: true }
+    )
+    if (!task) return res.status(404).json(ApiResponse.error(404, 'To task found'))
+    return res.status(200).json(ApiResponse.success(200, task, 'Todo status successfully updated'))
+
+})
+
+
+// @desc    Add new todo to task (Admin only)
+// @route   PATCH /api/v1/tasks/:taskId/todos/:todoId
+// @access  Private (admin)
+const updateTodoText = asyncHandler(async (req, res) => {
+    const { todoId, taskId } = req.params;
+    const { text } = req.body;
+    if (!todoId, !taskId) return res.status(400).json(ApiResponse.error(400, 'Both ID(s) are required'))
+
+    if (!mongoose.isValidObjectId(todoId) && !mongoose.isValidObjectId()) {
+        return res.status(400).json(ApiResponse.error(400, 'Todo and task ID(s) must be mongoose object id'));
+    }
+
+    const task = await Task.findOneAndUpdate(
+        { _id: taskId, 'todoList._id': todoId },
+        { $set: { 'todoList.$.text': text } },
+        { new: true }
+    )
+    if (!task) return res.status(404).json(ApiResponse.error(404, 'No task found'))
+    return res.status(200).json(ApiResponse.success(200, task, 'Todo text successfully updated'))
+
+
+})
+
 export {
     createTask,
     updateTask,
@@ -180,4 +299,8 @@ export {
     toggleDeleteTask,
     getTasks,
     getTaskById,
+    updateTodoStatus,
+    addTodoToTask,
+    removeTodoFromTask,
+    updateTodoText,
 }

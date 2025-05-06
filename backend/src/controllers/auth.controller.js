@@ -42,17 +42,16 @@ const registerUser = asyncHandler(async (req, res) => {
     const { email, password, adminInviteToken } = req.body;
 
     const profileImageLocalPath = req.file?.path
-    console.log(req.file)
     if (!profileImageLocalPath) {
         return res.status(400).json(ApiResponse.error(400, 'Profile Image is required'))
     }
 
-    let role = 'employee'
+    let role = 'admin'
     if (
         adminInviteToken &&
         adminInviteToken === process.env.ADMIN_INVITE_TOKEN
     ) {
-        role = 'admin'
+        role = 'employee'
     }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
