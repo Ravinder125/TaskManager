@@ -11,6 +11,7 @@ import {
     removeTodoFromTask,
     updateTodoText,
     getTaskById,
+    updateTodoList,
 } from '../controllers/task.controller.js'
 import { adminOnly, isAuthenticated } from '../middlewares/auth.middleware.js';
 import { validateParams } from '../middlewares/validateParams.middleware.js';
@@ -36,14 +37,16 @@ router.route('/:taskId')
 
 router
     .route('/:taskId/status')
-    .patch(isAuthenticated,
+    .patch(
+        isAuthenticated,
         [
             body('status')
                 .isIn(['completed', 'pending', 'in-progress'])
                 .withMessage('Only completed, pending or in-progress values are allowed')
         ],
         validateParams,
-        updateTaskStatus) // update tasks status
+        updateTaskStatus
+    ) // update tasks status
 router
     .route('/:taskId/todos/')
     .post(isAuthenticated, adminOnly,
@@ -51,8 +54,9 @@ router
             body('todos').isArray().withMessage('Todo must be an array of todos')
         ],
         validateParams,
-        addTodoToTask
-    ) // add new todo to task
+        addTodoToTask, // add new todo to task
+    )
+    .put(isAuthenticated, adminOnly, validateParams, updateTodoList)
 router.route('/:taskId/todos/:todoId/status').patch(isAuthenticated, updateTodoStatus) // update todo's status
 router
     .route('/:taskId/todos/:todoId')

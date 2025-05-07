@@ -5,9 +5,9 @@ import { Task } from "../models/Task.model.js";
 import { User } from "../models/user.model.js";
 import { validateObjectId } from "../utils/validateObjectId.js";
 
-// @desc Create a new task (Admin only)
-// @route POST /api/tasks
-// @access Admin
+// @desc    Create a new task (Admin only)
+// @route   POST /api/tasks
+// @access  Admin
 const createTask = asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -39,9 +39,9 @@ const createTask = asyncHandler(async (req, res) => {
     return res.status(201).json(ApiResponse.success(201, task, 'Task successfully created'));
 });
 
-// @desc Update a task
-// @route PUT /api/tasks/:taskId
-// @access Admin/User
+// @desc    Update a task
+// @route   PUT /api/tasks/:taskId
+// @access  Admin/User
 const updateTask = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
     const { title, description, status, attachments, priority, completedAt, dueTo, assignedTo, todoList } = req.body;
@@ -76,9 +76,9 @@ const updateTask = asyncHandler(async (req, res) => {
     return res.status(200).json(ApiResponse.success(200, updatedTask, 'Task successfully updated'));
 });
 
-// @desc Update task status
-// @route PATCH /api/tasks/:taskId/status
-// @access Admin/User
+// @desc    Update task status
+// @route   PATCH /api/tasks/:taskId/status
+// @access  Admin/User
 const updateTaskStatus = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
     const { status } = req.body;
@@ -88,20 +88,70 @@ const updateTaskStatus = asyncHandler(async (req, res) => {
     const task = await Task.findOne({ _id: taskId, isDeleted: false, status: 'pending' });
     if (!task) return res.status(404).json(ApiResponse.error(404, 'Task not found'));
 
-    if (status === 'completed') {
-        const allTodosCompleted = task.todoList.every(todo => todo.completed === true);
-        if (!allTodosCompleted) return res.status(400).json(ApiResponse.error(400, 'Every todo must be completed'));
+    const isAssigned = task.assignedTo.includes(req.user._id)
+    if (!isAssigned && req.user.role !== 'admin') {
+        return res.status(401).json(ApiResponse.error(401, 'Unauthorized request'))
     }
 
-    task.status = status;
+    if (status === 'completed') {
+        const allTodosComplete = task.todoList.forEach(todo => todo.completed === true);
+        task.progress = 100;
+        // if (!allTodosCompleted) return res.status(400).json(ApiResponse.error(400, 'Every todo must be completed'));
+    }
+
+    task.status = status || task.status;
     await task.save();
 
     return res.status(200).json(ApiResponse.success(200, task, 'Task status updated successfully'));
 });
 
-// @desc Toggle task deletion
-// @route PATCH /api/tasks/:taskId/toggle-delete
-// @access Admin
+// @desc    Update todo list
+// @route   PUT /api/v1/:taskId/todos
+// @access  Admin
+const updateTodoList = asyncHandler(async (req, res) => {
+    const { taskId } = req.params;
+    const { todos } = req.body;
+
+    if (!Array.isArray(todos)) {
+        return res.status(400).json(ApiResponse.error(400, 'Todos must be an array of todos'));
+    }
+    if (!validateObjectId([taskId])) {
+        return res.status(400).json(ApiResponse.error(400, 'Invalid id'));
+    }
+    const task = await Task.findOne({ _id: taskId, isDeleted: false })
+
+    if (!task) {
+        return res.status(404).json(ApiResponse.error(404, 'Task not found'));
+    }
+
+    task.todoList = todos
+
+    // Auto-update progress based o todo list completion
+    const completedCount = task.todoList?.filter(
+        todo => todo.completed
+    )?.length
+    const totalTodos = task.todoList?.length;
+    task.progress = totalTodos > 0 ? Math.round((totalTodos / completedCount) * 10) : 0;
+
+    // Auto-mark task as completed if all times are checked
+    if (task.progress === 100) {
+        task.status = 'completed'
+    } else if (task.progress > 0) {
+        task.status = 'in-progress';
+    } else {
+        task.status = 'pending'
+    }
+
+    await task.save();
+    const updatedTask = await Task.findById(taskId).populate('assignedTo', 'fullName email profileImageUrl')
+
+    return res.status(200).json(ApiResponse.success(200, updatedTask, 'Task todo list successfully updated'));
+
+})
+
+// @desc    Toggle task deletion
+// @route   PATCH /api/tasks/:taskId/toggle-delete
+// @access  Admin
 const toggleDeleteTask = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
 
@@ -114,9 +164,9 @@ const toggleDeleteTask = asyncHandler(async (req, res) => {
     return res.status(200).json(ApiResponse.success(200, deletedTask, 'Task deletion toggled successfully'));
 });
 
-// @desc Get all tasks
-// @route GET /api/tasks
-// @access Admin/User
+// @desc    Get all tasks
+// @route   GET /api/tasks
+// @access  Admin/User
 const getTasks = asyncHandler(async (req, res) => {
     const userId = req.user._id;
     const { status } = req.query;
@@ -155,9 +205,9 @@ const getTasks = asyncHandler(async (req, res) => {
     }, 'Tasks fetched successfully'));
 });
 
-// @desc Get task by ID
-// @route GET /api/tasks/:taskId
-// @access Admin/User
+// @desc    Get task by ID
+// @route   GET /api/tasks/:taskId
+// @access  Admin/User
 const getTaskById = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
     if (!validateObjectId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid Task ID'));
@@ -168,9 +218,9 @@ const getTaskById = asyncHandler(async (req, res) => {
     return res.status(200).json(ApiResponse.success(200, task, 'Task fetched successfully'));
 });
 
-// @desc Add todo to task
-// @route POST /api/tasks/:taskId/todos
-// @access Admin/User
+// @desc    Add todo to task
+// @route   POST /api/tasks/:taskId/todos
+// @access  Admin/User
 const addTodoToTask = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
     const { todos } = req.body;
@@ -195,9 +245,9 @@ const addTodoToTask = asyncHandler(async (req, res) => {
     return res.status(200).json(ApiResponse.success(200, task, 'Todo successfully added to the task'));
 });
 
-// @desc Remove todo
-// @route DELETE /api/tasks/:taskId/todos/:todoId
-// @access Admin/User
+// @desc    Remove todo
+// @route   DELETE /api/tasks/:taskId/todos/:todoId
+// @access  Admin/User
 const removeTodoFromTask = asyncHandler(async (req, res) => {
     const { taskId, todoId } = req.params;
 
@@ -211,9 +261,9 @@ const removeTodoFromTask = asyncHandler(async (req, res) => {
     return res.status(200).json(ApiResponse.success(200, task, 'Todo removed'));
 });
 
-// @desc Update todo status
-// @route PATCH /api/tasks/:taskId/todos/:todoId/status
-// @access Admin/User
+// @desc    Update todo status
+// @route   PATCH /api/tasks/:taskId/todos/:todoId/status
+// @access  Admin/User
 const updateTodoStatus = asyncHandler(async (req, res) => {
     const { taskId, todoId } = req.params;
     const { completed } = req.body;
@@ -230,9 +280,9 @@ const updateTodoStatus = asyncHandler(async (req, res) => {
     return res.status(200).json(ApiResponse.success(200, task, 'Todo status updated'));
 });
 
-// @desc Update todo text
-// @route PATCH /api/tasks/:taskId/todos/:todoId/text
-// @access Admin/User
+// @desc    Update todo text
+// @route   PATCH /api/tasks/:taskId/todos/:todoId/text
+// @access  Admin/User
 const updateTodoText = asyncHandler(async (req, res) => {
     const { taskId, todoId } = req.params;
     const { text } = req.body;
@@ -253,6 +303,7 @@ export {
     createTask,
     updateTask,
     updateTaskStatus,
+    updateTodoList,
     toggleDeleteTask,
     getTasks,
     getTaskById,

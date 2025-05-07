@@ -32,6 +32,7 @@ import dashboardRoutes from './routes/dashboard.routes.js'
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/tasks', taskRoutes)
+app.use('/api/v1/dashboard', dashboardRoutes)
 
 
 export default app

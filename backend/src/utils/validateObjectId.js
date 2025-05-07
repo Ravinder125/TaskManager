@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
-export const validateObjectId = (ids = []) => {
-    const isValid = ids.map(id => mongoose.Types.ObjectId.isValid(id))
-    if (!isValid.map((v) => !v)) return false
-    return true
+export const validateObjectId = (ids) => {
+    if (Array.isArray(ids)) {
+        return ids.every(id => mongoose.Types.ObjectId.isValid(id))
+    }
+    return mongoose.Types.ObjectId.isValid(ids)
 }

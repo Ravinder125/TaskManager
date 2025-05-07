@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asynchandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { Task } from "../models/Task.model.js";
+import { isValidObjectId } from "mongoose";
 
 // @desc    Get all users (Admin only)
 // @route   Get /api/v1/users/
@@ -29,8 +30,8 @@ const getUsers = asyncHandler(async (req, res) => {
 // @access   Private
 const getUserById = asyncHandler(async (req, res) => {
     const { userId } = req.params;
-    if (!userId) {
-        return res.status(400).json(ApiResponse.error(400, 'User id is required'));
+    if (!isValidObjectId([userId])) {
+        return res.status(400).json(ApiResponse.error(400, 'Invalid user id'));
     }
     const user = await User.findById(userId).select('-password -refreshToken');
     if (!user) {
