@@ -28,11 +28,13 @@ import authRoutes from './routes/auth.routes.js'
 import userRoutes from './routes/user.routes.js'
 import taskRoutes from './routes/task.routes.js'
 import dashboardRoutes from './routes/dashboard.routes.js'
+import reportRoutes from './routes/report.routes.js'
 
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/tasks', taskRoutes)
 app.use('/api/v1/dashboard', dashboardRoutes)
+app.use('/api/v1/reports', reportRoutes)
 
 
 export default app

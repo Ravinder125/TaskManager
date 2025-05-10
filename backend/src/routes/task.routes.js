@@ -23,6 +23,7 @@ router
     .route('/')
     .get(isAuthenticated, adminOnly, getTasks) // get all tasks
     .post(isAuthenticated, // creating a new task;
+        adminOnly,
         [
             body('title').notEmpty().withMessage('Title is required'),
             body('description').notEmpty().withMessage('Description is required'),
