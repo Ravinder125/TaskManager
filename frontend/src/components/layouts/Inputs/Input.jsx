@@ -7,6 +7,7 @@ const Input = ({
     label,
     placeholder,
     type,
+    required,
 }) => {
 
     const [showPassword, setShowPassword] = useState(false);
@@ -32,6 +33,7 @@ const Input = ({
                     className='w-full bg-transparent outline-none'
                     value={value}
                     onChange={e => onChange(e)}
+                    required={required}
                 />
                 {type === 'password' && (
                     <>

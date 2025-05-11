@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import AuthLayout from '../../components/layouts/AuthLayout'
-import Input from '../../components/layouts/Inputs/Input'
+import { Input, AuthLayout } from '../../components/index';
 import { validateEmail } from '../../utils/helper'
 
 const Login = () => {
@@ -17,13 +16,14 @@ const Login = () => {
 
         if (!validateEmail(email)) {
             setError("Please enter a valid email address");
+            console.log(error)
         }
 
-        if (!password || password > !password.length > 8) {
+        if (!password || !(password > password.length > 8)) {
             setError("Please ensure your password first");
         }
 
-        setError("");
+        // setError("");
 
         // Login API Call
 
@@ -33,7 +33,7 @@ const Login = () => {
         <AuthLayout>
             <div className='lg:w-[70%] h-3/4 w-full h-92 flex flex-col justify-center'>
                 <h3 className='text-xl font-semibold text-black'>Welcome</h3>
-                <p className='text-xs text-slate-700 mt-[5px] mb-6'>
+                <p className='text-xs text-slate-700 mt-2 mb-6'>
                     Please Enter your details to log in
                 </p>
 
@@ -44,13 +44,15 @@ const Login = () => {
                         label='Email Address'
                         placeholder='john@example.com'
                         type='email'
+                        required={true}
                     />
                     <Input
                         value={password}
                         onChange={({ target }) => setPassword(target.value)}
                         label='Password'
-                        placeholder='example@23'
+                        placeholder='Min 8 Characters'
                         type='password'
+                        required={true}
                     />
 
                     {error && <p className='text-red-500 text-xs pb-2-5'>{error}</p>}
