@@ -2,7 +2,7 @@ import react from 'react'
 import { Route, Routes } from 'react-router-dom'
 import PrivateRoute from './routes/PrivateRoute'
 import Login from './pages/Auth/Login'
-import SignUp from './pages/Auth/SignUp'
+import Register from './pages/Auth/Register'
 import Dashboard from './pages/Admin/Dashboard'
 import ManageTasks from './pages/Admin/ManageTasks'
 import CreateTasks from './pages/Admin/CreateTasks'
@@ -16,7 +16,7 @@ function App() {
     <>
       <Routes>
         <Route path='/login' element={<Login />} />
-        <Route path='/signup' element={<SignUp />} />
+        <Route path='/register' element={<Register />} />
 
         {/* Admin Routes */}
         <Route element={<PrivateRoute allowedRoles={['admin']} />} >
