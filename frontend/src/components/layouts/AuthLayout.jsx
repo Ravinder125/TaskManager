@@ -1,16 +1,18 @@
-import React, { useState } from 'react'
+import React from 'react';
 
 const AuthLayout = ({ children }) => {
     return (
-        <div className='min-h-screen h-screen w-full md:w-[60] p-4 xl:px-12 xl:pt-8 xl:pb-12' >
-            <h1 className='text-lg font-medium text-black'>Task Manager</h1>
-            <div className='flex justify-center  md:items-center md:h-[calc(100%-1.125rem)]'>
-                <div className='max-w-[600px] w-full '>
+        <div className="min-h-screen w-full p-4 xl:px-12 xl:pt-8 xl:pb-12 bg-gray-50">
+            <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+                Task Manager
+            </h1>
+            <div className="flex w-full justify-center items-center" style={{ height: 'calc(100% - 4rem)' }}>
+                <div className="max-w-md w-full">
                     {children}
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default AuthLayout
+export default AuthLayout;

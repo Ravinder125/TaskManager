@@ -31,7 +31,7 @@ const Login = () => {
     };
     return (
         <AuthLayout>
-            <div className='lg:w-[70%] h-3/4 w-full h-92 flex flex-col justify-center'>
+            <div className='flex  flex-col justify-center  p-6 rounded-md shadow-md '>
                 <h3 className='text-xl font-semibold text-black'>Welcome</h3>
                 <p className='text-xs text-slate-700 mt-2 mb-6'>
                     Please Enter your details to log in
@@ -40,33 +40,35 @@ const Login = () => {
                 <form onSubmit={handleLogin}>
                     <Input
                         value={email}
-                        onChange={({ target }) => setEmail(target.value)}
                         label='Email Address'
                         placeholder='john@example.com'
                         type='email'
                         required={true}
+                        onChange={({ target }) => setEmail(target.value)}
                     />
                     <Input
                         value={password}
-                        onChange={({ target }) => setPassword(target.value)}
                         label='Password'
                         placeholder='Min 8 Characters'
                         type='password'
                         required={true}
+                        onChange={({ target }) => setPassword(target.value)}
                     />
 
                     {error && <p className='text-red-500 text-xs pb-2-5'>{error}</p>}
+
+                    <p className='text-[13px] text-slate-800 mt-3 mb-3 ' >
+                        Don't have an account? {" "}
+                        <Link to='/register' className='font-medium text-primary underline ' >
+                            Register
+                        </Link>
+
+                    </p>
 
                     <button type="submit" className='btn-primary'>
                         LOGIn
                     </button>
 
-                    <p className='text-[13px] text-slate-800 mt-3'>
-                        Don't have an account? {" "}
-                        <Link to='/register' className='font-medium text-primary underline' >
-                            Register
-                        </Link>
-                    </p>
                 </form>
             </div>
         </AuthLayout>
