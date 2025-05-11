@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import AuthLayout from '../../components/layouts/AuthLayout'
 import Input from '../../components/layouts/Inputs/Input'
+import { validateEmail } from '../../utils/helper'
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -13,6 +14,20 @@ const Login = () => {
     // Handle login logic
     const handleLogin = (e) => {
         e.preventDefault();
+
+        if (!validateEmail(email)) {
+            setError("Please enter a valid email address");
+        }
+
+        if (!password || password > !password.length > 8) {
+            setError("Please ensure your password first");
+        }
+
+        setError("");
+
+        // Login API Call
+
+
     };
     return (
         <AuthLayout>
