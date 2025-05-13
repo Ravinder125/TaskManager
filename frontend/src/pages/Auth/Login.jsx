@@ -13,7 +13,7 @@ const Login = () => {
 
     const navigate = useNavigate()
 
-    const { } = useContext(UserContext);
+    const { updateUser } = useContext(UserContext);
 
     // Handle login logic
     const handleLogin = async (e) => {
