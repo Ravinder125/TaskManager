@@ -4,6 +4,7 @@ import { validateEmail } from '../../utils/helper';
 import { Link, useNavigate } from 'react-router-dom';
 import axiosPublicInstance from '../../utils/axiosPublicInstace';
 import { API_PATHS } from '../../utils/apiPaths';
+import { uploadImage } from '../../utils/uploadImag';
 
 const Register = () => {
     const [profilPic, setProfilPic] = useState(null);
@@ -35,7 +36,6 @@ const Register = () => {
 
         try {
             const formData = {
-                profileImage: profilPic,
                 fullName,
                 email,
                 password,
@@ -43,6 +43,9 @@ const Register = () => {
             }
 
             // Regiseration API logic
+            if (profilPic) {
+                const imageUploadRes = await uploadImage(profilPic)
+            }
             const response = await axiosPublicInstance.post(API_PATHS.AUTH.REGISTER, formData)
             console.log(response.data)
             navigate('/login')

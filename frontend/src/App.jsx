@@ -1,5 +1,5 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom'
+import React, { useContext } from 'react'
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import PrivateRoute from './routes/PrivateRoute'
 
 import Login from './pages/Auth/Login'
@@ -13,6 +13,7 @@ import ManageEmployees from './pages/Admin/ManageEmployees'
 import EmployeeDashboard from './pages/Employee/EmployeeDashboard'
 import Mytasks from './pages/Employee/MyTasks'
 import ViewTaskDetails from './pages/Employee/ViewTaskDetails'
+import { UserContext } from './context/userContext'
 
 function App() {
   return (
@@ -41,3 +42,15 @@ function App() {
 }
 
 export default App
+
+const Routee = () => {
+  const { user, loading } = useContext(UserContext);
+
+  if (loading) return <Outlet />
+
+  if (!user) {
+    return <Navigate to='/login' />
+  }
+
+  return user.role === 'admin' ? <Navigate to='/admin/dashboard' /> : <Navigate to='/user/dashboard' />;
+}
