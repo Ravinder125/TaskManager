@@ -1,7 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Input, AuthLayout } from '../../components/index';
 import { validateEmail } from '../../utils/helper'
+import axiosPublicInstance from '../../utils/axiosPublicInstace';
+import { API_PATHS } from '../../utils/apiPaths';
+import { UserContext } from '../../context/userContext';
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -10,23 +13,48 @@ const Login = () => {
 
     const navigate = useNavigate()
 
+    const { } = useContext(UserContext);
+
     // Handle login logic
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
 
         if (!validateEmail(email)) {
             setError("Please enter a valid email address");
-            console.log(error)
+            return;
         }
 
-        if (!password || !(password > password.length > 8)) {
+        if (!password || !(password.length >= 8)) {
             setError("Please ensure your password first");
+            return;
         }
 
-        // setError("");
+        setError("")
 
         // Login API Call
+        try {
+            const response = await axiosPublicInstance.post(
+                API_PATHS.AUTH.LOGIN,
+                { email, password }
+            );
 
+            // Redirect Based on role
+            const { role } = response.data;
+            updateUser(response.data);
+            console.log(response.data)
+
+            if (role === 'admin') {
+                navigate('/admin/dashboard')
+            } else {
+                navigate('/employee/dashboard')
+            }
+        } catch (error) {
+            if (error.response && error.response.data.message) {
+                setError(`Error: ${error.response.data.message}`)
+            } else {
+                setError('Something went wrong. Please try again')
+            }
+        }
 
     };
     return (
@@ -57,12 +85,11 @@ const Login = () => {
 
                     {error && <p className='text-red-500 text-xs pb-2-5'>{error}</p>}
 
-                    <p className='text-[13px] text-slate-800 mt-3 mb-3 ' >
+                    <p className='text-center text-xs text-gray-700 mt-3 mb-2'>
                         Don't have an account? {" "}
                         <Link to='/register' className='font-medium text-primary underline ' >
                             Register
                         </Link>
-
                     </p>
 
                     <button type="submit" className='btn-primary'>

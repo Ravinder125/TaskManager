@@ -48,7 +48,7 @@ router
     .put(isAuthenticated, updateUserProfile)
 
 router
-    .route('/profile-image')
+    .route('/upload-image')
     .patch(isAuthenticated, upload.single('profileImage'), updateUserProfileImage)
 
 

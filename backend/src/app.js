@@ -7,7 +7,7 @@ import cors from 'cors';
 const app = express();
 
 
-const whitelist = ['http://localhost:5173', 'http://localhost:4000', 'http://localhost:5000', 'https://01d2swjl-5173.inc1.devtunnels.ms/', 'https://01d2swjl-5173.inc1.devtunnels.ms', 'https://01d2swjl-5173.devtunnels.ms/', undefined];
+const whitelist = ['http://localhost:5173', 'http://localhost:4000', 'http://localhost:5000', 'https://01d2swjl-5173.inc1.devtunnels.ms/', 'https://01d2swjl-5173.inc1.devtunnels.ms', 'https://01d2swjl-5173.devtunnels.ms/'];
 const corsOptions = {
     origin: function (origin, callback) {
         if (whitelist.indexOf(origin) !== -1 || !origin) {

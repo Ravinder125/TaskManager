@@ -11,8 +11,6 @@ const generateToken = async (id) => {
         const accessToken = await user.generateAccessToken()
         const refreshToken = await user.generateRefreshToken()
 
-        console.log(refreshToken, accessToken)
-
         if (!accessToken || !refreshToken) throw new Error('Error while generating access or refreshToken token')
         user.refreshToken = refreshToken
         user.save({ validateBeforeSave: false })
@@ -36,12 +34,13 @@ const generateToken = async (id) => {
 const registerUser = asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors) {
-        return res.status(400).json(ApiResponse.error(400, errors.array(), 'Validation error'));
+        return res.status(400).json(ApiResponse.error(400, 'Validation error'));
     }
 
-    const { email, password, adminInviteToken } = req.body;
+    const { fullName, email, password, adminInviteToken } = req.body;
 
     const profileImageLocalPath = req.file?.path
+
     if (!profileImageLocalPath) {
         return res.status(400).json(ApiResponse.error(400, 'Profile Image is required'))
     }
@@ -60,6 +59,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const profileImage = await uploadOnCloudinary(profileImageLocalPath)
     const user = await User.create({
+        fullName,
         email,
         password,
         profileImageUrl: profileImage?.url,

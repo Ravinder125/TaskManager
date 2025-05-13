@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { AuthLayout, Input, ProfilePhotoSelector } from '../../components/index';
 import { validateEmail } from '../../utils/helper';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axiosPublicInstance from '../../utils/axiosPublicInstace';
+import { API_PATHS } from '../../utils/apiPaths';
 
 const Register = () => {
     const [profilPic, setProfilPic] = useState(null);
@@ -12,8 +14,9 @@ const Register = () => {
 
     const [error, setError] = useState(null);
 
+    const navigate = useNavigate()
 
-    const handleRegister = (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
 
         if (!fullName) {
@@ -30,14 +33,26 @@ const Register = () => {
         }
         setError("")
 
-        const formData = {
-            profilPic,
-            fullName,
-            email,
-            password,
-            adminInviteToken
+        try {
+            const formData = {
+                profileImage: profilPic,
+                fullName,
+                email,
+                password,
+                adminInviteToken
+            }
+
+            // Regiseration API logic
+            const response = await axiosPublicInstance.post(API_PATHS.AUTH.REGISTER, formData)
+            console.log(response.data)
+            navigate('/login')
+        } catch (error) {
+            if (error.response && error.response.data.message) {
+                setError(`Error: ${error.response.data.message}`)
+            } else {
+                setError('Something went wrong')
+            }
         }
-        console.log(formData)
     }
     return (
         <AuthLayout>
@@ -45,7 +60,7 @@ const Register = () => {
                 <h3 className='text-2xl text-black font-semibold text-center'>Create an Account</h3>
                 <p className='text-sm text-gray-600 mt-2 mb-6 text-center'>Join us today by entering your details below</p>
 
-                <form onSubmit={handleRegister} className='space-y-4'>
+                <form onSubmit={handleRegister}>
                     <ProfilePhotoSelector
                         setProfilPic={setProfilPic}
                     />
@@ -78,13 +93,13 @@ const Register = () => {
                         value={adminInviteToken}
                         placeholder='Admin invite token'
                         type='text'
-                        required={true}
+                        required={false}
                         onChange={({ target }) => setAdminInviteToken(target.value)}
                     />
 
-                    {error && <p className='text-red-500 text-sm text-center'>{error}</p>}
+                    {error && <p className='text-red-500 text-xs text-center'>{error}</p>}
 
-                    <p className='text-center text-sm text-gray-700 mt-3'>
+                    <p className='text-center text-xs text-gray-700 mt-3 mb-2'>
                         Already have an account?{' '}
                         <Link to='/login' className='font-medium text-blue-600 underline'>
                             Login here
