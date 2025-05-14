@@ -5,6 +5,9 @@ import { Task } from "../models/Task.model.js";
 import { validateObjectId } from "../utils/validateObjectId.js";
 
 
+// @desc    Get Admin Dashboard Data (Admin only)
+// @route   GET /api/v1/dashboard-data
+// @access  Admin 
 const getAdminDashboard = asyncHandler(async (req, res) => {
     // Stats
     const totalTasks = await Task.countDocuments({});
@@ -75,6 +78,9 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
     ));
 });
 
+// @desc    Get Employee Dashboard Data 
+// @route   GET /api/v1/user-dashboard-data
+// @access  Admin 
 const getUserDashboard = asyncHandler(async (req, res) => {
     const userId = req.user._id; // Only fetch employee data
     if (!validateObjectId(userId)) {

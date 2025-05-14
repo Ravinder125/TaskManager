@@ -39,12 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const { fullName, email, password, adminInviteToken } = req.body;
 
-    const profileImageLocalPath = req.file?.path
-
-    if (!profileImageLocalPath) {
-        return res.status(400).json(ApiResponse.error(400, 'Profile Image is required'))
-    }
-
+    console.log(fullName)
     let role = 'admin'
     if (
         adminInviteToken &&
@@ -52,21 +47,27 @@ const registerUser = asyncHandler(async (req, res) => {
     ) {
         role = 'employee'
     }
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    const userExist = await User.findOne({ email });
+    if (userExist) {
         return res.status(400).json(ApiResponse.error(400, 'User already exists'))
     }
 
-    const profileImage = await uploadOnCloudinary(profileImageLocalPath)
     const user = await User.create({
-        fullName,
+        fullName: {
+            firstName: fullName.split(' ')[0],
+            lastName: fullName.split(' ')[1]
+        },
         email,
         password,
-        profileImageUrl: profileImage?.url,
         role: role,
     })
+    const { accessToken, refreshToken, options } = await generateToken(user._id)
 
-    return res.status(201).json(ApiResponse.success(201, user, 'User successfully created'))
+    return res
+        .status(201)
+        .cookie('accessToken', accessToken, options)
+        .cookie('refreshToken', refreshToken, options)
+        .json(ApiResponse.success(201, user, 'User successfully created'))
 })
 
 // @desc    Login a user
@@ -197,6 +198,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 const updateUserProfileImage = asyncHandler(async (req, res) => {
     const userId = req.user._id;
     const profileImageLocalPath = req.file?.path;
+
     if (!profileImageLocalPath) {
         return res.status(400).json(ApiResponse.error(400, 'Profile Image is requird'));
     }
@@ -204,11 +206,14 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
     if (!profileImage?.url) {
         return res.status(400).json(ApiResponse.error(500, 'Error while uploading image. Please try again'))
     }
+
+    console.log(profileImage.url)
     const user = await User.findByIdAndUpdate(
         userId,
         { profileImageUrl: profileImage.url },
         { new: true }
     ).select('-password -refreshToken');
+    console.log(user.profileImageUrl)
     return res.status(200).json(ApiResponse.success(200, user, 'User profile image successfully updated'));
 })
 

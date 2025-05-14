@@ -1,16 +1,16 @@
-import { API_PATHS, BASE_URL } from "./apiPaths";
+import { API_PATHS } from "./apiPaths";
 import axiosInstance from "./axiosInstance";
 
 export const uploadImage = async (imageFile) => {
     const formData = new FormData();
     // Append image file to form data
-    formData.append('Profileimage', imageFile)
+    formData.append('profileImage', imageFile)
 
     try {
-        const response = await axiosInstance.post(API_PATHS.IMAGE.UPLOAD_IMAGE, formData, {
+        const response = await axiosInstance.patch(API_PATHS.IMAGE.UPLOAD_IMAGE, formData, {
             headers: {
-                'Content-Type': 'multipart/form-data', // Set header for file upload
-            },
+                'Content-Type': 'multipart/form-data'
+            }
         });
         return response.data
     } catch (error) {

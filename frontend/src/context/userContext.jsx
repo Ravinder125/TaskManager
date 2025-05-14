@@ -15,8 +15,8 @@ const UserProvider = ({ children }) => {
 
         const fetchUser = async () => {
             try {
-                const { data } = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE);
-                if (isMounted) setUser(data);
+                const { data } = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE, { withCredentials: true });
+                if (isMounted) setUser(data.data);
             } catch (err) {
                 if (isMounted) {
                     setError(err);

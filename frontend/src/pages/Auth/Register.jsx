@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import { AuthLayout, Input, ProfilePhotoSelector } from '../../components/index';
 import { validateEmail } from '../../utils/helper';
 import { Link, useNavigate } from 'react-router-dom';
-import axiosPublicInstance from '../../utils/axiosPublicInstace';
 import { API_PATHS } from '../../utils/apiPaths';
 import { uploadImage } from '../../utils/uploadImag';
+import axiosInstance from '../../utils/axiosInstance';
 
 const Register = () => {
     const [profilPic, setProfilPic] = useState(null);
@@ -43,10 +43,12 @@ const Register = () => {
             }
 
             // Regiseration API logic
+            const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, formData);
             if (profilPic) {
-                const imageUploadRes = await uploadImage(profilPic)
+                console.log(profilPic)
+                const imageUploadRes = await uploadImage(profilPic);
+                console.log(imageUploadRes)
             }
-            const response = await axiosPublicInstance.post(API_PATHS.AUTH.REGISTER, formData)
             console.log(response.data)
             navigate('/login')
         } catch (error) {

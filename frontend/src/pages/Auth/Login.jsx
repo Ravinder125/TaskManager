@@ -2,9 +2,9 @@ import React, { useState, useContext } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Input, AuthLayout } from '../../components/index';
 import { validateEmail } from '../../utils/helper'
-import axiosPublicInstance from '../../utils/axiosPublicInstace';
 import { API_PATHS } from '../../utils/apiPaths';
 import { UserContext } from '../../context/userContext';
+import axiosInstance from '../../utils/axiosInstance';
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -33,7 +33,7 @@ const Login = () => {
 
         // Login API Call
         try {
-            const response = await axiosPublicInstance.post(
+            const response = await axiosInstance.post(
                 API_PATHS.AUTH.LOGIN,
                 { email, password }
             );

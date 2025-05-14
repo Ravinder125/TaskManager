@@ -11,11 +11,12 @@ const ProfilePhotoSelector = ({ setProfilPic }) => {
         if (file) {
             // Update the image state
             setImage(file);
+            setProfilPic(file);
+            console.log(file)
 
             // Generate preview URL from the file
             const preview = URL.createObjectURL(file);
             setPreviewUrl(preview);
-            setProfilPic(file)
         };
     };
 

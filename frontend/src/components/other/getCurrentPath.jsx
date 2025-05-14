@@ -1,17 +1,16 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { setCurrentPath } from '../../utils/routerTracker';
 
 
-const getCurrentPath = () => {
+const GetCurrentPath = () => {
     const location = useLocation();
 
     useEffect(() => {
         setCurrentPath(location.pathname)
-    }, [location.pathname])
-    // return (
+    }, [location.pathname]);
 
-    // )
+    return null;
 }
 
-export default getCurrentPath
+export default GetCurrentPath

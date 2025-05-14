@@ -11,7 +11,7 @@ const userSchema = new Schema(
         email: { type: String, required: true, match: [/^\S+@\S+\.\S+$/, 'Please use a valid email address'], unique: true, trim: true, lowercase: true, index: true },
         password: { type: String, required: true, trim: true, minlength: [8, "Password must be at least 8 characters long"], select: false },
         refreshToken: { type: String, trim: true, select: false },
-        profileImageUrl: { type: String, trim: true, required: true },
+        profileImageUrl: { type: String, trim: true, },
         // admin: { type: Schema.Types.ObjectId, ref: 'Admin', required: true },
         role: { type: String, enum: ['admin', 'employee'], default: 'employee' },
     }, { timestamps: true });

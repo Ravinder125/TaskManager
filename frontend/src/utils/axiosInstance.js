@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { BASE_URL } from './apiPaths';
-import getCurrentPath from '../components/other/getCurrentPath';
+
+// Utility function to get the current path
+const getCurrentPath = () => window.location.pathname;
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
@@ -29,13 +31,12 @@ axiosInstance.interceptors.response.use(
         return response;
     },
     (error) => {
-        // Handle common errors globally
         if (error.response) {
-            if (error.response.status === 401) {
-                const currentPath = getCurrentPath();
-                const isOnAuthPage = ['/login', '/register']
-                if (isOnAuthPage.includes(currentPath)) return;
-
+            const currentPath = getCurrentPath();
+            console.log(currentPath)
+            const AuthPage = ['/login', '/register']
+            console.log(AuthPage)
+            if (error.response.status === 401 && !AuthPage.includes(currentPath)) {
                 // Redirected to login page
                 window.location.href = '/login';
             } else if (error.response.status === 500) {
@@ -47,6 +48,8 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(error);
     }
 )
+
+
 
 
 export default axiosInstance;
