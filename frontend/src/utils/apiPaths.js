@@ -5,6 +5,7 @@ const API_PATHS = {
     AUTH: {
         REGISTER: "/api/v1/auth/register", // Register a new user (Admin or Employee)
         LOGIN: "/api/v1/auth/login", // Authenticate user & return JWT token
+        LOGOUT: '/api/v1/auth/logout', // Logout a user 
         GET_PROFILE: "/api/v1/auth/profile", // Get logged-in user details
     },
 
@@ -28,8 +29,8 @@ const API_PATHS = {
     },
 
     DASHBOARD: {
-        GET_DASHBOARD_DATA: "/api/v1/dashboard/dashboard-data/", // Get Dashboard Data (Admin only)
-        GET_USER_DASHBOARD_DATA: "/api/v1/dashboard/dashboard-data/", // Get User Dashboard Data 
+        GET_DASHBOARD_DATA: "/api/v1/dashboard/user-data/", // Get Dashboard Data (Admin only)
+        GET_USER_DASHBOARD_DATA: "/api/v1/dashboard/admin-data/", // Get User Dashboard Data 
     },
 
     REPORT: {
@@ -48,4 +49,3 @@ export {
     BASE_URL,
     API_PATHS
 }
-seconds: 7, 140

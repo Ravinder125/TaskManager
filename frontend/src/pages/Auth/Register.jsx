@@ -44,12 +44,12 @@ const Register = () => {
 
             // Regiseration API logic
             const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, formData);
-            if (profilPic) {
-                console.log(profilPic)
+            console.log(response.data.message)
+            if (profilPic && response) {
                 const imageUploadRes = await uploadImage(profilPic);
-                console.log(imageUploadRes)
+                console.log(imageUploadRes.message)
             }
-            console.log(response.data)
+            // Redirect to login page after successfull registeration
             navigate('/login')
         } catch (error) {
             if (error.response && error.response.data.message) {
@@ -96,7 +96,7 @@ const Register = () => {
                     <Input
                         label='Admin Invite Token'
                         value={adminInviteToken}
-                        placeholder='Admin invite token'
+                        placeholder='6 digit token'
                         type='text'
                         required={false}
                         onChange={({ target }) => setAdminInviteToken(target.value)}

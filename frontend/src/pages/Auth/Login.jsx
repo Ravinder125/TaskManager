@@ -39,9 +39,10 @@ const Login = () => {
             );
 
             // Redirect Based on role
-            const { role } = response.data;
-            updateUser(response.data);
-            console.log(response.data)
+            const { role, message, data } = response.data;
+
+            updateUser(data);
+            console.log(message);
 
             if (role === 'admin') {
                 navigate('/admin/dashboard')
