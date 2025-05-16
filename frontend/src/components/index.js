@@ -4,7 +4,7 @@ import ProfilePhotoSelector from "./layouts/Inputs/ProfilePhotoSelector";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Navbar from "./layouts/Navbar";
 import SideMenu from "./layouts/SideMenu";
-
+import TaskListTable from './layouts/TaskListTable'
 
 
 export {
@@ -14,4 +14,5 @@ export {
     DashboardLayout,
     Navbar,
     SideMenu,
+    TaskListTable
 }

@@ -67,7 +67,7 @@ const registerUser = asyncHandler(async (req, res) => {
         .status(201)
         .cookie('accessToken', accessToken, options)
         .cookie('refreshToken', refreshToken, options)
-        .json(ApiResponse.success(201, user, 'User successfully created'))
+        .json(ApiResponse.success(201, user, `${user.role} successfully created`))
 })
 
 // @desc    Login a user
@@ -80,7 +80,8 @@ const loginUser = asyncHandler(async (req, res) => {
     }
     const { email, password } = req.body;
     const userExist = await User.findOne({ email }).select('+password');
-    if (!userExist || !userExist.isPasswordCorrect(password)) {
+
+    if (!userExist || !(await userExist.isPasswordCorrect(password))) {
         return res.status(401).json(ApiResponse.error(401, 'Email or password is invalid'));
     }
     const { accessToken, refreshToken, options } = await generateToken(userExist._id)
@@ -98,7 +99,7 @@ const loginUser = asyncHandler(async (req, res) => {
                     profileImageUrl: userExist.profileImageUrl,
                     role: userExist.role,
                 },
-                'User successfully logined in'))
+                `${userExist.role} successfully logged in`))
 })
 
 // @desc    Logout a user

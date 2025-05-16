@@ -7,12 +7,15 @@ const PrivateRoute = ({ allowedRoles }) => {
 
     if (loading) return null
 
-    if (!user || !allowedRoles.includes(user.role)) {
-        <Navigate to='/login' />
-        return;
+    console.log(user.role, allowedRoles)
+    console.log(allowedRoles.includes(user.role))
+    if (!user || !(allowedRoles.includes(user.role))) {
+        { console.log(<Outlet />) }
+        return <Navigate to='/login' />
+    } else {
+        return <Outlet />;
     }
 
-    return <Outlet />
 }
 
 export default PrivateRoute

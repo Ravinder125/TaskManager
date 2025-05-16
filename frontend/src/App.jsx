@@ -4,6 +4,7 @@ import PrivateRoute from './routes/PrivateRoute'
 
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
+import Logout from './pages/Auth/Logout'
 
 import Dashboard from './pages/Admin/Dashboard'
 import ManageTasks from './pages/Admin/ManageTasks'
@@ -23,19 +24,21 @@ function App() {
       <Route path='/register' element={<Register />} />
 
       {/* Admin Routes */}
-      <Route element={<PrivateRoute allowedRoles={['admin']} />} >
+      <Route element={<PrivateRoute allowedRoles={'admin'} />} >
         <Route path='/admin/dashboard' element={<Dashboard />} />
         <Route path='/admin/tasks' element={<ManageTasks />} />
         <Route path='/admin/create-task' element={<CreateTasks />} />
         <Route path='/admin/employees' element={<ManageEmployees />} />
+        <Route path='/logout' element={<Logout />} />
       </Route>
 
       {/* Employee Routes */}
-      <Route element={<PrivateRoute allowedRoles={['employee']} />} >
+      <Route element={<PrivateRoute allowedRoles={'employee'} />} >
         <Route path='/employee/dashboard' element={<EmployeeDashboard />} />
         <Route path='/employee/tasks' element={<Mytasks />} />
         {/* <Route path='/employee/profile' element={<ManageEmployees />} /> */}
         <Route path='/employee/task-details/:id' element={<ViewTaskDetails />} />
+        <Route path='/logout' element={<Logout />} />
       </Route>
     </Routes>
   )

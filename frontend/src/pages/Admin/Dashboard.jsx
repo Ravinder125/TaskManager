@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { DashboardLayout } from '../../components/index';
+import { DashboardLayout, TaskListTable } from '../../components/index';
 import { UserContext } from '../../context/userContext';
 import useUserAuth from '../../hooks/useUserAuth';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,8 @@ import { API_PATHS } from '../../utils/apiPaths';
 import moment from 'moment'
 import { addThousandsSeprator } from '../../utils/helper';
 import InfoCard from '../../components/Cards/InfoCard';
+import { LuArrowRight } from 'react-icons/lu';
+import Loading from '../Auth/Loading';
 
 function Dashboard() {
     useUserAuth();
@@ -20,8 +22,15 @@ function Dashboard() {
     const [pieChartData, setPieChartData] = useState([]);
     const [barChartData, setBarChartData] = useState([]);
 
+    const [loading, setLoading] = useState(false);
+
+    const onSeeMore = () => {
+        navigate('/admin/tasks')
+    }
     const getDashboarData = async () => {
         try {
+            setLoading(true);
+
             const response = await axiosInstance.get(
                 API_PATHS.DASHBOARD.GET_DASHBOARD_DATA,
                 { withCredentials: true }
@@ -32,25 +41,32 @@ function Dashboard() {
             }
         } catch (error) {
             console.error('Error fetching dashboard data:', error)
+        } finally {
+            setLoading(false)
         }
     }
 
     useEffect(() => {
         getDashboarData();
     }, [])
+
+    if (loading) return <Loading />
     return (
-        <DashboardLayout activeMenu='Dashboard'>
+        <DashboardLayout activeMenu='Dashboar'>
             <div className='card my-5'>
-                <div>
+                < div >
                     <div className=''>
-                        <h2 className='text-xl md:text-2xl'>Good Morning! {user?.fullName}</h2>
+                        <h2 className='text-xl leading-4 mb-3 md:text-2xl '>Good Morning!
+                            {`${user?.fullName.firstName.charAt(0).toUpperCase()}${user?.fullName.firstName.slice(1, user?.fullName.firstName.length)}
+                                 ${user?.fullName.lastName}`}
+                        </h2>
                         <p className='text-xs md:text-[13px] text-gray-400 mt-1.5'>
                             {moment().format('dddd Do MMM YYYY')}
                         </p>
                     </div>
-                </div>
+                </div >
 
-                {dashboardData && dashboardData.charts && dashboardData.charts.taskDistribution ? (
+                {dashboardData && dashboardData.charts && dashboardData.charts.taskDistribution && (
                     <div className='grid grid-cols-2 sm:grid-cols-2  gap-3 md:gap-6 mt-5'>
                         <InfoCard
                             label='Total Tasks'
@@ -81,13 +97,24 @@ function Dashboard() {
                             color='bg-cyan-500'
                         />
                     </div>
-                ) : (
-                    <div className='grid grid-cols-2 sm:grid-cols-5 md:grid-cols-4 gap-3 md:gap-6 mt-5'>
-                        <p className='col-span-4 text-center text-gray-400'>Loading...</p>
-                    </div>
                 )}
+
             </div>
-        </DashboardLayout>
+            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-3 my-4 md:m-6'>
+                <div className='md:col-span-2'>
+                    <div className='card '>
+                        <div className='flex items-center justify-between'>
+                            <h5 className='text-lg font-medium'>Recent Tasks</h5>
+
+                            <button className='card-btn' onClick={onSeeMore}>
+                                See All <LuArrowRight className='text-base' />
+                            </button>
+                        </div>
+                        <TaskListTable tableData={dashboardData?.recentTasks || []} />
+                    </div>
+                </div>
+            </div >
+        </DashboardLayout >
     )
 }
 

@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { API_PATHS } from '../../utils/apiPaths';
 import { uploadImage } from '../../utils/uploadImag';
 import axiosInstance from '../../utils/axiosInstance';
+import Loading from './Loading';
 
 const Register = () => {
     const [profilPic, setProfilPic] = useState(null);
@@ -12,6 +13,7 @@ const Register = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [adminInviteToken, setAdminInviteToken] = useState('');
+    const [loading, setLoading] = useState(false)
 
     const [error, setError] = useState(null);
 
@@ -22,16 +24,19 @@ const Register = () => {
 
         if (!fullName) {
             setError('Please enter your full name')
-            return;
         }
         if (!password || password.length < 8) {
-            setError('Please enter valid email')
-            return;
+            setError('Please ensure password')
         }
         if (!validateEmail(email)) {
             setError('Please enter valid email')
-            return;
         }
+
+        if (!profilPic) {
+            setError('Profile image is required')
+        }
+
+        if (error) return;
         setError("")
 
         try {
@@ -41,7 +46,7 @@ const Register = () => {
                 password,
                 adminInviteToken
             }
-
+            setLoading(true)
             // Regiseration API logic
             const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, formData);
             console.log(response.data.message)
@@ -57,51 +62,57 @@ const Register = () => {
             } else {
                 setError('Something went wrong')
             }
+        } finally {
+            setLoading(false)
         }
     }
+    if (loading) return <Loading />
     return (
         <AuthLayout>
             <div className='mt-6 mx-auto bg-white p-6 rounded-lg shadow-md'>
                 <h3 className='text-2xl text-black font-semibold text-center'>Create an Account</h3>
                 <p className='text-sm text-gray-600 mt-2 mb-6 text-center'>Join us today by entering your details below</p>
 
-                <form onSubmit={handleRegister}>
+                <form onSubmit={handleRegister} >
                     <ProfilePhotoSelector
                         setProfilPic={setProfilPic}
                     />
-                    <Input
-                        label='Full Name'
-                        value={fullName}
-                        placeholder='John Snow'
-                        type='text'
-                        required={true}
-                        onChange={({ target }) => setFullName(target.value)}
-                    />
-                    <Input
-                        label='Email'
-                        value={email}
-                        placeholder='john@gmail.com'
-                        type='email'
-                        required={true}
-                        onChange={({ target }) => setEmail(target.value)}
-                    />
-                    <Input
-                        label='Password'
-                        value={password}
-                        placeholder='Min 8 characters'
-                        type='password'
-                        required={true}
-                        onChange={({ target }) => setPassword(target.value)}
-                    />
-                    <Input
-                        label='Admin Invite Token'
-                        value={adminInviteToken}
-                        placeholder='6 digit token'
-                        type='text'
-                        required={false}
-                        onChange={({ target }) => setAdminInviteToken(target.value)}
-                    />
+                    <div className='grid md:grid-cols-2 grid-cols-1 gap-2 '>
 
+                        <Input
+                            label='Full Name'
+                            value={fullName}
+                            placeholder='John Snow'
+                            type='text'
+                            required={true}
+                            onChange={({ target }) => setFullName(target.value)}
+                        />
+                        <Input
+                            label='Email'
+                            value={email}
+                            placeholder='john@gmail.com'
+                            type='email'
+                            required={true}
+                            onChange={({ target }) => setEmail(target.value)}
+                        />
+                        <Input
+                            label='Password'
+                            value={password}
+                            placeholder='Min 8 characters'
+                            type='password'
+                            required={true}
+                            onChange={({ target }) => setPassword(target.value)}
+                        />
+                        <Input
+                            label='Admin Invite Token'
+                            value={adminInviteToken}
+                            placeholder='6 digit token'
+                            type='text'
+                            required={false}
+                            onChange={({ target }) => setAdminInviteToken(target.value)}
+                        />
+
+                    </div>
                     {error && <p className='text-red-500 text-xs text-center'>{error}</p>}
 
                     <p className='text-center text-xs text-gray-700 mt-3 mb-2'>

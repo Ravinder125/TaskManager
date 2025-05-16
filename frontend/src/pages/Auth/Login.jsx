@@ -5,12 +5,13 @@ import { validateEmail } from '../../utils/helper'
 import { API_PATHS } from '../../utils/apiPaths';
 import { UserContext } from '../../context/userContext';
 import axiosInstance from '../../utils/axiosInstance';
+import Loading from './Loading';
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate()
 
     const { updateUser } = useContext(UserContext);
@@ -33,18 +34,19 @@ const Login = () => {
 
         // Login API Call
         try {
+            setLoading(true)
+
             const response = await axiosInstance.post(
                 API_PATHS.AUTH.LOGIN,
                 { email, password }
             );
 
-            // Redirect Based on role
-            const { role, message, data } = response.data;
-
+            const { message, data } = response.data;
             updateUser(data);
-            console.log(message);
+            console.log(message || 'User successfully logged in');
 
-            if (role === 'admin') {
+            // Redirect Based on role
+            if (data.role === 'admin') {
                 navigate('/admin/dashboard')
             } else {
                 navigate('/employee/dashboard')
@@ -54,10 +56,15 @@ const Login = () => {
                 setError(`Error: ${error.response.data.message}`)
             } else {
                 setError('Something went wrong. Please try again')
+                console.error('Error:', error)
             }
+        } finally {
+            setLoading(false)
         }
 
     };
+
+    if (loading) return <Loading />
     return (
         <AuthLayout>
             <div className='flex  flex-col justify-center  p-6 rounded-md shadow-md '>

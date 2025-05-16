@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { SIDE_MENU_DATA, SIDE_MENU_EMPLOYEE_DATA, } from '../../utils/data';
+import { LuUser } from 'react-icons/lu';
 
 const SideMenu = ({ activeMenu }) => {
     const { user, clearUser } = useContext(UserContext);
@@ -43,12 +44,16 @@ const SideMenu = ({ activeMenu }) => {
     return (
         <div className='w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-200/50 sticky top-[61px] z-20'>
             <div className='flex flex-col items-center justify-center mb-7 pt-5'>
-                <div className='relative'>
-                    <img
-                        src={user?.profileImageUrl || ''}
-                        alt="Profile Image"
-                        className='w-20 h-20 bg-slate-400 rounded-full object-cover'
-                    />
+                <div className='relative '>
+                    {user?.profilImageUrl ?
+                        <img
+                            src={user?.profileImageUrl}
+                            alt="Profile Image"
+                            className='w-20 h-20 bg-slate-400 rounded-full object-cover'
+                        /> :
+                        <LuUser className='text-4xl text-primary rounded-full w-20 h-20  border-2' />
+
+                    }
                 </div>
 
                 {user?.role === 'admin' && (
@@ -58,7 +63,8 @@ const SideMenu = ({ activeMenu }) => {
                 )}
 
                 <h5 className='text-gray-950 font-medium leading-6 mt-3'>
-                    {user?.fullName || ''}
+                    {`${user?.fullName.firstName.charAt(0).toUpperCase()}${user?.fullName.firstName.slice(1, user?.fullName.firstName.length)}
+                     ${user?.fullName.lastName}`}
                 </h5>
 
                 <p className='text-[12px] text-gray-500 mb-8'>{user?.email || ''}</p>

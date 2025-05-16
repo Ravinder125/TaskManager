@@ -1,0 +1,28 @@
+import React, { useEffect } from 'react'
+import axiosInstance from '../../utils/axiosInstance'
+import { API_PATHS } from '../../utils/apiPaths'
+import { useNavigate } from 'react-router-dom'
+
+const Logout = () => {
+    const navigate = useNavigate();
+    useEffect(() => {
+        const handleLogout = async () => {
+            try {
+                const response = await axiosInstance.get(
+                    API_PATHS.AUTH.LOGOUT, { withCredentials: true }
+                );
+
+                console.log(response.data.message)
+                navigate('/login')
+            } catch (error) {
+                console.error('Error logout the user:', error)
+            }
+        }
+        handleLogout();
+    }, [])
+    return (
+        <div>Loading</div>
+    )
+}
+
+export default Logout
