@@ -3,18 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/userContext";
 
 const useUserAuth = () => {
-    const { user, loading, clearUser } = useContext(UserContext);
+    const { isAuthenticated, loading, clearUser } = useContext(UserContext);
     const navigate = useNavigate();
 
     useEffect(() => {
         if (loading) return;
-        if (user) return;
+        if (isAuthenticated) return;
 
-        if (!user) {
+        if (!isAuthenticated) {
             clearUser();
             navigate('/login');
         }
-    }, [user, loading, clearUser, navigate]);
+    }, [isAuthenticated, loading, clearUser, navigate]);
 };
 
 export default useUserAuth;

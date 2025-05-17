@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react'
 import { DashboardLayout, TaskListTable } from '../../components/index';
 import { UserContext } from '../../context/userContext';
 import useUserAuth from '../../hooks/useUserAuth';
-import { useNavigate } from 'react-router-dom';
+import { data, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import moment from 'moment'
@@ -10,6 +10,9 @@ import { addThousandsSeprator } from '../../utils/helper';
 import InfoCard from '../../components/Cards/InfoCard';
 import { LuArrowRight } from 'react-icons/lu';
 import Loading from '../Auth/Loading';
+import { CustomPieChart } from '../../components/index';
+
+const COLORS = ['#8051FF', '#00B8DB', '#7BCE00']
 
 function Dashboard() {
     useUserAuth();
@@ -24,9 +27,33 @@ function Dashboard() {
 
     const [loading, setLoading] = useState(false);
 
+    const prepareChartData = (data) => {
+        const taskDistribution = data?.taskDistribution || null;
+        const taskPriorityLevels = data?.taskPriorityLevels || null;
+
+        const DistributionData = [
+            { status: 'Pending', count: taskDistribution?.pending || 0 },
+            { status: 'In Progress', count: taskDistribution?.inProgress || 0 },
+            { status: 'Completed', count: taskDistribution?.completed || 0 },
+        ]
+
+        setPieChartData(DistributionData);
+
+        const PriorityLevelData = [
+            { priority: 'Low', count: taskPriorityLevels?.low || 0 },
+            { priority: 'Medium', count: taskPriorityLevels?.medium || 0 },
+            { priority: 'High', count: taskPriorityLevels?.high || 0 }
+        ]
+
+        setBarChartData(PriorityLevelData)
+    }
+
+
+
     const onSeeMore = () => {
         navigate('/admin/tasks')
     }
+
     const getDashboarData = async () => {
         try {
             setLoading(true);
@@ -37,7 +64,8 @@ function Dashboard() {
             );
             if (response.data) {
                 setDashboardData(response.data.data);
-                console.log('dashboard data:', response.data.data)
+                console.log(response.data.data.charts)
+                prepareChartData(response.data.data?.charts || null)
             }
         } catch (error) {
             console.error('Error fetching dashboard data:', error)
@@ -52,7 +80,7 @@ function Dashboard() {
 
     if (loading) return <Loading />
     return (
-        <DashboardLayout activeMenu='Dashboar'>
+        <DashboardLayout activeMenu='Dashboard'>
             <div className='card my-5'>
                 < div >
                     <div className=''>
@@ -65,6 +93,8 @@ function Dashboard() {
                         </p>
                     </div>
                 </div >
+
+
 
                 {dashboardData && dashboardData.charts && dashboardData.charts.taskDistribution && (
                     <div className='grid grid-cols-2 sm:grid-cols-2  gap-3 md:gap-6 mt-5'>
@@ -87,20 +117,33 @@ function Dashboard() {
                             value={addThousandsSeprator(
                                 dashboardData.charts.taskDistribution.inProgress || 0
                             )}
-                            color='bg-lime-500'
+                            color='bg-cyan-500'
                         />
                         <InfoCard
                             label='Complete Tasks'
                             value={addThousandsSeprator(
                                 dashboardData.charts.taskDistribution.completed || 0
                             )}
-                            color='bg-cyan-500'
+                            color='bg-lime-500'
                         />
                     </div>
                 )}
 
             </div>
-            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-3 my-4 md:m-6'>
+            <div className='grid grid-cols-1  md:grid-cols-2 gap-3 my-4  '>
+                <div >
+                    <div className='card h-auto '>
+                        <div className='flex items-center justify-bewteen mb-2'>
+                            <h5 className='font-medium'>Task Distribution</h5>
+                        </div>
+
+                        <CustomPieChart
+                            data={pieChartData}
+                            label='Total Balance'
+                            colors={COLORS}
+                        />
+                    </div>
+                </div>
                 <div className='md:col-span-2'>
                     <div className='card '>
                         <div className='flex items-center justify-between'>

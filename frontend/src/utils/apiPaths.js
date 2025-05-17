@@ -29,8 +29,8 @@ const API_PATHS = {
     },
 
     DASHBOARD: {
-        GET_DASHBOARD_DATA: "/api/v1/dashboard/user-data/", // Get Dashboard Data (Admin only)
-        GET_USER_DASHBOARD_DATA: "/api/v1/dashboard/admin-data/", // Get User Dashboard Data 
+        GET_DASHBOARD_DATA: "/api/v1/dashboard/admin-data/", // Get Dashboard Data (Admin only)
+        GET_USER_DASHBOARD_DATA: "/api/v1/dashboard/user-data/", // Get User Dashboard Data 
     },
 
     REPORT: {
@@ -44,6 +44,8 @@ const API_PATHS = {
 
 }
 
+
+Object.freeze(API_PATHS);
 
 export {
     BASE_URL,

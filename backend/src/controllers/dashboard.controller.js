@@ -10,10 +10,15 @@ import { validateObjectId } from "../utils/validateObjectId.js";
 // @access  Admin 
 const getAdminDashboard = asyncHandler(async (req, res) => {
     // Stats
-    const totalTasks = await Task.countDocuments({});
-    const pendingTasks = await Task.countDocuments({ status: 'pending' });
-    const inProgressTasks = await Task.countDocuments({ status: 'in-progress' });
-    const completedTasks = await Task.countDocuments({ status: 'completed' });
+
+    const filter = {
+        createdBy: req.user._id,
+        isDeleted: false
+    }
+    const totalTasks = await Task.countDocuments(filter);
+    const pendingTasks = await Task.countDocuments({ status: 'pending', ...filter });
+    const inProgressTasks = await Task.countDocuments({ status: 'in-progress', ...filter });
+    const completedTasks = await Task.countDocuments({ status: 'completed', ...filter });
 
     const overDueTasks = await Task.countDocuments({
         dueTo: { $lt: new Date() },
@@ -38,7 +43,7 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
         return acc;
     }, {});
 
-    taskDistribution["All"] = totalTasks;
+    taskDistribution["all"] = totalTasks;
 
     // Task priority distribution
     const taskPriorities = ['low', 'medium', 'high'];
