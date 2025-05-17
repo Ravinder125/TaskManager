@@ -1,8 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { DashboardLayout, TaskListTable } from '../../components/index';
 import { UserContext } from '../../context/userContext';
 import useUserAuth from '../../hooks/useUserAuth';
-import { data, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import moment from 'moment'
@@ -10,7 +9,12 @@ import { addThousandsSeprator } from '../../utils/helper';
 import InfoCard from '../../components/Cards/InfoCard';
 import { LuArrowRight } from 'react-icons/lu';
 import Loading from '../Auth/Loading';
-import { CustomPieChart } from '../../components/index';
+import {
+    DashboardLayout,
+    TaskListTable,
+    CustomPieChart,
+    CustomBarChart
+} from '../../components/index';
 
 const COLORS = ['#8051FF', '#00B8DB', '#7BCE00']
 
@@ -132,7 +136,7 @@ function Dashboard() {
             </div>
             <div className='grid grid-cols-1  md:grid-cols-2 gap-3 my-4  '>
                 <div >
-                    <div className='card h-auto '>
+                    <div className='card '>
                         <div className='flex items-center justify-bewteen mb-2'>
                             <h5 className='font-medium'>Task Distribution</h5>
                         </div>
@@ -144,6 +148,17 @@ function Dashboard() {
                         />
                     </div>
                 </div>
+
+                <div>
+                    <div className='card'>
+                        <div className='flex items-center justify-beween mb-2'>
+                            <h5 className='font-medium'>Task Priority Levels</h5>
+                        </div>
+
+                        <CustomBarChart data={barChartData} c />
+                    </div>
+                </div>
+
                 <div className='md:col-span-2'>
                     <div className='card '>
                         <div className='flex items-center justify-between'>

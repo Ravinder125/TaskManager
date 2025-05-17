@@ -6,8 +6,9 @@ import Navbar from "./layouts/Navbar";
 import SideMenu from "./layouts/SideMenu";
 import TaskListTable from './layouts/TaskListTable';
 import CustomPieChart from "./Charts/CustomPieChart";
-import CustomTooltip from "./Charts/CustomTooltip";
 import CustomLegend from "./Charts/CustomLegend";
+import CustomBarChart from "./Charts/CustomBarChart";
+import { CustomBarTooltip, CustomPieTooltip } from "./Charts/CustomTooltip";
 
 export {
     AuthLayout,
@@ -18,6 +19,8 @@ export {
     SideMenu,
     TaskListTable,
     CustomPieChart,
-    CustomTooltip,
+    CustomPieTooltip,
     CustomLegend,
+    CustomBarChart,
+    CustomBarTooltip,
 }
