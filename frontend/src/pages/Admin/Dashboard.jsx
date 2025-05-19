@@ -8,12 +8,12 @@ import moment from 'moment'
 import { addThousandsSeprator } from '../../utils/helper';
 import InfoCard from '../../components/Cards/InfoCard';
 import { LuArrowRight } from 'react-icons/lu';
-import Loading from '../Auth/Loading';
 import {
     DashboardLayout,
     TaskListTable,
     CustomPieChart,
-    CustomBarChart
+    CustomBarChart,
+    Loading
 } from '../../components/index';
 
 const COLORS = ['#8051FF', '#00B8DB', '#7BCE00']

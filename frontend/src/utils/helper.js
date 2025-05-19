@@ -15,7 +15,16 @@ const addThousandsSeprator = (num) => {
 
 };
 
+const formatName = (name) => {
+    if (!name || !name.firstName || !name.lastName) return '';
+    const firstName =
+        name.firstName.charAt(0).toUpperCase() +
+        name.firstName.slice(1);
+    return `${firstName} ${name.lastName}`;
+}
+
 export {
     validateEmail,
     addThousandsSeprator,
+    formatName
 } 

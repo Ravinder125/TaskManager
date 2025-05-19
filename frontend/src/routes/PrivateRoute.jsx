@@ -1,16 +1,14 @@
 import React, { useContext } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import { UserContext } from '../context/userContext'
+import { Loading } from '../components'
 
 const PrivateRoute = ({ allowedRoles }) => {
     const { user, loading } = useContext(UserContext)
 
-    if (loading) return null
+    if (loading) return <Loading />
 
-    console.log(user.role, allowedRoles)
-    console.log(allowedRoles.includes(user.role))
     if (!user || !(allowedRoles.includes(user.role))) {
-        { console.log(<Outlet />) }
         return <Navigate to='/login' />
     } else {
         return <Outlet />;
@@ -18,4 +16,4 @@ const PrivateRoute = ({ allowedRoles }) => {
 
 }
 
-export default PrivateRoute
+export default PrivateRoute 

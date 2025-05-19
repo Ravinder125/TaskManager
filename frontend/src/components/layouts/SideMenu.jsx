@@ -5,6 +5,7 @@ import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { SIDE_MENU_DATA, SIDE_MENU_EMPLOYEE_DATA, } from '../../utils/data';
 import { LuUser } from 'react-icons/lu';
+import { formatName } from '../../utils/helper';
 
 const SideMenu = ({ activeMenu }) => {
     const { user, clearUser } = useContext(UserContext);
@@ -63,8 +64,7 @@ const SideMenu = ({ activeMenu }) => {
                 )}
 
                 <h5 className='text-gray-950 font-medium leading-6 mt-3'>
-                    {`${user?.fullName.firstName.charAt(0).toUpperCase()}${user?.fullName.firstName.slice(1, user?.fullName.firstName.length)}
-                     ${user?.fullName.lastName}`}
+                    {user?.fullName && formatName(user?.fullName)}
                 </h5>
 
                 <p className='text-[12px] text-gray-500 mb-8'>{user?.email || ''}</p>

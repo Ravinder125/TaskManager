@@ -1,11 +1,10 @@
 import React, { useState, useContext } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Input, AuthLayout } from '../../components/index';
+import { Input, AuthLayout, Loading } from '../../components/index';
 import { validateEmail } from '../../utils/helper'
 import { API_PATHS } from '../../utils/apiPaths';
 import { UserContext } from '../../context/userContext';
 import axiosInstance from '../../utils/axiosInstance';
-import Loading from './Loading';
 
 const Login = () => {
     const [email, setEmail] = useState("");

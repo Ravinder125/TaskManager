@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
-import { AuthLayout, Input, ProfilePhotoSelector } from '../../components/index';
+import { AuthLayout, Input, Loading, ProfilePhotoSelector } from '../../components/index';
 import { validateEmail } from '../../utils/helper';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_PATHS } from '../../utils/apiPaths';
 import { uploadImage } from '../../utils/uploadImag';
 import axiosInstance from '../../utils/axiosInstance';
-import Loading from './Loading';
 
 const Register = () => {
     const [profilPic, setProfilPic] = useState(null);

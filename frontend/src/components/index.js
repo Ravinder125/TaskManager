@@ -1,6 +1,6 @@
 import AuthLayout from "./layouts/AuthLayout";
-import Input from "./layouts/Inputs/Input";
-import ProfilePhotoSelector from "./layouts/Inputs/ProfilePhotoSelector";
+import Input from "./Inputs/Input";
+import ProfilePhotoSelector from "./Inputs/ProfilePhotoSelector";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Navbar from "./layouts/Navbar";
 import SideMenu from "./layouts/SideMenu";
@@ -9,8 +9,14 @@ import CustomPieChart from "./Charts/CustomPieChart";
 import CustomLegend from "./Charts/CustomLegend";
 import CustomBarChart from "./Charts/CustomBarChart";
 import { CustomBarTooltip, CustomPieTooltip } from "./Charts/CustomTooltip";
+import SelectDropdown from "./Inputs/SelectDropdown";
+import Loading from "./layouts/Loading";
+import SelectUsers from "./Inputs/SelectUsers";
+import Modal from './Modal';
+
 
 export {
+    Loading,
     AuthLayout,
     Input,
     ProfilePhotoSelector,
@@ -23,4 +29,7 @@ export {
     CustomLegend,
     CustomBarChart,
     CustomBarTooltip,
+    SelectDropdown,
+    SelectUsers,
+    Modal
 }

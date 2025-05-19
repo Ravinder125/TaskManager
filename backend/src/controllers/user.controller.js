@@ -9,10 +9,10 @@ import { isValidObjectId } from "mongoose";
 // @access  Private (Admin)
 const getUsers = asyncHandler(async (req, res) => {
     const users = await User.find({ role: 'employee' }).select('-password -refreshToken');
-    const usersWithTaskCounts = Promise.all(users.map(async (user) => {
-        const pendingTasks = Task.countDocuments({ assignedTo: user._id, status: 'pending' });
-        const inProgressTasks = Task.countDocuments({ assignedTo: user._id, status: 'in-progress' });
-        const completedTasks = Task.countDocuments({ assignedTo: user._id, status: 'completed' });
+    const usersWithTaskCounts = await Promise.all(users.map(async (user) => {
+        const pendingTasks = await Task.countDocuments({ assignedTo: user._id, status: 'pending' });
+        const inProgressTasks = await Task.countDocuments({ assignedTo: user._id, status: 'in-progress' });
+        const completedTasks = await Task.countDocuments({ assignedTo: user._id, status: 'completed' });
         return {
             ...user._doc, // spread operator to include all user properties
             pendingTasks,
