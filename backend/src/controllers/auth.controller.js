@@ -3,6 +3,8 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import { validationResult } from 'express-validator';
 import { User } from '../models/user.model.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
+import redis from '../config/redis.js';
+import { generateCatchKey } from '../utils/generateCatcheKey.js';
 
 
 const generateToken = async (id) => {
@@ -123,44 +125,21 @@ const logoutUser = asyncHandler(async (req, res) => {
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
     const userId = req.user._id;
+    const path = generateCatchKey(req.path)
+    const profile = await redis.get(path)
+
+    if (profile) {
+        return res.status(200).json(ApiResponse.success(200, JSON.parse(profile), 'User profile successfully fetched redis'))
+    }
+
     const user = await User.findById(userId).select('-password -refreshToken')
-    // const user = await User.aggregate([
-    //     {
-    //         $match: { _id: userId }
-    //     },
-    //     {
-    //         $lookup: {
-    //             from: 'tasks',
-    //             localField: '_id',
-    //             foreignField: 'assignedTo',
-    //             as: 'tasks',
-    //             pipeline: [
-    //                 {
-    //                     $match: { isDeleted: false, status: 'pending' }
-    //                 }
-    //             ]
-    //         }
-    //     }
-    // ])
 
     if (!user) {
         return res.status(404).json(ApiResponse.error(400, 'Admin not found'))
     }
-    // return res.status(200).json(
-    //     ApiResponse.success(
-    //         200,
-    //         {
-    //             _id: user[0]._id,
-    //             email: user[0].email,
-    //             profileImages: user[0].profileImageUrl,
-    //             role: user[0].role,
-    //             tasks: user[0].tasks,
-    //             fullname: user[0].fullName,
-    //             tasks: user[0].tasks
-    //         },
-    //         'User profile successfully fetched'
 
-    //     ))
+    await redis.set(path, JSON.stringify(user))
+
     return res.status(200).json(ApiResponse.success(200, user, 'User profile successfully fetched'));
 })
 

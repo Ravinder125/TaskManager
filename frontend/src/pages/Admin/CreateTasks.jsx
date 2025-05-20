@@ -164,7 +164,7 @@ const CreateTasks = () => {
                                 </label>
 
                                 <SelectUsers
-                                    selectedUser={taskData.assignedTo}
+                                    selectedUsers={taskData.assignedTo}
                                     setSelectedUsers={(value) => handleInputChange("assignedTo", value)}
                                 />
                             </div>

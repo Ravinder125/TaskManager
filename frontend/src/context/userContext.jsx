@@ -18,6 +18,7 @@ const UserProvider = ({ children }) => {
                 const { data } = await axiosInstance.get(
                     API_PATHS.AUTH.GET_PROFILE, { withCredentials: true }
                 );
+                console.log(data.message)
                 if (isMounted) setUser(data.data);
             } catch (err) {
                 if (isMounted) {
@@ -44,7 +45,7 @@ const UserProvider = ({ children }) => {
     const clearUser = useCallback(() => {
         setUser(null);
         setLoading(false);
-        
+
     }, []);
 
     return (

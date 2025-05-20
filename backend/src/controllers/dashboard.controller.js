@@ -3,6 +3,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { Task } from "../models/Task.model.js";
 import { validateObjectId } from "../utils/validateObjectId.js";
+import { generateCatchKey } from "../utils/generateCatcheKey.js";
+import redis from "../config/redis.js";
 
 
 // @desc    Get Admin Dashboard Data (Admin only)
@@ -10,10 +12,18 @@ import { validateObjectId } from "../utils/validateObjectId.js";
 // @access  Admin 
 const getAdminDashboard = asyncHandler(async (req, res) => {
     // Stats
-
+    const path = generateCatchKey(req.path)
+    const data = await redis.get(path)
+    if (data) {
+        return res.status(200).json(ApiResponse.success(
+            200,
+            JSON.parse(data),
+            "Admin dashboard fetched successfully (redis)"
+        ));
+    }
     const filter = {
-        createdBy: req.user._id,
-        isDeleted: false
+        isDeleted: false,
+        createdBy: req.user._id
     }
     const totalTasks = await Task.countDocuments(filter);
     const pendingTasks = await Task.countDocuments({ status: 'pending', ...filter });
@@ -63,22 +73,28 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
         .limit(10)
         .select('title status priority dueTo createdAt');
 
+
+    const responseData = {
+        statistics: {
+            totalTasks,
+            pendingTasks,
+            inProgressTasks,
+            completedTasks,
+            overDueTasks,
+        },
+        charts: {
+            taskDistribution,
+            taskPriorityLevels,
+        },
+        recentTasks,
+    }
+
+    await redis.set(path, JSON.stringify(responseData), 'EX', 300); // cache for 5 minutes
+
+
     return res.status(200).json(ApiResponse.success(
         200,
-        {
-            statistics: {
-                totalTasks,
-                pendingTasks,
-                inProgressTasks,
-                completedTasks,
-                overDueTasks,
-            },
-            charts: {
-                taskDistribution,
-                taskPriorityLevels,
-            },
-            recentTasks,
-        },
+        responseData,
         "Admin dashboard fetched successfully"
     ));
 });
