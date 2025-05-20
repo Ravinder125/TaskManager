@@ -4,11 +4,14 @@ import { validationResult } from "express-validator";
 import { Task } from "../models/Task.model.js";
 import { User } from "../models/user.model.js";
 import { validateObjectId } from "../utils/validateObjectId.js";
+import redis from "../config/redis.js";
+import { generateCatchKey } from "../utils/generateCatcheKey.js";
 
 // @desc    Create a new task (Admin only)
 // @route   POST /api/tasks
 // @access  Admin
 const createTask = asyncHandler(async (req, res) => {
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json(ApiResponse.error(400, errors.array().map(e => e.msg).join()));
@@ -168,8 +171,22 @@ const toggleDeleteTask = asyncHandler(async (req, res) => {
 // @route   GET /api/tasks
 // @access  Admin/User
 const getTasks = asyncHandler(async (req, res) => {
-    const userId = req.user._id;
+    const path = req.path;
     const { status } = req.query;
+    const data = await redis.get(generateCatchKey(path, { status }))
+    if (data) {
+        return res
+            .status(200)
+            .json(
+                ApiResponse.success(
+                    200,
+                    JSON.parse(data),
+                    'Task fetched successfully'
+                )
+            );
+    }
+
+    const userId = req.user._id;
     const isAdmin = req.user.role === 'admin';
 
     const filter = {
@@ -199,9 +216,12 @@ const getTasks = asyncHandler(async (req, res) => {
         Task.countDocuments({ ...summaryFilter, status: 'completed' })
     ]);
 
+    const responseData = await { all: allTasks, pendingTasks, inProgress, completedTasks };
+
+    await redis.set(path, JSON.stringify(responseData), 'EX', 300)
     return res.status(200).json(ApiResponse.success(200, {
         tasks,
-        statusSummary: { all: allTasks, pendingTasks, inProgress, completedTasks }
+        statusSummary: responseData
     }, 'Tasks fetched successfully'));
 });
 
@@ -210,6 +230,18 @@ const getTasks = asyncHandler(async (req, res) => {
 // @access  Admin/User
 const getTaskById = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
+    const path = generateCatchKey(req.path, { taskId });
+    const data = await redis.get(path)
+    if (data) {
+        return res.status(200).json(
+            ApiResponse.success(
+                200,
+                JSON.parse(data),
+                'Task fetched successfully'
+            )
+        )
+    }
+
     if (!validateObjectId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid Task ID'));
 
     const task = await Task.findById(taskId).populate('assignedTo', 'fullName avatar coverImage');

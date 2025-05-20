@@ -3,12 +3,33 @@ import { asyncHandler } from "../utils/asynchandler.js";
 import { User } from "../models/user.model.js";
 import { Task } from "../models/Task.model.js";
 import excelJS from "exceljs"
+import { generateCatchKey } from "../utils/generateCatcheKey.js";
+import redis from "../config/redis.js";
 
+const setHeaders = (filename) => {
+    res.setHeaders(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedoument.spreadsheet.sheet"
+    )
+    res.setHeaders(
+        "Content-Disposition",
+        `attchament; filename="${filename}.xlsx"`
+    )
+
+    return workbook.xlsx.write(res).then(() => {
+        res.end()
+    })
+}
 
 // @desc    Export user report (Admin only)
 // @route   GET /api/v1/reports
 // @access  Admin 
 const exportUsersReport = asyncHandler(async (req, res) => {
+    const path = generateCatchKey(req.path);
+    const report = await redis.get(path);
+    if (report) {
+        setHeaders('users_report')
+    }
     const users = await User.find().select("name email _id").lean();
     const usersTasks = await Task.find().populate(
         "assignedTo",
@@ -65,18 +86,20 @@ const exportUsersReport = asyncHandler(async (req, res) => {
         worksheet.addRow(user);
     });
 
-    res.setHeaders(
-        "Content-Type",
-        "application/vnd.openxmlformats-officedocument.spreadsheet.sheet"
-    )
-    res.setHeaders(
-        "Content-Disposition",
-        'attachment; filname="tasks_report.xlsx"'
-    )
+    setHeaders('users_report')
 
-    return workbook.xlsx.write(res).then(() => {
-        res.end()
-    })
+    // res.setHeaders(
+    //     "Content-Type",
+    //     "application/vnd.openxmlformats-officedocument.spreadsheet.sheet"
+    // )
+    // res.setHeaders(
+    //     "Content-Disposition",
+    //     'attachment; filname="users_report.xlsx"'
+    // )
+
+    // return workbook.xlsx.write(res).then(() => {
+    //     res.end()
+    // })
 
 })
 
@@ -114,18 +137,20 @@ const exportTasksReport = asyncHandler(async (req, res) => {
         });
     });
 
-    res.setHeaders(
-        "Content-Type",
-        "application/vnd.openxmlformats-officedoument.spreadsheet.sheet"
-    )
-    res.setHeaders(
-        "Content-Disposition",
-        'attchament; filename="tasks_report.xlsx"'
-    )
+    setHeaders('tasks_report')
 
-    return workbook.xlsx.write(res).then(() => {
-        res.end()
-    })
+    // res.setHeaders(
+    //     "Content-Type",
+    //     "application/vnd.openxmlformats-officedoument.spreadsheet.sheet"
+    // )
+    // res.setHeaders(
+    //     "Content-Disposition",
+    //     'attchament; filename="tasks_report.xlsx"'
+    // )
+
+    // return workbook.xlsx.write(res).then(() => {
+    //     res.end()
+    // })
 })
 
 

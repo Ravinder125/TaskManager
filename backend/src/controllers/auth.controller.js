@@ -147,6 +147,12 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // @route    GET /api/v1/auth/profile
 // @access   Private
 const updateUserProfile = asyncHandler(async (req, res) => {
+    const path = generateCatchKey(req.path)
+    const profile = await redis.get(path)
+    if (profile) {
+        return res.status(200).json(ApiResponse.success(200, JSON.parse(profile), 'User profile successfully updated'));
+    }
+
     const userId = req.user._id;
     const { email, fullname, password } = req.body;
     const user = await User.findById(userId);
@@ -160,15 +166,10 @@ const updateUserProfile = asyncHandler(async (req, res) => {
             lastname: fullname?.lastname
         }
     }
-    // if (req.file) {
-    //     const profileImageLocalPath = req.file?.path
-    //     const profileImage = await uploadOnCloudinary(profileImageLocalPath)
-    //     if (profileImage?.url) {
-    //         user.profileImageUrl = profileImage?.url
-    //     }
-    // }
     if (password) user.password = password;
-    await user.save();
+
+    const updatedUser = await user.save();
+    await redis.set(path, JSON.stringify(updatedUser), 'EX', 300) // 5 min expiry
     return res.status(200).json(ApiResponse.success(200, user, 'User profile successfully updated'))
 })
 
@@ -176,8 +177,13 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 // @route    GET /api/v1/auth/profile-image
 // @access   Private
 const updateUserProfileImage = asyncHandler(async (req, res) => {
-    const userId = req.user._id;
-    const profileImageLocalPath = req.file?.path;
+    const path = generateCatchKey(req.path);
+    const imageUrl = await redis.get(path)
+    if (imageUrl) {
+        return res.status(200).json(200, JSON.parse(imageUrl), 'User profile image successfully updated')
+    }
+
+    const profileImageLocalPath = req?.file?.path;
 
     if (!profileImageLocalPath) {
         return res.status(400).json(ApiResponse.error(400, 'Profile Image is requird'));
@@ -187,14 +193,14 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
         return res.status(400).json(ApiResponse.error(500, 'Error while uploading image. Please try again'))
     }
 
-    console.log(profileImage.url)
     const user = await User.findByIdAndUpdate(
-        userId,
+        req.user._id,
         { profileImageUrl: profileImage.url },
         { new: true }
     ).select('-password -refreshToken');
-    console.log(user.profileImageUrl)
-    return res.status(200).json(ApiResponse.success(200, user, 'User profile image successfully updated'));
+
+    await redis.set(path, JSON.stringify(user.profileImageUrl), 'EX', 300)
+    return res.status(200).json(ApiResponse.success(200, user?.profileImageUrl, 'User profile image successfully updated'));
 })
 
 export {
