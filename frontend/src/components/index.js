@@ -15,6 +15,7 @@ import SelectUsers from "./Inputs/SelectUsers";
 import Modal from './Modal';
 import AvatarGroup from "./AvatarGroup";
 import TodoListInput from "./Inputs/TodoListInput";
+import AddAttachmentsInput from "./Inputs/AddAttachmentsInput";
 
 
 export {
@@ -35,5 +36,6 @@ export {
     SelectUsers,
     Modal,
     AvatarGroup,
-    TodoListInput
+    TodoListInput,
+    AddAttachmentsInput,
 }

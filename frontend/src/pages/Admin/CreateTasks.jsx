@@ -10,7 +10,8 @@ import {
     DashboardLayout,
     SelectUsers,
     SelectDropdown,
-    TodoListInput
+    TodoListInput,
+    AddAttachmentsInput
 } from '../../components/index';
 
 const CreateTasks = () => {
@@ -80,8 +81,8 @@ const CreateTasks = () => {
 
     return (
         <DashboardLayout activeMenu='Create Task'>
-            <div className=' max-[375px]:min-h-screen ' >
-                <div className='grid grid-cols-1 md:grid-cols-4 mt-4'>
+            <div className='' >
+                <div className='grid grid-cols-1 md:grid-cols-4 my-4'>
                     <div className='form-card col-span-3'>
                         <div className='flex justify-between items-center'>
                             <h2 className='text-xl font-medium'>
@@ -179,10 +180,24 @@ const CreateTasks = () => {
                                 }
                             />
                         </div>
+
+                        <div className='mt-3'>
+                            <label className='text-xs font-medium text-slate-600'>
+                                Add Attachments
+                            </label>
+
+                            <AddAttachmentsInput
+                                attachments={taskData.attachments}
+                                setAttachments={(value) =>
+                                    handleInputChange("attachments", value)
+                                }
+                            />
+                        </div>
+
                         {error && (
-                            <div className='text-xs text-rose-600'>{error}</div>
+                            <div className='text-xs font-mdedium text-red-500 mt-5'>{error}</div>
                         )}
-                        <div className='mt-6'>
+                        <div className='mt-7 flex justify-end mt-7'>
                             <button
                                 disabled={loading}
                                 onClick={createTask}

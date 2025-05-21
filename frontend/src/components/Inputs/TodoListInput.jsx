@@ -13,8 +13,8 @@ const TodoListInput = ({ todoList, setTodoList }) => {
     }
 
     // Function to handle deleting an option
-    const handleDeleteOption = (idx) => {
-        const updateArr = todoList.filter((_, idx) => idx !== idx);
+    const handleDeleteOption = (index) => {
+        const updateArr = todoList.filter((_, idx) => idx !== index);
         setTodoList(updateArr);
     }
     return (
