@@ -89,7 +89,7 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
         recentTasks,
     }
 
-    await redis.set(path, JSON.stringify(responseData), 'EX', 300); // cache for 5 minutes
+    await redis.set(path, JSON.stringify(responseData), 'EX', 60); // cache for 5 minutes
 
 
     return res.status(200).json(ApiResponse.success(

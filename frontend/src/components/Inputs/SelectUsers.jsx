@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { LuUsers } from 'react-icons/lu';
-import { Modal } from '../index';
+import { Modal, AvatarGroup } from '../index';
 import { formatName } from '../../utils/helper';
 
 const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
@@ -18,6 +18,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
             );
             if (response?.data?.data?.length > 0) {
                 setAllUsers(response.data.data);
+                console.log(response.data.data)
             }
         } catch (error) {
             console.error("Error fetching the users", error);
@@ -34,7 +35,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
 
     const handleAssign = () => {
         const uniqueNewUsers = tempSelectedUsers.filter(
-            (id) => !selectedUsers.includes(id)
+            (id) => !selectedUsers?.includes(id)
         );
         setSelectedUsers((prev) => [...prev, ...uniqueNewUsers]);
         setIsModalOpen(false);
@@ -47,6 +48,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
     useEffect(() => {
         getAllUsers();
     }, []);
+
 
     useEffect(() => {
         if (selectedUsers?.length === 0) {
@@ -61,6 +63,16 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
                     <LuUsers className='text-sm' /> Add Members
                 </button>
             )}
+
+            {selectedUsersAvatar.length > 0 && (
+                <div
+                    className='cursor-pointer'
+                    onClick={() => setIsModalOpen(true)}
+                >
+                    <AvatarGroup avatars={selectedUsersAvatar} maxVisible={3} />
+                </div>
+            )}
+
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}

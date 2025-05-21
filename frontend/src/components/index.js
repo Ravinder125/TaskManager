@@ -13,6 +13,8 @@ import SelectDropdown from "./Inputs/SelectDropdown";
 import Loading from "./layouts/Loading";
 import SelectUsers from "./Inputs/SelectUsers";
 import Modal from './Modal';
+import AvatarGroup from "./AvatarGroup";
+import TodoListInput from "./Inputs/TodoListInput";
 
 
 export {
@@ -31,5 +33,7 @@ export {
     CustomBarTooltip,
     SelectDropdown,
     SelectUsers,
-    Modal
+    Modal,
+    AvatarGroup,
+    TodoListInput
 }

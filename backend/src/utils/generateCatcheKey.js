@@ -1,4 +1,4 @@
-export const generateCatchKey = (path, query) => {
+export const generateCatchKey = (path = '', query = {}, userId = '') => {
     const baseUrl = path.replace(/^\+|\/+$/g, '').replace(/\//g, ':');
     let params, sortedParams;
     if (query) {
@@ -8,6 +8,10 @@ export const generateCatchKey = (path, query) => {
             .map((key) => `${key}=${params[key]}`)
             .join('&');
     }
-    return sortedParams ? `${baseUrl}:${sortedParams}` : baseUrl
 
+    let key = sortedParams ? `${baseUrl}:${sortedParams}` : baseUrl;
+    if (userId) {
+        key += `:userId=${userId}`;
+    }
+    return key;
 }

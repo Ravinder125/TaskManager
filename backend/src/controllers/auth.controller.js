@@ -177,11 +177,11 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 // @route    GET /api/v1/auth/profile-image
 // @access   Private
 const updateUserProfileImage = asyncHandler(async (req, res) => {
-    const path = generateCatchKey(req.path);
-    const imageUrl = await redis.get(path)
-    if (imageUrl) {
-        return res.status(200).json(200, JSON.parse(imageUrl), 'User profile image successfully updated')
-    }
+    // const path = generateCatchKey(req.path);
+    // const imageUrl = await redis.get(path)
+    // if (imageUrl) {
+    //     return res.status(200).json(ApiResponse.success(200, JSON.parse(imageUrl), 'User profile image successfully updated'))
+    // }
 
     const profileImageLocalPath = req?.file?.path;
 
@@ -199,7 +199,7 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
         { new: true }
     ).select('-password -refreshToken');
 
-    await redis.set(path, JSON.stringify(user.profileImageUrl), 'EX', 300)
+    // await redis.set(path, JSON.stringify(user.profileImageUrl), 'EX', 300)
     return res.status(200).json(ApiResponse.success(200, user?.profileImageUrl, 'User profile image successfully updated'));
 })
 
