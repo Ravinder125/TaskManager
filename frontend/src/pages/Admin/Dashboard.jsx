@@ -44,9 +44,9 @@ function Dashboard() {
         setPieChartData(DistributionData);
 
         const PriorityLevelData = [
-            { priority: 'Low', count: taskPriorityLevels?.low || 0 },
-            { priority: 'Medium', count: taskPriorityLevels?.medium || 0 },
-            { priority: 'High', count: taskPriorityLevels?.high || 0 }
+            { priority: 'low', count: taskPriorityLevels?.low || 0 },
+            { priority: 'medium', count: taskPriorityLevels?.medium || 0 },
+            { priority: 'high', count: taskPriorityLevels?.high || 0 }
         ]
 
         setBarChartData(PriorityLevelData)

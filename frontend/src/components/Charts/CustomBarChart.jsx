@@ -16,19 +16,17 @@ import {
 const CustomBarChart = ({ data }) => {
 
     // Function to alternate colors
+    // Returns a distinct color for each priority level
     const getBarColor = (entry) => {
         switch (entry?.priority) {
             case 'low':
-                return '$00BC7D'
-
+                return '#4CAF50'    // Green for low priority
             case 'medium':
-                return '#FE9900'
-
+                return '#FFC107'    // Amber for medium priority
             case 'high':
-                return '#FF1F57'
-
+                return '#F44336'    // Red for high priority
             default:
-                return '#00BC7D'
+                return '#90A4AE'    // Grey as fallback
         }
     }
 
