@@ -89,7 +89,7 @@ function Dashboard() {
                 < div >
                     <div className=''>
                         <h2 className='text-xl leading-4 mb-3 md:text-2xl '>Good Morning!
-                            {formatName(user?.fullName)}
+                            {" "} {formatName(user?.fullName)}
                         </h2>
                         <p className='text-xs md:text-[13px] text-gray-400 mt-1.5'>
                             {moment().format('dddd Do MMM YYYY')}

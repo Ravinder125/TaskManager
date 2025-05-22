@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PRIORITY_DATA } from '../../utils/data';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { LuTrash2 } from 'react-icons/lu';
@@ -11,7 +11,8 @@ import {
     SelectUsers,
     SelectDropdown,
     TodoListInput,
-    AddAttachmentsInput
+    AddAttachmentsInput,
+    Loading
 } from '../../components/index';
 
 const CreateTasks = () => {
@@ -53,21 +54,43 @@ const CreateTasks = () => {
 
     // Create task
     const createTask = async () => {
+        setError("")
         const payload = {
             ...taskData,
             assignedTo: selectedUsers,
+            dueTo: new Date((taskData.dueTo).toString()),
         };
+        console.log(payload)
 
+        // Validate required fields
+        const isInvalid = Object.entries(payload).some(([key, value]) => {
+            if (key === 'dueTo' || key === 'priority') return false;
+            if (Array.isArray(value)) {
+                const validated = value.length === 0 && (key === 'assignedTo' || key === 'todoList')
+                if (validated) {
+                    key === 'assignedTo' ? setError('Task not assigned to any member') : setError('Add at least on todo')
+                }
+                return validated
+            }
+            setError(`${key.charAt(0).toUpperCase()}${key.slice(1, key.length)} is required`)
+            return typeof value === 'string' && value.trim() === '';
+        });
+        if (isInvalid) {
+            toast.error('Please fill in all required fields.');
+            return;
+        }
+
+        setError("")
         try {
             setLoading(true);
             const response = await axiosInstance.post(API_PATHS.TASKS.CREATE_TASK, payload);
-            console.log(response.data.message)
-            toast.success('Task created successfully!');
+            console.log(response.data.message, response.data.data)
             clearData();
-            navigate('/admin/tasks');
+            toast.success('Task created successfully')
+            // navigate('/admin/tasks');
         } catch (err) {
             console.error(err);
-            setError(err.data?.message || 'Something went wrong');
+            setError(err.response?.data?.message || 'Something went wrong');
             toast.error('Failed to create task');
         } finally {
             setLoading(false);
@@ -79,6 +102,7 @@ const CreateTasks = () => {
     const getTaskById = () => { };
     const deleteTask = () => { };
 
+    if (loading) return <Loading />
     return (
         <DashboardLayout activeMenu='Create Task'>
             <div className='' >
@@ -88,7 +112,6 @@ const CreateTasks = () => {
                             <h2 className='text-xl font-medium'>
                                 {taskId ? 'Update Task' : 'Create Task'}
                             </h2>
-
                             {taskId && (
                                 <button
                                     className='flex items-center gap-1.5 text-[13px] font-medium text-rose-500 bg-rose-50 rounded px-2 py-1 border border-rose-100 hover:border-rose-300'
@@ -198,13 +221,24 @@ const CreateTasks = () => {
                             <div className='text-xs font-mdedium text-red-500 mt-5'>{error}</div>
                         )}
                         <div className='mt-7 flex justify-end mt-7'>
-                            <button
-                                disabled={loading}
-                                onClick={createTask}
-                                className='px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50'
-                            >
-                                {loading ? 'Creating...' : 'Create Task'}
-                            </button>
+                            {taskId ? (
+                                <button
+                                    disabled={loading}
+                                    onClick={updateTask}
+                                    className='px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50'
+                                >
+                                    Update Task
+                                </button>
+                            ) : (
+                                <button
+                                    disabled={loading}
+                                    onClick={createTask}
+                                    className='px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50'
+                                >
+                                    Create Task
+                                </button>
+                            )}
+
                         </div>
                     </div>
                 </div>

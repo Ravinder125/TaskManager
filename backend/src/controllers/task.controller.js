@@ -26,14 +26,16 @@ const createTask = asyncHandler(async (req, res) => {
     const taskExists = await Task.findOne({ title, createdBy: req.user._id, assignedTo, isDeleted: false });
     if (taskExists) return res.status(400).json(ApiResponse.error(404, 'Task already exists'));
 
+    const todosCheckList = todoList?.map((todo) => ({ text: todo }))
+
     const task = await Task.create({
         title,
         description,
-        todoList,
+        todoList: todosCheckList,
         attachments,
         createdBy: req.user._id,
         assignedTo,
-        priority,
+        priority: priority || 'medium',
         dueTo: date
     });
 
