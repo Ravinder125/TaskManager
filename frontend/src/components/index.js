@@ -16,6 +16,7 @@ import Modal from './Modal';
 import AvatarGroup from "./AvatarGroup";
 import TodoListInput from "./Inputs/TodoListInput";
 import AddAttachmentsInput from "./Inputs/AddAttachmentsInput";
+import TaskStatusTabs from "./TaskStatusTabs";
 
 
 export {
@@ -38,4 +39,5 @@ export {
     AvatarGroup,
     TodoListInput,
     AddAttachmentsInput,
+    TaskStatusTabs,
 }
