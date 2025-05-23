@@ -22,7 +22,6 @@ const TaskCard = ({
     useEffect(() => {
         const getAvatars = assignedTo.map((user) => user.profileImageUrl)
         setAvatars(getAvatars)
-        console.log(description)
     }, [])
 
     const getStatusTagColor = (status) => {
@@ -84,12 +83,12 @@ const TaskCard = ({
 
                     <div>
                         <label className="text-xs text-gray-500">Start Date</label>
-                        <p className="text-sm text-gray-700">{moment(createdAt).format("Do MMM YYYY")}</p>
+                        <p className="text-sm font-medium text-gray-700">{moment(createdAt).format("Do MMM YYYY")}</p>
                     </div>
 
                     <div>
                         <label className="text-xs text-gray-500">Due Date</label>
-                        <p className="text-sm text-gray-700">{moment(dueDate).format("Do MMM YYYY")}</p>
+                        <p className="text-sm font-medium text-gray-700">{moment(dueDate).format("Do MMM YYYY")}</p>
                     </div>
                 </div>
 
