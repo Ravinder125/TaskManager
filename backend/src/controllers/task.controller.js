@@ -44,6 +44,69 @@ const createTask = asyncHandler(async (req, res) => {
     return res.status(201).json(ApiResponse.success(201, task, 'Task successfully created'));
 });
 
+// @desc    Get all tasks
+// @route   GET /api/tasks
+// @access  Admin/User
+const getTasks = asyncHandler(async (req, res) => {
+    const path = req.path;
+    const { status } = req.query;
+    const data = await redis.get(generateCatchKey(path, { status }))
+    if (data) {
+        return res
+            .status(200)
+            .json(
+                ApiResponse.success(
+                    200,
+                    JSON.parse(data),
+                    'Task fetched successfully'
+                )
+            );
+    }
+
+    const userId = req.user._id;
+    const isAdmin = req.user.role === 'admin';
+
+    const filter = {
+        isDeleted: false,
+        ...(status && { status }),
+        ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
+    };
+
+    let tasks = await Task.find(filter).populate(isAdmin ? 'assignedTo' : 'createdBy', 'fullName email profileImageUrl');
+
+    tasks = await Promise.all(
+        tasks.map(task => {
+            const completedTodoCount = task.todoList.filter(todo => todo.completed).length;
+            return { ...task._doc, completedTodoCount };
+        })
+    );
+
+    const summaryFilter = {
+        isDeleted: false,
+        ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
+    };
+
+    const [allTasks, pendingTasks, inProgressTasks, completedTasks] = await Promise.all([
+        Task.countDocuments(summaryFilter),
+        Task.countDocuments({ ...summaryFilter, status: 'pending' }),
+        Task.countDocuments({ ...summaryFilter, status: 'in-progress' }),
+        Task.countDocuments({ ...summaryFilter, status: 'completed' })
+    ]);
+
+    const responseData = {
+        allTasks,
+        pendingTasks,
+        inProgressTasks,
+        completedTasks
+    };
+
+    await redis.set(path, JSON.stringify(responseData), 'EX', 300)
+    return res.status(200).json(ApiResponse.success(200, {
+        tasks,
+        statusSummary: responseData
+    }, 'Tasks fetched successfully'));
+});
+
 // @desc    Update a task
 // @route   PUT /api/tasks/:taskId
 // @access  Admin/User
@@ -100,8 +163,9 @@ const updateTaskStatus = asyncHandler(async (req, res) => {
 
     if (status === 'completed') {
         const allTodosComplete = task.todoList.forEach(todo => todo.completed === true);
+        if (!allTodosComplete) return res.status(400).json(ApiResponse.error(400, 'Every todo must be completed'));
+
         task.progress = 100;
-        // if (!allTodosCompleted) return res.status(400).json(ApiResponse.error(400, 'Every todo must be completed'));
     }
 
     task.status = status || task.status;
@@ -136,7 +200,7 @@ const updateTodoList = asyncHandler(async (req, res) => {
         todo => todo.completed
     )?.length
     const totalTodos = task.todoList?.length;
-    task.progress = totalTodos > 0 ? Math.round((totalTodos / completedCount) * 10) : 0;
+    task.progress = totalTodos > 0 ? Math.round((completedCount / totalTodos) * 100) : 0;
 
     // Auto-mark task as completed if all times are checked
     if (task.progress === 100) {
@@ -169,63 +233,6 @@ const toggleDeleteTask = asyncHandler(async (req, res) => {
     return res.status(200).json(ApiResponse.success(200, deletedTask, 'Task deletion toggled successfully'));
 });
 
-// @desc    Get all tasks
-// @route   GET /api/tasks
-// @access  Admin/User
-const getTasks = asyncHandler(async (req, res) => {
-    const path = req.path;
-    const { status } = req.query;
-    const data = await redis.get(generateCatchKey(path, { status }))
-    if (data) {
-        return res
-            .status(200)
-            .json(
-                ApiResponse.success(
-                    200,
-                    JSON.parse(data),
-                    'Task fetched successfully'
-                )
-            );
-    }
-
-    const userId = req.user._id;
-    const isAdmin = req.user.role === 'admin';
-
-    const filter = {
-        isDeleted: false,
-        ...(status && { status }),
-        ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
-    };
-
-    let tasks = await Task.find(filter).populate(isAdmin ? 'assignedTo' : 'createdBy', 'fullName email profileImageUrl');
-
-    tasks = await Promise.all(
-        tasks.map(task => {
-            const completedTodoCount = task.todoList.filter(todo => todo.completed).length;
-            return { ...task._doc, completedTodoCount };
-        })
-    );
-
-    const summaryFilter = {
-        isDeleted: false,
-        ...(isAdmin ? {} : { assignedTo: userId })
-    };
-
-    const [allTasks, pendingTasks, inProgress, completedTasks] = await Promise.all([
-        Task.countDocuments(summaryFilter),
-        Task.countDocuments({ ...summaryFilter, status: 'pending' }),
-        Task.countDocuments({ ...summaryFilter, status: 'in-progress' }),
-        Task.countDocuments({ ...summaryFilter, status: 'completed' })
-    ]);
-
-    const responseData = await { all: allTasks, pendingTasks, inProgress, completedTasks };
-
-    await redis.set(path, JSON.stringify(responseData), 'EX', 300)
-    return res.status(200).json(ApiResponse.success(200, {
-        tasks,
-        statusSummary: responseData
-    }, 'Tasks fetched successfully'));
-});
 
 // @desc    Get task by ID
 // @route   GET /api/tasks/:taskId

@@ -47,7 +47,10 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
     ]);
 
     const taskDistribution = taskStatuses.reduce((acc, status) => {
-        const formattedKey = status.replace(/\s+/g, "");
+        let formattedKey = status.replace(/\s+/g, "");
+        if (status === 'in-progress') {
+            formattedKey = 'inProgress'.replace(/\s+/g, "")
+        }
         acc[formattedKey] =
             taskDistributionRaw.find(item => item._id === status)?.count || 0;
         return acc;

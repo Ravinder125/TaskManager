@@ -1,5 +1,6 @@
 import React from 'react'
 import moment from 'moment';
+import { formatName } from '../../utils/helper';
 
 const TaskListTable = ({ tableData }) => {
     const getStatusBadgeColor = (status) => {
@@ -35,10 +36,10 @@ const TaskListTable = ({ tableData }) => {
                         <tr key={idx} className=''>
                             <td className='my-3 mx-4 text-gray-700 text-[13px] line-clamp-1 overflow-hidden '>{task.title}</td>
                             <td className=' p-4'>
-                                <span className={`px-2 py-1 text-xs rounded inline-block ${getStatusBadgeColor(task.status)}`}>{task.status}</span>
+                                <span className={`px-2 py-1 text-xs rounded inline-block ${getStatusBadgeColor(task.status)}`}>{formatName(task.status === 'in-progress' ? 'inProgress' : task.status)}</span>
                             </td>
                             <td className=' p-4'>
-                                <span className={`px-2 py-1 text-xs rounded inline-block ${getPriorityBadgeColor(task.priority)}`}>{task.priority}</span>
+                                <span className={`px-2 py-1 text-xs rounded inline-block ${getPriorityBadgeColor(task.priority)}`}>{formatName(task.priority)}</span>
                             </td>
                             <td className='p-4 text-gray-700 text-[13px] text-nowrap hidden md:table-cell'>{task.createdAt ? moment(task.createdAt).format('Do MMM YYYY') : 'N/A'}</td>
                         </tr>

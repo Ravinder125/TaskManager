@@ -6,7 +6,7 @@ import Navbar from "./layouts/Navbar";
 import SideMenu from "./layouts/SideMenu";
 import TaskListTable from './layouts/TaskListTable';
 import CustomPieChart from "./Charts/CustomPieChart";
-import CustomLegend from "./Charts/CustomLegend";
+import { CustomPieLegend, CustomBarLegend } from "./Charts/CustomLegend";
 import CustomBarChart from "./Charts/CustomBarChart";
 import { CustomBarTooltip, CustomPieTooltip } from "./Charts/CustomTooltip";
 import SelectDropdown from "./Inputs/SelectDropdown";
@@ -17,6 +17,8 @@ import AvatarGroup from "./AvatarGroup";
 import TodoListInput from "./Inputs/TodoListInput";
 import AddAttachmentsInput from "./Inputs/AddAttachmentsInput";
 import TaskStatusTabs from "./TaskStatusTabs";
+import TaskCard from "./TaskCard";
+import Progress from "./Progress";
 
 
 export {
@@ -30,9 +32,10 @@ export {
     TaskListTable,
     CustomPieChart,
     CustomPieTooltip,
-    CustomLegend,
-    CustomBarChart,
     CustomBarTooltip,
+    CustomPieLegend,
+    CustomBarLegend,
+    CustomBarChart,
     SelectDropdown,
     SelectUsers,
     Modal,
@@ -40,4 +43,6 @@ export {
     TodoListInput,
     AddAttachmentsInput,
     TaskStatusTabs,
+    TaskCard,
+    Progress,
 }

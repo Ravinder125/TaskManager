@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { UserContext } from '../../context/userContext';
 import useUserAuth from '../../hooks/useUserAuth';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import moment from 'moment'
@@ -44,9 +44,9 @@ function Dashboard() {
         setPieChartData(DistributionData);
 
         const PriorityLevelData = [
-            { priority: 'low', count: taskPriorityLevels?.low || 0 },
-            { priority: 'medium', count: taskPriorityLevels?.medium || 0 },
-            { priority: 'high', count: taskPriorityLevels?.high || 0 }
+            { priority: 'Low', count: taskPriorityLevels?.low || 0 },
+            { priority: 'Medium', count: taskPriorityLevels?.medium || 0 },
+            { priority: 'High', count: taskPriorityLevels?.high || 0 }
         ]
 
         setBarChartData(PriorityLevelData)
@@ -68,7 +68,7 @@ function Dashboard() {
             );
             if (response.data) {
                 setDashboardData(response.data.data);
-                console.log(response.data.data.charts)
+                console.log(response.data.data)
                 prepareChartData(response.data.data?.charts || null)
             }
         } catch (error) {
@@ -96,8 +96,6 @@ function Dashboard() {
                         </p>
                     </div>
                 </div >
-
-
 
                 {dashboardData && dashboardData.charts && dashboardData.charts.taskDistribution && (
                     <div className='grid grid-cols-2 sm:grid-cols-2  gap-3 md:gap-6 mt-5'>
@@ -163,9 +161,9 @@ function Dashboard() {
                         <div className='flex items-center justify-between'>
                             <h5 className='text-lg font-medium'>Recent Tasks</h5>
 
-                            <button className='card-btn' onClick={onSeeMore}>
+                            <Link to='/admin/tasks' className='card-btn' onClick={onSeeMore}>
                                 See All <LuArrowRight className='text-base' />
-                            </button>
+                            </Link>
                         </div>
                         <TaskListTable tableData={dashboardData?.recentTasks || []} />
                     </div>

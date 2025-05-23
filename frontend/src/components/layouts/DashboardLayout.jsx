@@ -7,7 +7,7 @@ import { SideMenu } from '../index'
 const DashboardLayout = ({ children, activeMenu }) => {
     const { user } = useContext(UserContext);
     return (
-        <div className=''>
+        <div className='hide-scrollbar'>
             <Navbar activeMenu={activeMenu} />
 
             {user && (
@@ -16,7 +16,7 @@ const DashboardLayout = ({ children, activeMenu }) => {
                         <SideMenu activeMenu={activeMenu} />
                     </div>
 
-                    <div className='grow mx-5'>{children}</div>
+                    <div className='grow mx-5 hide-scrollbar'>{children}</div>
                 </div>
             )}
         </div>

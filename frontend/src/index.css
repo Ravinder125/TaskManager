@@ -5,7 +5,19 @@
   --font-family: 'Poppins', sans-serif;
   --breakpoint-3xl: 1920px;
   --color-primary: #1368EC;
+}
 
+/* Hide scrollbars  */
+.hide-scrollbar {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 @layer base {

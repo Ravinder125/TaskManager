@@ -16,11 +16,24 @@ const addThousandsSeprator = (num) => {
 };
 
 const formatName = (name) => {
-    if (!name || !name.firstName || !name.lastName) return '';
-    const firstName =
-        name.firstName.charAt(0).toUpperCase() +
-        name.firstName.slice(1);
-    return `${firstName} ${name.lastName}`;
+    if (typeof name === 'object') {
+        if (!name || !name.firstName || !name.lastName) return '';
+        const firstName =
+            name.firstName.charAt(0).toUpperCase() +
+            name.firstName.slice(1);
+        return `${firstName} ${name.lastName}`;
+    } else if (typeof name === 'string') {
+
+        if (name.length === 0) return '';
+        const firstChar = name.charAt(0);
+        if (firstChar === firstChar.toUpperCase()) {
+            return `${firstChar.toLowerCase()}${name.slice(1)}`
+
+        } else {
+            return `${firstChar.toUpperCase()}${name.slice(1)}`
+
+        }
+    }
 }
 
 export {
