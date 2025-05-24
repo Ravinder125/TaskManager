@@ -3,7 +3,7 @@ import { PRIORITY_DATA } from '../../utils/data';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { toast } from 'react-hot-toast';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useFetcher } from 'react-router-dom';
 import moment from 'moment';
 import { LuTrash2 } from 'react-icons/lu';
 import {
@@ -16,7 +16,9 @@ import {
 } from '../../components/index';
 
 const CreateTasks = () => {
-    const { taskId } = useParams(); // for future use when updating
+    // Get the taskId from the URL params if present (e.g., /admin/tasks/:taskId)
+    const location = useLocation();
+    const { taskId } = location.state;
     const navigate = useNavigate();
 
     const [taskData, setTaskData] = useState({
@@ -52,6 +54,33 @@ const CreateTasks = () => {
         setSelectedUsers([]);
     };
 
+    const validateFields = (payload) => {
+        switch (true) {
+            case !payload.title:
+                setError("Title is required");
+                return false;
+            case !payload.description:
+                setError("Description is required");
+                return false;
+            case !payload.priority:
+                setError("Priority is required");
+                return false;
+            case !payload.dueTo:
+                setError("Due date is required");
+                return false;
+            case !Array.isArray(payload.assignedTo) || payload.assignedTo.length === 0:
+                setError("Task not assigned to any member");
+                return false;
+            case !Array.isArray(payload.todoList) || payload.todoList.length === 0:
+                setError("Add at least one todo");
+                return false;
+            default:
+                return true;
+        }
+    };
+
+
+
     // Create task
     const createTask = async () => {
         setError("")
@@ -60,34 +89,23 @@ const CreateTasks = () => {
             assignedTo: selectedUsers,
             dueTo: new Date((taskData.dueTo).toString()),
         };
-        console.log(payload)
 
         // Validate required fields
-        const isInvalid = Object.entries(payload).some(([key, value]) => {
-            if (key === 'dueTo' || key === 'priority') return false;
-            if (Array.isArray(value)) {
-                const validated = value.length === 0 && (key === 'assignedTo' || key === 'todoList')
-                if (validated) {
-                    key === 'assignedTo' ? setError('Task not assigned to any member') : setError('Add at least on todo')
-                }
-                return validated
-            }
-            setError(`${key.charAt(0).toUpperCase()}${key.slice(1, key.length)} is required`)
-            return typeof value === 'string' && value.trim() === '';
-        });
-        if (isInvalid) {
+        if (!validateFields(payload)) {
             toast.error('Please fill in all required fields.');
             return;
         }
+
 
         setError("")
         try {
             setLoading(true);
             const response = await axiosInstance.post(API_PATHS.TASKS.CREATE_TASK, payload);
-            console.log(response.data.message, response.data.data)
+            console.log(response.data.data)
             clearData();
             toast.success('Task created successfully')
-            // navigate('/admin/tasks');
+
+            navigate('/admin/tasks');
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.message || 'Something went wrong');
@@ -96,11 +114,65 @@ const CreateTasks = () => {
             setLoading(false);
         }
     };
-
     // Future features
-    const updateTask = () => { };
-    const getTaskById = () => { };
+
+    const updateTask = async () => {
+        setError("");
+
+        const payload = {
+            ...taskData,
+            assignedTo: selectedUsers,
+            dueTo: new Date((taskData.dueTo).toString()),
+        };
+
+        if (!validateFields(payload)) {
+            toast.error('Please filll in all required fields.');
+            return
+        }
+
+        try {
+            const response = await axiosInstance.put(
+                API_PATHS.TASKS.UPDATE_TASK,
+                payload,
+            )
+            toast.success('Task successfully updated')
+        } catch (error) {
+            console.log('Error updating the task', error)
+            setError(error.response?.data?.message || 'Somethint went wrong')
+            toast.error('Failed to update task');
+        }
+    };
+
+    const getTaskById = async () => {
+        setError("");
+        try {
+            setLoading(true)
+            const response = await axiosInstance.get(API_PATHS.TASKS.GET_TASK_BY_ID(taskId))
+            if (response?.data?.data) {
+                const data = response.data.data
+                console.log(response.data.data);
+                const todoList = Object.values(data.todoList).map((todo) => todo.text)
+                data.todoList = todoList
+                setSelectedUsers(data.assignedTo)
+                data.dueTo = moment(data?.dueTo).format('YYYY-MM-DD')
+                setTaskData(prev => ({ ...prev, ...data }))
+            }
+        } catch (error) {
+            console.log('Error while fetching a task data', error)
+            setError(error.response?.data?.message || 'Something went wrong')
+            toast.error('Failed to fetch task')
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const deleteTask = () => { };
+
+    useEffect(() => {
+        if (taskId) {
+            getTaskById();
+        }
+    }, [])
 
     if (loading) return <Loading />
     return (

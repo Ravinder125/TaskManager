@@ -22,9 +22,6 @@ const ManageTasks = () => {
 
     const getAllTasks = async () => {
         try {
-            // if (filterStatus === 'In Progress') {
-            //     setFilterStatus('in-progress')
-            // }
             setLoading(true)
             const response = await axiosInstance.get(API_PATHS.TASKS.GET_ALL_TASKS, {
                 params: {
@@ -38,8 +35,6 @@ const ManageTasks = () => {
             });
 
             setAllTasks(response.data?.data.tasks.length > 0 ? response.data.data.tasks : [])
-            console.log(response.data.data.tasks);
-
             // Map statusSummary data will fixed labels and order
             const statusSummary = response.data?.data?.statusSummary
             console.log(statusSummary)
@@ -59,7 +54,10 @@ const ManageTasks = () => {
 
 
     const handleClick = (taskData) => {
-        navigate('/admin/create-task', { state: { taskId: taskData._id } })
+        if (taskData && taskData._id) {
+            console.log(taskData._id)
+            navigate('/admin/create-task', { state: { taskId: taskData._id } });
+        }
     }
 
     // Download task report

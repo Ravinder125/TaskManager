@@ -49,10 +49,18 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
         getAllUsers();
     }, []);
 
+    for (const user of allUsers) {
+        const found = tempSelectedUsers.includes(user._id);
+        console.log(found ? 'true' : 'false');
+    }
 
     useEffect(() => {
         if (selectedUsers?.length === 0) {
             setTempSelectedUsers([]);
+        } else {
+            console.log(selectedUsers)
+            setTempSelectedUsers(selectedUsers);
+
         }
     }, [selectedUsers]);
 
