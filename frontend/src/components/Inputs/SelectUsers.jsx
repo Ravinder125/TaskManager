@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { LuUsers } from 'react-icons/lu';
@@ -18,7 +18,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
             );
             if (response?.data?.data?.length > 0) {
                 setAllUsers(response.data.data);
-                console.log(response.data.data)
+                // console.log('All users:', response.data.data);
             }
         } catch (error) {
             console.error("Error fetching the users", error);
@@ -41,98 +41,78 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
         setIsModalOpen(false);
     };
 
-    const selectedUsersAvatar = allUsers
-        .filter((user) => selectedUsers?.includes(user?._id))
-        .map((user) => user?.profileImageUrl);
+    const selectedUsersAvatar = allUsers.reduce((acc, user) => {
+        if (selectedUsers?.includes(user?._id)) {
+            acc.push(user?.profileImageUrl);
+        }
+        return acc;
+    }, []);
 
     useEffect(() => {
         getAllUsers();
     }, []);
 
-    for (const user of allUsers) {
-        const found = tempSelectedUsers.includes(user._id);
-        console.log(found ? 'true' : 'false');
-    }
-
     useEffect(() => {
-        if (selectedUsers?.length === 0) {
-            setTempSelectedUsers([]);
-        } else {
-            console.log(selectedUsers)
-            setTempSelectedUsers(selectedUsers);
-
-        }
+        setTempSelectedUsers(selectedUsers?.length > 0 ? selectedUsers : []);
     }, [selectedUsers]);
 
-    return (
-        <div className='space-y-4 mt-2'>
-            {selectedUsersAvatar.length === 0 && (
-                <button className='card-btn' onClick={() => setIsModalOpen(true)}>
-                    <LuUsers className='text-sm' /> Add Members
-                </button>
-            )}
+    if (allUsers || selectedUsers) {
+        return (
+            <div className='space-y-4 mt-2'>
+                {selectedUsersAvatar.length === 0 ? (
+                    <button className='card-btn' onClick={() => setIsModalOpen(true)}>
+                        <LuUsers className='text-sm' /> Add Members
+                    </button>
+                ) : (
+                    <div className='cursor-pointer' onClick={() => setIsModalOpen(true)}>
+                        <AvatarGroup avatars={selectedUsersAvatar} maxVisible={3} />
+                    </div>
+                )}
 
-            {selectedUsersAvatar.length > 0 && (
-                <div
-                    className='cursor-pointer'
-                    onClick={() => setIsModalOpen(true)}
+                <Modal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    title='Select Users'
                 >
-                    <AvatarGroup avatars={selectedUsersAvatar} maxVisible={3} />
-                </div>
-            )}
-
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title='Selected Users'
-            >
-                <div className='space-y-4 h-[60vh] overflow-y-auto'>
-                    {allUsers.map((user, idx) => (
-                        <div
-                            key={`user-${idx}`}
-                            className='flex items-center gap-4 p-3 border-b border-gray-200'
-                        >
-                            <img
-                                src={user.profileImageUrl}
-                                alt={formatName(user.fullName)}
-                                className='w-10 h-10 rounded-full'
-                            />
-                            <div className='flex-1'>
-                                <p className='font-medium text-gray-600 dark:text-white'>
-                                    {formatName(user.fullName)}
-                                </p>
-                                <p className='text-[13px] text-gray-500'>
-                                    {user.email}
-                                </p>
+                    <div className='space-y-4 h-[60vh] overflow-y-auto'>
+                        {allUsers.map((user, idx) => (
+                            <div
+                                key={`user-${idx}`}
+                                className='flex items-center gap-4 p-3 border-b border-gray-200'
+                            >
+                                <img
+                                    src={user?.profileImageUrl}
+                                    alt={formatName(user?.fullName)}
+                                    className='w-10 h-10 rounded-full'
+                                />
+                                <div className='flex-1'>
+                                    <p className='font-medium text-gray-600 dark:text-white'>
+                                        {formatName(user?.fullName)}
+                                    </p>
+                                    <p className='text-[13px] text-gray-500'>{user?.email}</p>
+                                </div>
+                                <input
+                                    className='w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded-sm outline-none'
+                                    type='checkbox'
+                                    onChange={() => toggleUserSelection(user?._id)}
+                                    checked={tempSelectedUsers.includes(user?._id)}
+                                />
                             </div>
+                        ))}
+                    </div>
 
-                            <input
-                                className='w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded-sm outline-none'
-                                type="checkbox"
-                                onChange={() => toggleUserSelection(user._id)}
-                                checked={tempSelectedUsers.includes(user._id)}
-                            />
-                        </div>
-                    ))}
-                </div>
-
-                <div className='flex justify-between items-center'>
-                    <button
-                        className='card-btn'
-                        onClick={() => setIsModalOpen(false)}
-                    >
-                        CANCEL
-                    </button>
-                    <button
-                        className='card-btn-fill'
-                        onClick={handleAssign}
-                    >
-                        DONE
-                    </button>
-                </div>
-            </Modal>
-        </div>
-    );
+                    <div className='flex justify-between items-center'>
+                        <button className='card-btn' onClick={() => setIsModalOpen(false)}>
+                            CANCEL
+                        </button>
+                        <button className='card-btn-fill' onClick={handleAssign}>
+                            DONE
+                        </button>
+                    </div>
+                </Modal>
+            </div>
+        );
+    }
 };
 
 export default SelectUsers;

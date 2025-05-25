@@ -76,7 +76,7 @@ const getTasks = asyncHandler(async (req, res) => {
 
     tasks = await Promise.all(
         tasks.map(task => {
-            const completedTodoCount = task.todoList.filter(todo => todo.completed).length;
+            const completedTodoCount = task.todoList.filter(todo => todo?.completed)?.length;
             return { ...task._doc, completedTodoCount };
         })
     );
@@ -123,12 +123,16 @@ const updateTask = asyncHandler(async (req, res) => {
     const task = await Task.findOne({ _id: taskId, isDeleted: false });
     if (!task) return res.status(400).json(ApiResponse.error(400, "Task not found"));
 
+    const todoCheckList = todoList?.map((todo) => {
+        { text: todo }
+    })
+
     task.title = title || task.title;
     task.description = description || task.description;
     task.status = status || task.status;
     task.priority = priority || task.priority;
     task.completedAt = completedAt || task.completedAt;
-    task.todoList = todoList || task.todoList;
+    task.todoList = todoCheckList || task.todoList;
     task.attachments = attachments || task.attachments;
     task.dueTo = dueTo || task.dueTo;
 
@@ -239,17 +243,6 @@ const toggleDeleteTask = asyncHandler(async (req, res) => {
 // @access  Admin/User
 const getTaskById = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
-    const path = generateCatchKey(req.path, { taskId });
-    const data = await redis.get(path)
-    if (data) {
-        return res.status(200).json(
-            ApiResponse.success(
-                200,
-                JSON.parse(data),
-                'Task fetched successfully'
-            )
-        )
-    }
 
     if (!validateObjectId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid Task ID'));
 
