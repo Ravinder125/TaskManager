@@ -19,6 +19,7 @@ import AddAttachmentsInput from "./Inputs/AddAttachmentsInput";
 import TaskStatusTabs from "./TaskStatusTabs";
 import TaskCard from "./TaskCard";
 import Progress from "./Progress";
+import DeleteAlert from "./DeleteAlert";
 
 
 export {
@@ -45,4 +46,5 @@ export {
     TaskStatusTabs,
     TaskCard,
     Progress,
+    DeleteAlert
 }

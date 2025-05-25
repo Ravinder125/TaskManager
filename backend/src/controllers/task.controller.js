@@ -26,12 +26,11 @@ const createTask = asyncHandler(async (req, res) => {
     const taskExists = await Task.findOne({ title, createdBy: req.user._id, assignedTo, isDeleted: false });
     if (taskExists) return res.status(400).json(ApiResponse.error(404, 'Task already exists'));
 
-    const todosCheckList = todoList?.map((todo) => ({ text: todo }))
 
     const task = await Task.create({
         title,
         description,
-        todoList: todosCheckList,
+        todoList,
         attachments,
         createdBy: req.user._id,
         assignedTo,
@@ -123,16 +122,14 @@ const updateTask = asyncHandler(async (req, res) => {
     const task = await Task.findOne({ _id: taskId, isDeleted: false });
     if (!task) return res.status(400).json(ApiResponse.error(400, "Task not found"));
 
-    const todoCheckList = todoList?.map((todo) => {
-        { text: todo }
-    })
+
 
     task.title = title || task.title;
     task.description = description || task.description;
     task.status = status || task.status;
     task.priority = priority || task.priority;
     task.completedAt = completedAt || task.completedAt;
-    task.todoList = todoCheckList || task.todoList;
+    task.todoList = todoList || task.todoList;
     task.attachments = attachments || task.attachments;
     task.dueTo = dueTo || task.dueTo;
 

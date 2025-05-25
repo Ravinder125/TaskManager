@@ -12,7 +12,9 @@ import {
     SelectDropdown,
     TodoListInput,
     AddAttachmentsInput,
-    Loading
+    Loading,
+    Modal,
+    DeleteAlert,
 } from '../../components/index';
 
 const CreateTasks = () => {
@@ -80,6 +82,8 @@ const CreateTasks = () => {
 
     const createTask = async () => {
         setError("");
+
+        taskData.todoList = taskData.todoList?.map((todo) => { text: todo })
         const payload = {
             ...taskData,
             assignedTo: selectedUsers.map(user =>
@@ -114,7 +118,7 @@ const CreateTasks = () => {
         const prevTodoList = currentTask?.todoList || [];
 
         const todoList = taskData.todoList.map((todo) => {
-            const matched = prevTodoList.find(item => item.text === todo);
+            const matched = prevTodoList.find(item => item?.text === todo);
             return {
                 text: todo,
                 completed: matched ? matched.completed : false,
@@ -163,7 +167,7 @@ const CreateTasks = () => {
                     priority: taskInfo.priority,
                     dueTo: taskInfo.dueTo ? moment(taskInfo.dueTo).format('YYYY-MM-DD') : '',
                     assignedTo: taskInfo.assignedTo || [],
-                    todoList: taskInfo.todoList.map((todo) => todo.text),
+                    todoList: taskInfo.todoList.map((todo) => todo?.text),
                     attachments: taskInfo.attachments || [],
                 });
                 setSelectedUsers(taskInfo.assignedTo);
@@ -331,6 +335,17 @@ const CreateTasks = () => {
                     </div>
                 </div>
             </div>
+
+            <Modal
+                isOpen={openDeleteAlert}
+                onClose={() => setOpenDeleteAlert(false)}
+                title='Delete Task'
+            >
+                <DeleteAlert
+                    content="Are you really want to delete this task?"
+                    onDelete={() => deleteTask(taskId)}
+                />
+            </Modal>
         </DashboardLayout>
     );
 };
