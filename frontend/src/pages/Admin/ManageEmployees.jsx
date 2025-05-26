@@ -23,7 +23,26 @@ const ManageEmployees = () => {
         }
     }
 
-    const handleDownloadReport = async () => { }
+    const handleDownloadReport = async () => {
+        try {
+            const response = await axiosInstance.get(API_PATHS.REPORT.EXPORT_USERS, {
+                responseType: 'blob', // Important for downloading files
+            })
+            console.log(response)
+            // Create a Url for the blob
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url
+            link.setAttribute('Download', 'users_report.xlsx'); // Set the file name
+            document.body.appendChild(link);
+            link.click(); // Trigger the download
+            link.parentNode.removeChild(link); // Clean up the link element
+            window.URL.revokeObjectURL(url); // Free up memory
+        } catch (error) {
+            console.error('Error downloading report:', error);
+
+        }
+    }
 
     useEffect(() => {
         getAllUsers();

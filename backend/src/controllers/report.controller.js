@@ -2,44 +2,45 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asynchandler.js";
 import { User } from "../models/user.model.js";
 import { Task } from "../models/Task.model.js";
-import excelJS from "exceljs"
+import excelJS from "exceljs";
 import { generateCatchKey } from "../utils/generateCatcheKey.js";
 import redis from "../config/redis.js";
 
-const setHeaders = (filename) => {
-    res.setHeaders(
+// Set headers and write workbook
+const setHeaders = (filename, res, workbook) => {
+    res.setHeader(
         "Content-Type",
-        "application/vnd.openxmlformats-officedoument.spreadsheet.sheet"
-    )
-    res.setHeaders(
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
         "Content-Disposition",
-        `attchament; filename="${filename}.xlsx"`
-    )
+        `attachment; filename="${filename}.xlsx"`
+    );
 
     return workbook.xlsx.write(res).then(() => {
-        res.end()
-    })
-}
+        res.end();
+    });
+};
 
 // @desc    Export user report (Admin only)
-// @route   GET /api/v1/reports
+// @route   GET /api/v1/reports/users
 // @access  Admin 
 const exportUsersReport = asyncHandler(async (req, res) => {
     const path = generateCatchKey(req.path);
     const report = await redis.get(path);
     if (report) {
-        setHeaders('users_report')
+        const workbook = new excelJS.Workbook();
+        return setHeaders("users_report", res, workbook);
     }
-    const users = await User.find().select("name email _id").lean();
-    const usersTasks = await Task.find().populate(
-        "assignedTo",
-        "name email _id"
-    );
+
+    const users = await User.find().select("fullName email _id").lean();
+    const usersTasks = await Task.find().populate("assignedTo", "fullName email _id");
 
     const userTaskMap = {};
     users.forEach((user) => {
         userTaskMap[user._id] = {
-            name: user.fullName,
+            _id: user._id,
+            fullName: user.fullName,
             email: user.email,
             taskCount: 0,
             pendingTasks: 0,
@@ -51,76 +52,54 @@ const exportUsersReport = asyncHandler(async (req, res) => {
     usersTasks.forEach((task) => {
         if (task.assignedTo) {
             task.assignedTo.forEach((assignedTo) => {
-                const userTaskMapWithId = userTaskMap[assignedTo._id]
-                const status = task.status
-
-                if (userTaskMapWithId) {
-                    userTaskMapWithId.taskCount += 1;
-                    if (status === 'pending') {
-                        userTaskMapWithId.pendingTasks += 1;
-                    } else if (status === 'in-progress') {
-                        userTaskMapWithId.inProgressTasks += 1;
-                    } else if (status === 'completed') {
-                        userTaskMapWithId.completedTasks += 1
-                    }
+                const userStats = userTaskMap[assignedTo._id];
+                if (userStats) {
+                    userStats.taskCount += 1;
+                    if (task.status === 'pending') userStats.pendingTasks += 1;
+                    else if (task.status === 'in-progress') userStats.inProgressTasks += 1;
+                    else if (task.status === 'completed') userStats.completedTasks += 1;
                 }
             });
-        };
+        }
     });
 
     const workbook = new excelJS.Workbook();
-    const worksheet = new workbook.addWorksheet('Employee Reports');
+    const worksheet = workbook.addWorksheet('Employee Reports');
 
-    workbook.columns = [
+    worksheet.columns = [
         { header: "User ID", key: '_id', width: 25 },
         { header: "Name", key: 'fullName', width: 30 },
         { header: "Email", key: 'email', width: 35 },
-        { header: "Role", key: 'email', width: 20 },
         { header: "Total Assigned Tasks", key: 'taskCount', width: 20 },
         { header: "Pending Tasks", key: 'pendingTasks', width: 20 },
         { header: "In Progress Tasks", key: 'inProgressTasks', width: 20 },
-        { header: "Completed Tasks", key: 'completedTasks', width: 15 },
+        { header: "Completed Tasks", key: 'completedTasks', width: 20 },
     ];
 
-    Object.values(userTaskMap).forEach((user) => {
+    Object.values(userTaskMap).forEach(user => {
         worksheet.addRow(user);
     });
 
-    setHeaders('users_report')
-
-    // res.setHeaders(
-    //     "Content-Type",
-    //     "application/vnd.openxmlformats-officedocument.spreadsheet.sheet"
-    // )
-    // res.setHeaders(
-    //     "Content-Disposition",
-    //     'attachment; filname="users_report.xlsx"'
-    // )
-
-    // return workbook.xlsx.write(res).then(() => {
-    //     res.end()
-    // })
-
-})
+    return setHeaders("users_report", res, workbook);
+});
 
 // @desc    Export all tasks report as Excel file
-// @route   GET /api/v1/reports
+// @route   GET /api/v1/reports/tasks
 // @access  Admin 
 const exportTasksReport = asyncHandler(async (req, res) => {
-    const tasks = await Task.findById(req.user._id).populate('assignedTo', 'fullName email')
+    const tasks = await Task.find().populate('assignedTo', 'fullName email');
 
     const workbook = new excelJS.Workbook();
-    const worksheet = new workbook.addWorksheet('Tasks Report');
+    const worksheet = workbook.addWorksheet('Tasks Report');
 
-    workbook.columns = [
+    worksheet.columns = [
         { header: "Task ID", key: "_id", width: 25 },
         { header: "Title", key: "title", width: 30 },
         { header: "Description", key: "description", width: 50 },
         { header: "Priority", key: "priority", width: 15 },
         { header: "Status", key: "status", width: 25 },
         { header: "Due Date", key: "dueTo", width: 20 },
-        { header: "Task ID", key: "_id", width: 25 },
-        { header: "AssignedTo", key: "assignedTo", width: 30 },
+        { header: "Assigned To", key: "assignedTo", width: 50 },
     ];
 
     tasks.forEach(task => {
@@ -129,33 +108,19 @@ const exportTasksReport = asyncHandler(async (req, res) => {
             .join(", ");
         worksheet.addRow({
             _id: task._id,
+            title: task.title,
             description: task.description,
             priority: task.priority,
             status: task.status,
             dueTo: task.dueTo,
-            assignedTo: task.assignedTo,
+            assignedTo: assignedTo,
         });
     });
 
-    setHeaders('tasks_report')
-
-    // res.setHeaders(
-    //     "Content-Type",
-    //     "application/vnd.openxmlformats-officedoument.spreadsheet.sheet"
-    // )
-    // res.setHeaders(
-    //     "Content-Disposition",
-    //     'attchament; filename="tasks_report.xlsx"'
-    // )
-
-    // return workbook.xlsx.write(res).then(() => {
-    //     res.end()
-    // })
-})
-
-
+    return setHeaders("tasks_report", res, workbook);
+});
 
 export {
     exportTasksReport,
     exportUsersReport
-}
+};

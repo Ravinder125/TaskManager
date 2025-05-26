@@ -19,9 +19,45 @@ const UserCard = ({ userInfo }) => {
                     </div>
                 </div>
             </div>
-            <div className='flex items-end gap-3 mt-5'></div>
+            <div className='flex  flex-wrap items-end gap-3 mt-5'>
+                <StatCard
+                    lable='Pending'
+                    count={userInfo?.pendingTasks || 0}
+                    status='pending'
+                />
+                <StatCard
+                    lable='In Progress'
+                    count={userInfo?.inProgressTasks || 0}
+                    status='inProgress'
+                />
+                <StatCard
+                    lable='Completed'
+                    count={userInfo?.completedTasks || 0}
+                    status='completed'
+                />
+            </div>
         </div>
     )
 }
 
 export default UserCard
+
+const StatCard = ({ lable, count, status }) => {
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'inProgress':
+                return 'text-cyan-500 bg-gray-100';
+            case 'completed':
+                return 'text-indigo-500 bg-gray-100';
+            default:
+                return 'text-violet-500 bg-gray-100';
+        }
+    }
+
+    return (
+        <div className={`flex-1 text-[10px] font-medium px-4 py-0.5 rounded-md ${getStatusColor(status)}`}>
+            <span className='text-[12px] font-semibold'>{count}</span> <br />
+            {lable}
+        </div>
+    )
+}
