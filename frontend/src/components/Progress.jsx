@@ -17,7 +17,6 @@ const Progress = ({ status, progress }) => {
                 className={`${getColor(status)} h-1.5 rounded-full text-center text-xs font-medium`}
                 style={{ width: `${progress}%` }}
             >
-
             </div>
         </div>
     )

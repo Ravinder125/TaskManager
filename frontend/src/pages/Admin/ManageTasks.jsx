@@ -75,10 +75,10 @@ const ManageTasks = () => {
                     <div className='flex items-center justify-between gap-4'>
                         <h2 className='text-2xl font-semibold text-gray-800'>My Tasks</h2>
                         <button
-                            className='flex items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-white text-sm font-medium shadow hover:bg-green-700 transition-colors duration-150 lg:hidden'
+                            className='flex lg:hidden download-btn'
                             onClick={handleDownloadReport}
                         >
-                            <LuFileSpreadsheet className='text-xl' />
+                            <LuFileSpreadsheet className='text-xl ' />
                             <span className='text-[13px] sm:text-normal'>Download Report</span>
                         </button>
                     </div>
@@ -92,7 +92,7 @@ const ManageTasks = () => {
                             />
 
                             <button
-                                className='hidden lg:flex items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-white text-sm font-medium shadow hover:bg-green-700 transition-colors duration-150'
+                                className='hidden lg:flex download-btn'
                                 onClick={handleDownloadReport}
                             >
                                 <LuFileSpreadsheet className='text-xl' />

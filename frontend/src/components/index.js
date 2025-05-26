@@ -20,6 +20,7 @@ import TaskStatusTabs from "./TaskStatusTabs";
 import TaskCard from "./TaskCard";
 import Progress from "./Progress";
 import DeleteAlert from "./DeleteAlert";
+import UserCard from "./UserCard";
 
 
 export {
@@ -46,5 +47,6 @@ export {
     TaskStatusTabs,
     TaskCard,
     Progress,
-    DeleteAlert
+    DeleteAlert,
+    UserCard,
 }

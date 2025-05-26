@@ -22,6 +22,7 @@ const TaskCard = ({
     useEffect(() => {
         const getAvatars = assignedTo.map((user) => user.profileImageUrl)
         setAvatars(getAvatars)
+
     }, [])
 
     const getStatusTagColor = (status) => {

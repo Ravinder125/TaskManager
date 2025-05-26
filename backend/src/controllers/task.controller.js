@@ -47,20 +47,20 @@ const createTask = asyncHandler(async (req, res) => {
 // @route   GET /api/tasks
 // @access  Admin/User
 const getTasks = asyncHandler(async (req, res) => {
-    const path = req.path;
     const { status } = req.query;
-    const data = await redis.get(generateCatchKey(path, { status }))
-    if (data) {
-        return res
-            .status(200)
-            .json(
-                ApiResponse.success(
-                    200,
-                    JSON.parse(data),
-                    'Task fetched successfully'
-                )
-            );
-    }
+    // const path = req.path;
+    // const data = await redis.get(generateCatchKey(path, { status }))
+    // if (data) {
+    //     return res
+    //         .status(200)
+    //         .json(
+    //             ApiResponse.success(
+    //                 200,
+    //                 JSON.parse(data),
+    //                 'Task fetched successfully'
+    //             )
+    //         );
+    // }
 
     const userId = req.user._id;
     const isAdmin = req.user.role === 'admin';
@@ -75,11 +75,10 @@ const getTasks = asyncHandler(async (req, res) => {
 
     tasks = await Promise.all(
         tasks.map(task => {
-            const completedTodoCount = task.todoList.filter(todo => todo?.completed)?.length;
+            const completedTodoCount = task.todoList.filter(todo => todo.completed)?.length;
             return { ...task._doc, completedTodoCount };
         })
     );
-
     const summaryFilter = {
         isDeleted: false,
         ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
@@ -92,17 +91,17 @@ const getTasks = asyncHandler(async (req, res) => {
         Task.countDocuments({ ...summaryFilter, status: 'completed' })
     ]);
 
-    const responseData = {
+    const statusSummary = {
         allTasks,
         pendingTasks,
         inProgressTasks,
         completedTasks
     };
 
-    await redis.set(path, JSON.stringify(responseData), 'EX', 300)
+    // await redis.set(path, JSON.stringify(responseData), 'EX', 300)
     return res.status(200).json(ApiResponse.success(200, {
         tasks,
-        statusSummary: responseData
+        statusSummary,
     }, 'Tasks fetched successfully'));
 });
 
@@ -122,16 +121,27 @@ const updateTask = asyncHandler(async (req, res) => {
     const task = await Task.findOne({ _id: taskId, isDeleted: false });
     if (!task) return res.status(400).json(ApiResponse.error(400, "Task not found"));
 
-
-
     task.title = title || task.title;
     task.description = description || task.description;
-    task.status = status || task.status;
     task.priority = priority || task.priority;
     task.completedAt = completedAt || task.completedAt;
     task.todoList = todoList || task.todoList;
     task.attachments = attachments || task.attachments;
     task.dueTo = dueTo || task.dueTo;
+
+    const completedTodoCount = task.todoList?.filter(todo => todo.completed)?.length || 0;
+    const totalTodos = task.todoList?.length || 0;
+    task.progress = totalTodos > 0 ? Math.round((completedTodoCount / totalTodos) * 100) : 0;
+
+    // Auto-update status based on progress
+    if (task.progress === 100) {
+        task.status = 'completed';
+    } else if (task.progress > 0) {
+        task.status = 'in-progress';
+    } else {
+        task.status = 'pending';
+    }
+    task.status = status || task.status;
 
     if (assignedTo) {
         if (!Array.isArray(assignedTo) && !assignedTo?.length > 0) {
@@ -197,11 +207,10 @@ const updateTodoList = asyncHandler(async (req, res) => {
     task.todoList = todos
 
     // Auto-update progress based o todo list completion
-    const completedCount = task.todoList?.filter(
-        todo => todo.completed
-    )?.length
-    const totalTodos = task.todoList?.length;
-    task.progress = totalTodos > 0 ? Math.round((completedCount / totalTodos) * 100) : 0;
+    const completedTodoCount = task.todoList?.filter(
+        todo => todo.completed)?.length || 0;
+    const totalTodos = task.todoList?.length || 0;
+    task.progress = totalTodos > 0 ? Math.round((completedTodoCount / totalTodos) * 100) : 0;
 
     // Auto-mark task as completed if all times are checked
     if (task.progress === 100) {
