@@ -111,7 +111,6 @@ const getTasks = asyncHandler(async (req, res) => {
 const updateTask = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
     const { title, description, status, attachments, priority, completedAt, dueTo, assignedTo, todoList } = req.body;
-    console.log(todoList)
     if (!validateObjectId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid Task ID'));
 
     if (!title && !description && !status && !priority && !completedAt && !dueTo) {

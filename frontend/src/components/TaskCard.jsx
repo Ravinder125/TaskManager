@@ -49,8 +49,9 @@ const TaskCard = ({
 
     return (
         <div
-            className="bg-white rounded-lg shadow-md p-5 mb-4 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            className="bg-white rounded-lg shadow-md p-5 mb-4 cursor-pointer hover:shadow-lg transition-shadow duration-200 hover:scale-[1.01] hover:translate-y-[-2px] transition-transform duration-500 ease-in-out"
             onClick={onClick}
+            style={{ transition: 'box-shadow 0.2s, transform 0.2s' }}
         >
             <div className="flex items-center justify-between mb-2">
                 <span className={`text-xs font-semibold px-3 py-1 rounded-full ${getStatusTagColor(status)}`}>

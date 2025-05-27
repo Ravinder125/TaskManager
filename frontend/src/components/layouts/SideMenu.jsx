@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../context/userContext'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { SIDE_MENU_DATA, SIDE_MENU_EMPLOYEE_DATA, } from '../../utils/data';
@@ -22,18 +22,18 @@ const SideMenu = ({ activeMenu }) => {
         navigate(route)
     };
 
-    const handleLogout = async () => {
-        try {
-            const response = axiosInstance.get(API_PATHS.AUTH.LOGOUT, { withCredentials: true })
-            console.log(response.data.message)
-        } catch (error) {
-            if (error.response && error.response.data?.message)
-                console.error('Error while logout the user :', error.response.data.message)
-        } finally {
-            clearUser();
-            navigate('/logout');
-        }
-    }
+    // const handleLogout = async () => {
+    //     try {
+    //         const response = axiosInstance.get(API_PATHS.AUTH.LOGOUT, { withCredentials: true })
+    //         console.log(response.data.message)
+    //     } catch (error) {
+    //         if (error.response && error.response.data?.message)
+    //             console.error('Error while logout the user :', error.response.data.message)
+    //     } finally {
+    //         clearUser();
+    //         navigate('/logout');
+    //     }
+    // }
 
     useEffect(() => {
         if (user) {
@@ -46,14 +46,13 @@ const SideMenu = ({ activeMenu }) => {
         <div className='w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-200/50 sticky top-[61px] z-20'>
             <div className='flex flex-col items-center justify-center mb-7 pt-5'>
                 <div className='relative '>
-                    {user?.profilImageUrl ?
-                        <img
+                    {user?.profilImageUrl
+                        ? <img
                             src={user?.profileImageUrl}
                             alt="Profile Image"
                             className='w-20 h-20 bg-slate-400 rounded-full object-cover'
-                        /> :
-                        <LuUser className='text-4xl text-primary rounded-full w-20 h-20  border-2' />
-
+                        />
+                        : <LuUser className='text-4xl text-primary rounded-full w-20 h-20  border-2' />
                     }
                 </div>
 
@@ -67,7 +66,11 @@ const SideMenu = ({ activeMenu }) => {
                     {user?.fullName && formatName(user?.fullName)}
                 </h5>
 
-                <p className='text-[12px] text-gray-500 mb-8'>{user?.email || ''}</p>
+                <p className='text-[12px] text-gray-500'>{user?.email || ''}</p>
+
+                <Link to='/profile' className='rounded-lg font-medium  px-5 py-1 bg-primary/80 text-white mt-4 mb-8 cursor-pointer'>
+                    Edit Profile
+                </Link>
 
                 {sideMenuData.map((item, idx) => (
                     <button
@@ -78,12 +81,12 @@ const SideMenu = ({ activeMenu }) => {
                                 : ''} py-3 px-6 mb-3 cursor-pointer`}
                         onClick={() => handleClick(item.path)}
                     >
-                        <item.icon className='text-xl' />
+                        <item.icon className={`text-xl ${item.label === 'Logout' ? 'text-rose-600' : ''}`} />
                         {item.label}
                     </button>
                 ))}
             </div>
-        </div>
+        </div >
     )
 }
 

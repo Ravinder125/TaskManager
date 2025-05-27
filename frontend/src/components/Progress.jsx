@@ -1,5 +1,3 @@
-import React from 'react'
-
 const Progress = ({ status, progress }) => {
     const getColor = (status) => {
         switch (status) {

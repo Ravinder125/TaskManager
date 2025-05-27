@@ -6,6 +6,8 @@ import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
 import Logout from './pages/Auth/Logout'
 
+import Profile from './pages/Profile'
+
 import Dashboard from './pages/Admin/Dashboard'
 import ManageTasks from './pages/Admin/ManageTasks'
 import CreateTasks from './pages/Admin/CreateTasks'
@@ -27,20 +29,22 @@ function App() {
 
         {/* Admin Routes */}
         <Route element={<PrivateRoute allowedRoles={'admin'} />} >
+          <Route path='/logout' element={<Logout />} />
+          <Route path='/profile' element={<Profile />} />
           <Route path='/admin/dashboard' element={<Dashboard />} />
           <Route path='/admin/tasks' element={<ManageTasks />} />
           <Route path='/admin/create-task' element={<CreateTasks />} />
           <Route path='/admin/employees' element={<ManageEmployees />} />
-          <Route path='/logout' element={<Logout />} />
         </Route>
 
         {/* Employee Routes */}
         <Route element={<PrivateRoute allowedRoles={'employee'} />} >
+          <Route path='/logout' element={<Logout />} />
+          <Route path='/profile' element={<Profile />} />
           <Route path='/employee/dashboard' element={<EmployeeDashboard />} />
           <Route path='/employee/tasks' element={<Mytasks />} />
           {/* <Route path='/employee/profile' element={<ManageEmployees />} /> */}
           <Route path='/employee/task-details/:id' element={<ViewTaskDetails />} />
-          <Route path='/logout' element={<Logout />} />
         </Route>
       </Routes>
 

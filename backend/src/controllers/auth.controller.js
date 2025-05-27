@@ -125,12 +125,12 @@ const logoutUser = asyncHandler(async (req, res) => {
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
     const userId = req.user._id;
-    const path = generateCatchKey(req.path)
-    const profile = await redis.get(path)
+    // const path = generateCatchKey(req.path)
+    // const profile = await redis.get(path)
 
-    if (profile) {
-        return res.status(200).json(ApiResponse.success(200, JSON.parse(profile), 'User profile successfully fetched redis'))
-    }
+    // if (profile) {
+    //     return res.status(200).json(ApiResponse.success(200, JSON.parse(profile), 'User profile successfully fetched redis'))
+    // }
 
     const user = await User.findById(userId).select('-password -refreshToken')
 
@@ -138,7 +138,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
         return res.status(404).json(ApiResponse.error(400, 'Admin not found'))
     }
 
-    await redis.set(path, JSON.stringify(user))
+    // await redis.set(path, JSON.stringify(user))
 
     return res.status(200).json(ApiResponse.success(200, user, 'User profile successfully fetched'));
 })

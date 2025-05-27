@@ -114,9 +114,6 @@ const CreateTasks = () => {
 
     const updateTask = async () => {
         setError("");
-
-        const prevTodoList = currentTask?.todoList || [];
-
         const todoList = taskData.todoList
 
         const payload = {
@@ -188,12 +185,16 @@ const CreateTasks = () => {
             toast.error('Failed to delete task');
         }
     };
-
     useEffect(() => {
         if (taskId) {
             getTaskById(taskId);
+        } else {
+            // If not editing, clear task data and currentTask
+            clearData();
+            setCurrentTask(null);
+            setSelectedUsers([]);
         }
-    }, []);
+    }, [taskId]);
 
     if (loading) return <Loading />;
 
@@ -218,7 +219,7 @@ const CreateTasks = () => {
                         </div>
 
                         <div className='mt-4'>
-                            <label htmlFor='title' className='text-xs font-medium text-slate-600'>
+                            <label htmlFor='title' className='form-label'>
                                 Task Title
                             </label>
                             <input
@@ -233,7 +234,7 @@ const CreateTasks = () => {
                         </div>
 
                         <div className='mt-3'>
-                            <label htmlFor='description' className='text-xs font-medium text-slate-600'>
+                            <label htmlFor='description' className='form-label'>
                                 Description
                             </label>
                             <textarea
@@ -248,7 +249,7 @@ const CreateTasks = () => {
 
                         <div className='grid grid-cols-1 md:grid-cols-4 gap-4 mt-4'>
                             <div className='w-full'>
-                                <label htmlFor='priority' className='text-xs font-medium text-slate-600'>
+                                <label htmlFor='priority' className='form-label'>
                                     Priority
                                 </label>
                                 <SelectDropdown
@@ -261,7 +262,7 @@ const CreateTasks = () => {
                             </div>
 
                             <div className='w-full'>
-                                <label htmlFor='dueTo' className='text-xs font-medium text-slate-600'>
+                                <label htmlFor='dueTo' className='form-label'>
                                     Due Date
                                 </label>
                                 <input
@@ -275,7 +276,7 @@ const CreateTasks = () => {
                             </div>
 
                             <div className='w-full'>
-                                <label htmlFor='assignTo' className='text-xs font-medium text-slate-600'>
+                                <label htmlFor='assignTo' className='form-label'>
                                     Assign To
                                 </label>
                                 <SelectUsers
@@ -286,7 +287,7 @@ const CreateTasks = () => {
                         </div>
 
                         <div className='mt-3 w-full'>
-                            <label className='text-xs font-medium text-slate-600'>
+                            <label className='form-label'>
                                 TODO Checklist
                             </label>
                             <TodoListInput
@@ -297,7 +298,7 @@ const CreateTasks = () => {
                         </div>
 
                         <div className='mt-3'>
-                            <label className='text-xs font-medium text-slate-600'>
+                            <label className='form-label'>
                                 Add Attachments
                             </label>
                             <AddAttachmentsInput
