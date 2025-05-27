@@ -91,10 +91,10 @@ const ManageTasks = () => {
         <DashboardLayout activeMenu='Manage Tasks'>
             <div className='my-8 w-full '>
                 <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
-                    <div className='flex items-center justify-between gap-4'>
+                    <div className='flex flex-col md:flex-row lg:items-center justify-center  gap-4'>
                         <h2 className='text-2xl font-semibold text-gray-800'>My Tasks</h2>
                         <button
-                            className='flex lg:hidden download-btn'
+                            className='flex lg:hidden self-end lg:self-normal download-btn'
                             onClick={handleDownloadReport}
                         >
                             <LuFileSpreadsheet className='text-xl ' />
@@ -111,7 +111,7 @@ const ManageTasks = () => {
                             />
 
                             <button
-                                className='hidden lg:flex download-btn'
+                                className='hidden self-end w-fit lg:flex download-btn'
                                 onClick={handleDownloadReport}
                             >
                                 <LuFileSpreadsheet className='text-xl' />

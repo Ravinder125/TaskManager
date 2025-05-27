@@ -1,8 +1,6 @@
 import { asyncHandler } from "../utils/asynchandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { User } from "../models/user.model.js";
 import { Task } from "../models/Task.model.js";
-import { validateObjectId } from "../utils/validateObjectId.js";
 import { generateCatchKey } from "../utils/generateCatcheKey.js";
 import redis from "../config/redis.js";
 
@@ -13,14 +11,14 @@ import redis from "../config/redis.js";
 const getAdminDashboard = asyncHandler(async (req, res) => {
     // Stats
     const path = generateCatchKey(req.path)
-    const data = await redis.get(path)
-    if (data) {
-        return res.status(200).json(ApiResponse.success(
-            200,
-            JSON.parse(data),
-            "Admin dashboard fetched successfully (redis)"
-        ));
-    }
+    // const data = await redis.get(path)
+    // if (data) {
+    //     return res.status(200).json(ApiResponse.success(
+    //         200,
+    //         JSON.parse(data),
+    //         "Admin dashboard fetched successfully (redis)"
+    //     ));
+    // }
     const filter = {
         isDeleted: false,
         createdBy: req.user._id
@@ -38,6 +36,7 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
     // Task status distribution
     const taskStatuses = ['pending', 'in-progress', 'completed'];
     const taskDistributionRaw = await Task.aggregate([
+        { $match: filter },
         {
             $group: {
                 _id: "$status",
@@ -46,13 +45,14 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
         },
     ]);
 
+
     const taskDistribution = taskStatuses.reduce((acc, status) => {
-        let formattedKey = status.replace(/\s+/g, "");
+        let formattedKey = status;
         if (status === 'in-progress') {
-            formattedKey = 'inProgress'.replace(/\s+/g, "")
+            formattedKey = 'inProgress';
         }
-        acc[formattedKey] =
-            taskDistributionRaw.find(item => item._id === status)?.count || 0;
+        const found = taskDistributionRaw.find(item => item._id === status);
+        acc[formattedKey] = found ? found.count : 0;
         return acc;
     }, {});
 
@@ -61,7 +61,13 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
     // Task priority distribution
     const taskPriorities = ['low', 'medium', 'high'];
     const taskPriorityLevelRaw = await Task.aggregate([
-        { $group: { _id: "$priority", count: { $sum: 1 }, }, },
+        { $match: filter },
+        {
+            $group: {
+                _id: "$priority",
+                count: { $sum: 1 },
+            },
+        },
     ]);
 
     const taskPriorityLevels = taskPriorities.reduce((acc, priority) => {
@@ -75,7 +81,6 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(10)
         .select('title status priority dueTo createdAt');
-
 
     const responseData = {
         statistics: {

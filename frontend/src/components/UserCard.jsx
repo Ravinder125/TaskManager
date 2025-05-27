@@ -55,7 +55,7 @@ const StatCard = ({ lable, count, status }) => {
     }
 
     return (
-        <div className={`flex-1 text-[10px] font-medium px-4 py-0.5 rounded-md ${getStatusColor(status)}`}>
+        <div className={`flex-1 text-[10px] font-medium px-4 py-2 rounded-md  ${getStatusColor(status)}`}>
             <span className='text-[12px] font-semibold'>{count}</span> <br />
             {lable}
         </div>

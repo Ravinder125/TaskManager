@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { DashboardLayout, UserCard } from '../../components/index'
+import { DashboardLayout, Loading, UserCard } from '../../components/index'
 import { useState } from 'react'
 import axiosInstance from '../../utils/axiosInstance'
 import { API_PATHS } from '../../utils/apiPaths'
@@ -51,18 +51,20 @@ const ManageEmployees = () => {
             setAllUsers([]);
         }
     }, [])
+
+    if (loading) return <Loading />
     return (
         <DashboardLayout activeMenu='Team Members' >
             <div className='mt-5 mb-10'>
-                <div className='flex md:flex-row flex-col justify-between md:items-center'>
-                    <h2 className='text-xl md:text-xl font-medium'>Team Members</h2>
+                <div className='flex md:flex-row gap-2 md:gap-0 flex-col justify-between md:items-center'>
+                    <h2 className='text-xl md:text-xl  font-medium'>Team Members</h2>
 
                     <button
-                        className='flex md:flex download-btn'
+                        className='flex self-end md:flex w-fit download-btn'
                         onClick={handleDownloadReport}
                     >
                         <LuFileSpreadsheet className='text-lg' />
-                        <span>Download</span>
+                        <span>Download Report</span>
                     </button>
                 </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { PRIORITY_DATA } from '../../utils/data';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
@@ -83,7 +83,7 @@ const CreateTasks = () => {
     const createTask = async () => {
         setError("");
 
-        taskData.todoList = taskData.todoList?.map((todo) => { text: todo })
+        taskData.todoList = taskData.todoList
         const payload = {
             ...taskData,
             assignedTo: selectedUsers.map(user =>
@@ -117,13 +117,7 @@ const CreateTasks = () => {
 
         const prevTodoList = currentTask?.todoList || [];
 
-        const todoList = taskData.todoList.map((todo) => {
-            const matched = prevTodoList.find(item => item?.text === todo);
-            return {
-                text: todo,
-                completed: matched ? matched.completed : false,
-            };
-        });
+        const todoList = taskData.todoList
 
         const payload = {
             ...taskData,
@@ -167,7 +161,9 @@ const CreateTasks = () => {
                     priority: taskInfo.priority,
                     dueTo: taskInfo.dueTo ? moment(taskInfo.dueTo).format('YYYY-MM-DD') : '',
                     assignedTo: taskInfo.assignedTo || [],
-                    todoList: taskInfo.todoList.map((todo) => todo?.text),
+                    todoList: taskInfo.todoList?.map((todo) => (
+                        { text: todo.text, completed: todo.completed }
+                    )) || [],
                     attachments: taskInfo.attachments || [],
                 });
                 setSelectedUsers(taskInfo.assignedTo);
@@ -294,6 +290,7 @@ const CreateTasks = () => {
                                 TODO Checklist
                             </label>
                             <TodoListInput
+                                isUpdate={!!taskId}
                                 todoList={taskData.todoList}
                                 setTodoList={(value) => handleInputChange("todoList", value)}
                             />
