@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose'; import bcryptjs from 'bcryptjs'; import jwt from 'jsonwebtoken';
+import mongoose, { Schema, trusted } from 'mongoose'; import bcryptjs from 'bcryptjs'; import jwt from 'jsonwebtoken';
 
 const fullNameSchema = new Schema({
 
@@ -6,7 +6,7 @@ const fullNameSchema = new Schema({
 
 const userSchema = new Schema(
     {
-        fullName: { firstName: { type: String, required: true, trim: true }, lastName: { type: String, required: true, trim: true }, },
+        fullName: { firstName: { type: String, required: true, trim: true }, lastName: { type: String, trim: true }, },
         email: { type: String, required: true, match: [/^\S+@\S+\.\S+$/, 'Please use a valid email address'], unique: true, trim: true, lowercase: true, index: true },
         password: { type: String, required: true, trim: true, minlength: [8, "Password must be at least 8 characters long"], select: false },
         refreshToken: { type: String, trim: true, select: false },

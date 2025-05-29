@@ -3,24 +3,36 @@ import useUserAuth from "../hooks/useUserAuth"
 import { UserContext } from "../context/userContext"
 import { DashboardLayout } from "../components";
 import { formatName } from "../utils/helper";
+import { IoMdRefresh } from 'react-icons/io'
+import axiosInstance from "../utils/axiosInstance";
+import { API_PATHS } from "../utils/apiPaths";
 
 const Profile = () => {
     useUserAuth();
-    const { user } = useContext(UserContext);
+    const { user, inviteToken, setInviteToken } = useContext(UserContext);
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [profileData, setProfileData] = useState({
         fullName: { firstName: '', lastName: '' },
         email: '',
+        inviteToken: "",
     })
     const [profileImage, setProfileImage] = useState(null);
 
     const handleInputChange = (name, value) => {
-
+        setProfileData(prev => ({ ...prev, [name]: value }))
     }
 
-
+    const generateInviteToken = async () => {
+        try {
+            const response = await axiosInstance.get(API_PATHS.INVITE.GENERATE_INVITE_TOKEN(inviteToken))
+            if (response?.data?.data?.token)
+                setInviteToken(response.data.data.token)
+        } catch (error) {
+            console.error('Error while generating new invite token:', error)
+        }
+    }
 
     useEffect(() => {
         // This hook will handle the authentication check
@@ -28,6 +40,7 @@ const Profile = () => {
         // No need to do anything else here
 
         console.log('User Profile:', user);
+        console.log('inviteToken', inviteToken)
     }, [user]);
 
     return (
@@ -40,28 +53,44 @@ const Profile = () => {
                         </div>
 
                         <div className="mt-8">
-                            <form>
-                                <div className="">
-                                    <label className="form-label">Your Name</label>
+                            <div className="">
+                                <label className="form-label">Your Name</label>
+                                <input
+                                    className="form-input"
+                                    type="text"
+                                    value={formatName(user?.fullName) || ''}
+                                    onChange={({ target }) => handleInputChange(target.name, target.value)}
+                                />
+                            </div>
+
+                            <div className="">
+                                <label className="form-label">Your Email</label>
+                                <input
+                                    className="form-input"
+                                    type="text"
+                                    value={user?.email || ''}
+                                    onChange={({ target }) => handleInputChange(target.name, target.value)}
+                                />
+                            </div>
+
+                            <div className="">
+                                <label className="form-label">Your invite Token</label>
+
+                                <div className="flex items-center ">
                                     <input
                                         className="form-input"
                                         type="text"
-                                        value={formatName(user?.fullName) || ''}
+                                        value={inviteToken}
                                         onChange={({ target }) => handleInputChange(target.name, target.value)}
                                     />
+                                    <button
+                                        className="flex items-center justify-center cursor-pointer ml-2 p-1  hover:bg-black/10 rounded-full"
+                                        onClick={() => generateInviteToken && generateInviteToken()}
+                                    >
+                                        <IoMdRefresh className="text-3xl   " />
+                                    </button>
                                 </div>
-
-                                <div className="">
-                                    <label className="form-label">Your Email</label>
-                                    <input
-                                        className="form-input"
-                                        type="text"
-                                        value={user?.email || ''}
-                                        onChange={({ target }) => handleInputChange(target.name, target.value)}
-                                    />
-                                </div>
-
-                            </form>
+                            </div>
                         </div>
                     </div>
 

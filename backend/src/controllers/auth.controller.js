@@ -5,6 +5,9 @@ import { User } from '../models/user.model.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import redis from '../config/redis.js';
 import { generateCatchKey } from '../utils/generateCatcheKey.js';
+import { InviteToken } from '../models/inviteToken.model.js';
+import crypto from 'crypto'
+import { compareSync } from 'bcryptjs';
 
 
 const generateToken = async (id) => {
@@ -40,19 +43,36 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     const { fullName, email, password, adminInviteToken } = req.body;
+    const userExist = await User.findOne({ email });
+    if (userExist) {
+        return res.status(400).json(ApiResponse.error(400, 'User already exists'))
+    }
 
-    console.log(fullName)
-    let role = 'admin'
+    let role = 'admin', createInviteToken
     if (
         adminInviteToken &&
         adminInviteToken === process.env.ADMIN_INVITE_TOKEN
     ) {
         role = 'employee'
+        const isTokenValid = await InviteToken.findOne({ token: adminInviteToken })
+        if (!isTokenValid || isTokenValid.isExpired) {
+            return res.status(400).json(ApiResponse.error(400, 'Invite token is expired or invalid'))
+        }
+        createInviteToken = await InviteToken.create({
+            email,
+            token: adminInviteToken,
+            role: 'employee'
+
+        })
+    } else {
+        const hashedToken = crypto.randomBytes(32).toString('hex')
+        createInviteToken = await InviteToken.create({
+            email,
+            token: hashedToken,
+            role: 'admin'
+        })
     }
-    const userExist = await User.findOne({ email });
-    if (userExist) {
-        return res.status(400).json(ApiResponse.error(400, 'User already exists'))
-    }
+
 
     const user = await User.create({
         fullName: {
@@ -67,8 +87,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .cookie('accessToken', accessToken, options)
-        .cookie('refreshToken', refreshToken, options)
+        // .cookie('accessToken', accessToken, options)
+        // .cookie('refreshToken', refreshToken, options)
         .json(ApiResponse.success(201, user, `${user.role} successfully created`))
 })
 
@@ -120,6 +140,28 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(ApiResponse.success(200, null, 'User successfully logged out'))
 })
 
+const generateInviteToken = asyncHandler(async (req, res) => {
+    const { inviteToken } = req.params
+    console.log(inviteToken)
+    const user = await User.findById(req.user._id);
+    // const createInviteToken = await InviteToken.create({
+    //     token: hashedToken,
+    //     email: user.email,
+    //     role: 'admin',
+    // })
+    const isInviteTokenValid = await InviteToken.findOne({ token: inviteToken });
+    console.log(isInviteTokenValid)
+    // if (!isInviteTokenValid?.length > 0) {
+    //     return res.status(400).json(ApiResponse.error(400, 'Invite token is invalid'))
+    // }
+
+    const hashedToken = crypto.randomBytes(32).toString('hex');
+    isInviteTokenValid.token = hashedToken;
+    await isInviteTokenValid.save();
+
+    return res.status(200).json(ApiResponse.success(200, { inviteToken: createInviteToken.token }, 'Admin invite token successfully generated'))
+})
+
 // @desc    Get user profile
 // @route   GET /api/v1/auth/profile
 // @access  Private
@@ -138,9 +180,9 @@ const getUserProfile = asyncHandler(async (req, res) => {
         return res.status(404).json(ApiResponse.error(400, 'Admin not found'))
     }
 
+    const inviteToken = await InviteToken.findOne({ email: user.email })
     // await redis.set(path, JSON.stringify(user))
-
-    return res.status(200).json(ApiResponse.success(200, user, 'User profile successfully fetched'));
+    return res.status(200).json(ApiResponse.success(200, { user, inviteToken: inviteToken.token }, 'User profile successfully fetched'));
 })
 
 // @desc     Update user profile
@@ -210,4 +252,5 @@ export {
     getUserProfile,
     updateUserProfile,
     updateUserProfileImage,
+    generateInviteToken,
 }

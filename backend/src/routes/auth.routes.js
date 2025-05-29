@@ -7,7 +7,8 @@ import {
     logoutUser,
     getUserProfile,
     updateUserProfile,
-    updateUserProfileImage
+    updateUserProfileImage,
+    generateInviteToken
 } from '../controllers/auth.controller.js'
 import { isAuthenticated, adminOnly } from '../middlewares/auth.middleware.js';
 
@@ -51,6 +52,8 @@ router
     .route('/upload-image')
     .patch(isAuthenticated, upload.single('profileImage'), updateUserProfileImage)
 
-
+router
+    .route('/invite/:token')
+    .get(isAuthenticated, adminOnly, generateInviteToken)
 
 export default router

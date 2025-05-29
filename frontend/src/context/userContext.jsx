@@ -8,6 +8,7 @@ const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [inviteToken, setInviteToken] = useState("")
 
     // Fetch user profile on mount
     useEffect(() => {
@@ -16,10 +17,12 @@ const UserProvider = ({ children }) => {
         const fetchUser = async () => {
             try {
                 const { data } = await axiosInstance.get(
-                    API_PATHS.AUTH.GET_PROFILE, { withCredentials: true }
+                    API_PATHS.AUTH.GET_PROFILE,
                 );
-                console.log(data.message)
-                if (isMounted) setUser(data.data);
+                if (isMounted) {
+                    setUser(data.data.user);
+                    setInviteToken(data.data.inviteToken)
+                }
             } catch (err) {
                 if (isMounted) {
                     setError(err);
@@ -57,6 +60,8 @@ const UserProvider = ({ children }) => {
                 updateUser,
                 clearUser,
                 isAuthenticated: !!user,
+                inviteToken,
+                setInviteToken
             }}
         >
             {children}

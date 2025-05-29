@@ -40,8 +40,11 @@ const API_PATHS = {
 
     IMAGE: {
         UPLOAD_IMAGE: "/api/v1/auth/upload-image",
-    }
+    },
 
+    INVITE: {
+        GENERATE_INVITE_TOKEN: (token) => `/api/v1/auth/invite/${token}` // Generate a new invite token
+    }
 }
 
 
