@@ -5,13 +5,11 @@ import { Loading } from '../components'
 
 const PrivateRoute = ({ allowedRoles }) => {
     const { user, isAuthenticated, inviteToken, loading } = useContext(UserContext)
-
+    console.log(user)
     if (loading) return <Loading />
-
     if (
         !isAuthenticated ||
-        !(allowedRoles.includes(user.role)) ||
-        !(inviteToken)
+        !(allowedRoles.includes(user?.role))
     ) {
         return <Navigate to='/login' />
     } else {

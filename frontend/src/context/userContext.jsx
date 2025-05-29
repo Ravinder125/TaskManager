@@ -22,10 +22,11 @@ const UserProvider = ({ children }) => {
                 if (isMounted) {
                     setUser(data.data.user);
                     setInviteToken(data.data.inviteToken)
+                    console.log(data.data.inviteToken)
                 }
-            } catch (err) {
+            } catch (error) {
                 if (isMounted) {
-                    setError(err);
+                    setError(error);
                     clearUser(); // logout or session expired
                 }
             } finally {
@@ -61,7 +62,7 @@ const UserProvider = ({ children }) => {
                 clearUser,
                 isAuthenticated: !!user,
                 inviteToken,
-                setInviteToken
+                setInviteToken,
             }}
         >
             {children}

@@ -48,30 +48,18 @@ const registerUser = asyncHandler(async (req, res) => {
         return res.status(400).json(ApiResponse.error(400, 'User already exists'))
     }
 
-    let role = 'admin', createInviteToken
-    if (
-        adminInviteToken &&
-        adminInviteToken === process.env.ADMIN_INVITE_TOKEN
-    ) {
-        role = 'employee'
-        const isTokenValid = await InviteToken.findOne({ token: adminInviteToken })
-        if (!isTokenValid || isTokenValid.isExpired) {
-            return res.status(400).json(ApiResponse.error(400, 'Invite token is expired or invalid'))
-        }
-        createInviteToken = await InviteToken.create({
-            email,
-            token: adminInviteToken,
-            role: 'employee'
+    const isTokenValid = await InviteToken.findOne({ token: adminInviteToken })
 
-        })
-    } else {
-        const hashedToken = crypto.randomBytes(32).toString('hex')
-        createInviteToken = await InviteToken.create({
-            email,
-            token: hashedToken,
-            role: 'admin'
-        })
+    if ((adminInviteToken && !isTokenValid)) {
+        return res.status(400).json(ApiResponse.error(400, 'Invite token is expired or invalid'))
     }
+
+    const hashedToken = crypto.randomBytes(32).toString('hex')
+    await InviteToken.create({
+        email,
+        token: adminInviteToken ? adminInviteToken : hashedToken,
+        role: adminInviteToken ? 'employee' : 'admin'
+    })
 
 
     const user = await User.create({
@@ -81,14 +69,12 @@ const registerUser = asyncHandler(async (req, res) => {
         },
         email,
         password,
-        role: role,
+        role: adminInviteToken ? 'employee' : 'admin',
     })
     const { accessToken, refreshToken, options } = await generateToken(user._id)
 
     return res
         .status(201)
-        // .cookie('accessToken', accessToken, options)
-        // .cookie('refreshToken', refreshToken, options)
         .json(ApiResponse.success(201, user, `${user.role} successfully created`))
 })
 
@@ -141,25 +127,24 @@ const logoutUser = asyncHandler(async (req, res) => {
 })
 
 const generateInviteToken = asyncHandler(async (req, res) => {
-    const { inviteToken } = req.params
-    console.log(inviteToken)
+    const { token } = req.params
     const user = await User.findById(req.user._id);
-    // const createInviteToken = await InviteToken.create({
-    //     token: hashedToken,
-    //     email: user.email,
-    //     role: 'admin',
-    // })
-    const isInviteTokenValid = await InviteToken.findOne({ token: inviteToken });
-    console.log(isInviteTokenValid)
-    // if (!isInviteTokenValid?.length > 0) {
-    //     return res.status(400).json(ApiResponse.error(400, 'Invite token is invalid'))
-    // }
 
+    let inviteToken = await InviteToken.findOne({ token, email: user.email, isExpired: false });
     const hashedToken = crypto.randomBytes(32).toString('hex');
-    isInviteTokenValid.token = hashedToken;
-    await isInviteTokenValid.save();
+    
+    if (!inviteToken) {
+        inviteToken = await InviteToken.create({
+            token,
+            email: user?.email,
+            role: 'admin'
+        })
+    }
 
-    return res.status(200).json(ApiResponse.success(200, { inviteToken: createInviteToken.token }, 'Admin invite token successfully generated'))
+    inviteToken.token = hashedToken;
+    await inviteToken.save();
+
+    return res.status(200).json(ApiResponse.success(200, { inviteToken: inviteToken.token }, 'Admin invite token successfully generated'))
 })
 
 // @desc    Get user profile
@@ -180,9 +165,10 @@ const getUserProfile = asyncHandler(async (req, res) => {
         return res.status(404).json(ApiResponse.error(400, 'Admin not found'))
     }
 
-    const inviteToken = await InviteToken.findOne({ email: user.email })
+    let inviteToken = await InviteToken.findOne({ email: user.email })
+    inviteToken = inviteToken?.token || process.env.ADMIN_INVITE_TOKEN
     // await redis.set(path, JSON.stringify(user))
-    return res.status(200).json(ApiResponse.success(200, { user, inviteToken: inviteToken.token }, 'User profile successfully fetched'));
+    return res.status(200).json(ApiResponse.success(200, { user, inviteToken }, 'User profile successfully fetched'));
 })
 
 // @desc     Update user profile

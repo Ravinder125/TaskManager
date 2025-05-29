@@ -16,7 +16,6 @@ const Profile = () => {
     const [profileData, setProfileData] = useState({
         fullName: { firstName: '', lastName: '' },
         email: '',
-        inviteToken: "",
     })
     const [profileImage, setProfileImage] = useState(null);
 
@@ -27,8 +26,7 @@ const Profile = () => {
     const generateInviteToken = async () => {
         try {
             const response = await axiosInstance.get(API_PATHS.INVITE.GENERATE_INVITE_TOKEN(inviteToken))
-            if (response?.data?.data?.token)
-                setInviteToken(response.data.data.token)
+            setInviteToken(response?.data?.data?.inviteToken || inviteToken)
         } catch (error) {
             console.error('Error while generating new invite token:', error)
         }
@@ -81,7 +79,6 @@ const Profile = () => {
                                         className="form-input"
                                         type="text"
                                         value={inviteToken}
-                                        onChange={({ target }) => handleInputChange(target.name, target.value)}
                                     />
                                     <button
                                         className="flex items-center justify-center cursor-pointer ml-2 p-1  hover:bg-black/10 rounded-full"
