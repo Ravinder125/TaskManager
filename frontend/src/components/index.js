@@ -21,6 +21,7 @@ import TaskCard from "./TaskCard";
 import Progress from "./Progress";
 import DeleteAlert from "./DeleteAlert";
 import UserCard from "./UserCard";
+import SubmitButton from "./Inputs/SubmitButton";
 
 
 export {
@@ -49,4 +50,5 @@ export {
     Progress,
     DeleteAlert,
     UserCard,
+    SubmitButton,
 }

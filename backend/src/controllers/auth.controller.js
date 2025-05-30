@@ -61,7 +61,7 @@ const registerUser = asyncHandler(async (req, res) => {
         role: adminInviteToken ? 'employee' : 'admin'
     })
 
-
+    // TODO: Make it simple by removing the fullName split logic
     const user = await User.create({
         fullName: {
             firstName: fullName.split(' ')[0],
@@ -132,7 +132,7 @@ const generateInviteToken = asyncHandler(async (req, res) => {
 
     let inviteToken = await InviteToken.findOne({ token, email: user.email, isExpired: false });
     const hashedToken = crypto.randomBytes(32).toString('hex');
-    
+
     if (!inviteToken) {
         inviteToken = await InviteToken.create({
             token,
@@ -168,6 +168,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     let inviteToken = await InviteToken.findOne({ email: user.email })
     inviteToken = inviteToken?.token || process.env.ADMIN_INVITE_TOKEN
     // await redis.set(path, JSON.stringify(user))
+
     return res.status(200).json(ApiResponse.success(200, { user, inviteToken }, 'User profile successfully fetched'));
 })
 
@@ -175,29 +176,28 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // @route    GET /api/v1/auth/profile
 // @access   Private
 const updateUserProfile = asyncHandler(async (req, res) => {
-    const path = generateCatchKey(req.path)
-    const profile = await redis.get(path)
-    if (profile) {
-        return res.status(200).json(ApiResponse.success(200, JSON.parse(profile), 'User profile successfully updated'));
-    }
+    // const path = generateCatchKey(req.path)
+    // const profile = await redis.get(path)
+    // if (profile) {
+    //     return res.status(200).json(ApiResponse.success(200, JSON.parse(profile), 'User profile successfully updated'));
+    // }
 
     const userId = req.user._id;
-    const { email, fullname, password } = req.body;
+    const { email, fullName } = req.body;
     const user = await User.findById(userId);
     if (!user) {
         return res.status(404).json(ApiResponse.error(404, 'User not found'))
     }
     if (email) user.email = email;
-    if (fullname?.firstname || fullname?.lastname) {
+    if (fullName?.firstName || fullName?.lastName) {
         user.fullName = {
-            firstName: fullname?.firstname,
-            lastname: fullname?.lastname
+            firstName: fullName?.firstName,
+            lastName: fullName?.lastName
         }
     }
-    if (password) user.password = password;
 
-    const updatedUser = await user.save();
-    await redis.set(path, JSON.stringify(updatedUser), 'EX', 300) // 5 min expiry
+    await user.save();
+    // await redis.set(path, JSON.stringify(updatedUser), 'EX', 300) // 5 min expiry
     return res.status(200).json(ApiResponse.success(200, user, 'User profile successfully updated'))
 })
 
@@ -231,6 +231,31 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
     return res.status(200).json(ApiResponse.success(200, user?.profileImageUrl, 'User profile image successfully updated'));
 })
 
+// @desc     Change user Password
+// @route    POST /api/v1/auth/change-password
+// @access   Private
+const changeUserPassword = asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json(ApiResponse.error(400, errors.array().join(',')));
+    }
+
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (newPassword !== confirmPassword) {
+        return res.status(400).json(ApiResponse.error(400, 'New password and confirm password do not match'));
+    }
+
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user || !compareSync(currentPassword, user.password)) {
+        return res.status(401).json(ApiResponse.error(401, 'Password is incorrect'));
+    }
+
+    user.password = confirmPassword;
+    await user.save();
+    return res.status(200).json(ApiResponse.success(200, null, 'Password successfully changed'));
+})
+
 export {
     registerUser,
     loginUser,
@@ -239,4 +264,5 @@ export {
     updateUserProfile,
     updateUserProfileImage,
     generateInviteToken,
+    changeUserPassword,
 }

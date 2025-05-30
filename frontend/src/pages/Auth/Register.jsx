@@ -5,9 +5,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { API_PATHS } from '../../utils/apiPaths';
 import { uploadImage } from '../../utils/uploadImag';
 import axiosInstance from '../../utils/axiosInstance';
+import toast from 'react-hot-toast';
 
 const Register = () => {
-    const [profilPic, setProfilPic] = useState(null);
+    const [profilePic, setProfilePic] = useState(null);
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -31,7 +32,7 @@ const Register = () => {
             setError('Please enter valid email')
         }
 
-        if (!profilPic) {
+        if (!profilePic) {
             setError('Profile image is required')
         }
 
@@ -48,18 +49,23 @@ const Register = () => {
             setLoading(true)
             // Regiseration API logic
             const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, formData);
-            console.log(response.data.message)
-            if (profilPic && response) {
-                const imageUploadRes = await uploadImage(profilPic);
-                console.log(imageUploadRes.message)
+            if (response?.data?.data) {
+                toast.success(response.data.message)
+                if (profilePic && response) {
+                    const imageUploadRes = await uploadImage(profilePic);
+                    toast.success(imageUploadRes.message)
+                }
+
+                // Redirect to login page after successfull registeration
+                navigate('/login')
             }
-            // Redirect to login page after successfull registeration
-            navigate('/login')
         } catch (error) {
             if (error.response && error.response.data.message) {
                 setError(`Error: ${error.response.data.message}`)
+                toast.error(error.response.data.message)
             } else {
                 setError('Something went wrong')
+                toast.error('Something went wrong, please try again')
             }
         } finally {
             setLoading(false)
@@ -74,7 +80,7 @@ const Register = () => {
 
                 <form onSubmit={handleRegister} >
                     <ProfilePhotoSelector
-                        setProfilPic={setProfilPic}
+                        setProfilePic={setProfilePic}
                     />
                     <div className='grid md:grid-cols-2 grid-cols-1 gap-2 '>
 
@@ -105,7 +111,7 @@ const Register = () => {
                         <Input
                             label='Admin Invite Token'
                             value={adminInviteToken}
-                            placeholder='6 digit token'
+                            placeholder='Enter invite token if you have one'
                             type='text'
                             required={false}
                             onChange={({ target }) => setAdminInviteToken(target.value)}

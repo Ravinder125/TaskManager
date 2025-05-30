@@ -17,11 +17,11 @@ const addThousandsSeprator = (num) => {
 
 const formatName = (name) => {
     if (typeof name === 'object') {
-        if (!name || !name.firstName || !name.lastName) return '';
+        if (!name || !name.firstName) return '';
         const firstName =
             name.firstName.charAt(0).toUpperCase() +
             name.firstName.slice(1);
-        return `${firstName} ${name.lastName}`;
+        return `${firstName} ${name?.lastName ? name.lastName : ''}`;
     } else if (typeof name === 'string') {
 
         if (name.length === 0) return '';

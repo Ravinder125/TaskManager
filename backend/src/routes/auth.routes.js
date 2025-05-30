@@ -8,7 +8,8 @@ import {
     getUserProfile,
     updateUserProfile,
     updateUserProfileImage,
-    generateInviteToken
+    generateInviteToken,
+    changeUserPassword
 } from '../controllers/auth.controller.js'
 import { isAuthenticated, adminOnly } from '../middlewares/auth.middleware.js';
 
@@ -47,6 +48,16 @@ router
     .route('/profile')
     .get(isAuthenticated, getUserProfile)
     .put(isAuthenticated, updateUserProfile)
+
+router.route('/change-password').post(
+    isAuthenticated,
+    [
+        body('currentPassword').isLength({ min: 8 }).withMessage('Current password must be at least 8 characters long'),
+        body('newPassword').isLength({ min: 8 }).withMessage('New password must be at least 8 characters long'),
+        body('confirmPassword').isLength({ min: 8 }).withMessage('New password must be at least 8 characters long')
+    ],
+    changeUserPassword
+)
 
 router
     .route('/upload-image')

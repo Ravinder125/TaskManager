@@ -22,7 +22,6 @@ const UserProvider = ({ children }) => {
                 if (isMounted) {
                     setUser(data.data.user);
                     setInviteToken(data.data.inviteToken)
-                    console.log(data.data.inviteToken)
                 }
             } catch (error) {
                 if (isMounted) {

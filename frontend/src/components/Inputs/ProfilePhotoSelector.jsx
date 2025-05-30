@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { LuUser, LuUpload, LuTrash } from 'react-icons/lu';
 
-const ProfilePhotoSelector = ({ setProfilPic }) => {
+const ProfilePhotoSelector = ({ setProfilePic, profilePic }) => {
     const inputRef = useRef(null);
     const [image, setImage] = useState()
     const [previewUrl, setPreviewUrl] = useState(null);
@@ -11,8 +11,7 @@ const ProfilePhotoSelector = ({ setProfilPic }) => {
         if (file) {
             // Update the image state
             setImage(file);
-            setProfilPic(file);
-            console.log(file)
+            setProfilePic(file);
 
             // Generate preview URL from the file
             const preview = URL.createObjectURL(file);
@@ -23,7 +22,7 @@ const ProfilePhotoSelector = ({ setProfilPic }) => {
     const handleRemoveImage = () => {
         setImage(null);
         setPreviewUrl(null);
-        setProfilPic(null)
+        setProfilePic(null)
     }
 
     const onChooseFile = () => {
@@ -41,26 +40,43 @@ const ProfilePhotoSelector = ({ setProfilPic }) => {
                     className='hidden'
                 />
                 {!image ? (
-                    <div className='w-20 h-20 flex items-center justify-center bg-blue-500/10 rounded-full relative '>
-                        <LuUser className='text-4xl text-primary ' />
-
-                        <button
-                            type='button'
-                            className='w-8 h-8 flex text-white items-center absolute -bottom-1 bg-primary rounded-full items-center justify-center -right-1 cursor-pointer '
-                            onClick={onChooseFile}
-                        >
-                            <LuUpload />
-                        </button>
-                    </div>) : (
+                    profilePic ? (
+                        <div className='relative'>
+                            <img
+                                src={profilePic}
+                                alt="profile photo"
+                                className='w-20 h-20 object-cover rounded-full'
+                            />
+                            <button
+                                type='button'
+                                className='w-8 h-8 flex text-white items-center absolute -bottom-1 bg-red-500 rounded-full items-center justify-center -right-1 cursor-pointer'
+                                onClick={handleRemoveImage}
+                            >
+                                <LuTrash />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className='w-20 h-20 flex items-center justify-center bg-blue-500/10 rounded-full relative'>
+                            <LuUser className='text-4xl text-primary' />
+                            <button
+                                type='button'
+                                className='w-8 h-8 flex text-white items-center absolute -bottom-1 bg-primary rounded-full items-center justify-center -right-1 cursor-pointer'
+                                onClick={onChooseFile}
+                            >
+                                <LuUpload />
+                            </button>
+                        </div>
+                    )
+                ) : (
                     <div className='relative'>
                         <img
                             src={previewUrl}
                             alt="profile photo"
-                            className='w-20 h-20 object-cover rounded-full  '
+                            className='w-20 h-20 object-cover rounded-full'
                         />
                         <button
                             type='button'
-                            className='w-8 h-8 flex  text-white items-center absolute -bottom-1 bg-red-500 rounded-full items-center justify-center -right-1 cursor-pointer '
+                            className='w-8 h-8 flex text-white items-center absolute -bottom-1 bg-red-500 rounded-full items-center justify-center -right-1 cursor-pointer'
                             onClick={handleRemoveImage}
                         >
                             <LuTrash />
@@ -68,7 +84,7 @@ const ProfilePhotoSelector = ({ setProfilPic }) => {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     )
 }
 

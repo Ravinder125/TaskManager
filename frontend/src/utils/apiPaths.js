@@ -5,8 +5,10 @@ const API_PATHS = {
     AUTH: {
         REGISTER: "/api/v1/auth/register", // Register a new user (Admin or Employee)
         LOGIN: "/api/v1/auth/login", // Authenticate user & return JWT token
-        LOGOUT: '/api/v1/auth/logout', // Logout a user 
+        LOGOUT: "/api/v1/auth/logout", // Logout a user 
         GET_PROFILE: "/api/v1/auth/profile", // Get logged-in user details
+        UPDATE_PROFILE: "/api/v1/auth/profile", // Update user profile details
+        CHANGE_PASSWORD: "/api/v1/auth/change-password", // Change user password
     },
 
     USERS: {

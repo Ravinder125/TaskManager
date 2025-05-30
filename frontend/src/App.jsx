@@ -18,19 +18,19 @@ import Mytasks from './pages/Employee/MyTasks'
 import ViewTaskDetails from './pages/Employee/ViewTaskDetails'
 import { UserContext } from './context/userContext'
 import { Toaster } from 'react-hot-toast'
+import { Loading } from './components'
 
 function App() {
   return (
     <>
       <Routes>
         {/* Public Routes */}
+        <Route path='/' element={<Routee />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
 
         {/* Admin Routes */}
-        <Route element={<PrivateRoute allowedRoles={'admin'} />} >
-          <Route path='/logout' element={<Logout />} />
-          <Route path='/profile' element={<Profile />} />
+        <Route element={<PrivateRoute allowedRoles={['admin']} />} >
           <Route path='/admin/dashboard' element={<Dashboard />} />
           <Route path='/admin/tasks' element={<ManageTasks />} />
           <Route path='/admin/create-task' element={<CreateTasks />} />
@@ -38,13 +38,17 @@ function App() {
         </Route>
 
         {/* Employee Routes */}
-        <Route element={<PrivateRoute allowedRoles={'employee'} />} >
-          <Route path='/logout' element={<Logout />} />
-          <Route path='/profile' element={<Profile />} />
+        <Route element={<PrivateRoute allowedRoles={['employee']} />} >
           <Route path='/employee/dashboard' element={<EmployeeDashboard />} />
           <Route path='/employee/tasks' element={<Mytasks />} />
           {/* <Route path='/employee/profile' element={<ManageEmployees />} /> */}
           <Route path='/employee/task-details/:id' element={<ViewTaskDetails />} />
+        </Route>
+
+        {/* Both Admin and Employee Routes */}
+        <Route element={<PrivateRoute allowedRoles={['admin', 'employee']} />} >
+          <Route path='/logout' element={<Logout />} />
+          <Route path='/profile' element={<Profile />} />
         </Route>
       </Routes>
 
@@ -71,11 +75,13 @@ export default App
 const Routee = () => {
   const { user, loading } = useContext(UserContext);
 
-  if (loading) return <Outlet />
+  if (loading) return <Loading />
 
   if (!user) {
     return <Navigate to='/login' />
   }
 
-  return user.role === 'admin' ? <Navigate to='/admin/dashboard' /> : <Navigate to='/user/dashboard' />;
+  return user.role === 'admin'
+    ? <Navigate to='/admin/dashboard' />
+    : <Navigate to='/employee/dashboard' />;
 }

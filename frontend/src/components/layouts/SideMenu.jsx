@@ -22,31 +22,17 @@ const SideMenu = ({ activeMenu }) => {
         navigate(route)
     };
 
-    // const handleLogout = async () => {
-    //     try {
-    //         const response = axiosInstance.get(API_PATHS.AUTH.LOGOUT, { withCredentials: true })
-    //         console.log(response.data.message)
-    //     } catch (error) {
-    //         if (error.response && error.response.data?.message)
-    //             console.error('Error while logout the user :', error.response.data.message)
-    //     } finally {
-    //         clearUser();
-    //         navigate('/logout');
-    //     }
-    // }
 
     useEffect(() => {
         if (user) {
             setSideMenuData(user?.role === 'admin' ? SIDE_MENU_DATA : SIDE_MENU_EMPLOYEE_DATA);
         }
-
-        return () => { };
     }, [user])
     return (
         <div className='w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-200/50 sticky top-[61px] z-20'>
             <div className='flex flex-col items-center justify-center mb-7 pt-5'>
                 <div className='relative '>
-                    {user?.profilImageUrl
+                    {user?.profileImageUrl
                         ? <img
                             src={user?.profileImageUrl}
                             alt="Profile Image"
@@ -68,7 +54,7 @@ const SideMenu = ({ activeMenu }) => {
 
                 <p className='text-[12px] text-gray-500'>{user?.email || ''}</p>
 
-                <Link to='/profile' className='rounded-lg font-medium  px-5 py-1 bg-primary/80 text-white mt-4 mb-8 cursor-pointer'>
+                <Link to='/profile' className='rounded-md font-medium  px-5 py-1 bg-lime-500 hover:bg-primary transition-bg duration-1000 ease-in-out  text-white mt-4 mb-8 cursor-pointer'>
                     Edit Profile
                 </Link>
 
