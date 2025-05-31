@@ -106,6 +106,7 @@ const loginUser = asyncHandler(async (req, res) => {
                     email: userExist.email,
                     profileImageUrl: userExist.profileImageUrl,
                     role: userExist.role,
+                    fullName: userExist.fullName
                 },
                 `${userExist.role} successfully logged in`))
 })
@@ -129,22 +130,26 @@ const logoutUser = asyncHandler(async (req, res) => {
 const generateInviteToken = asyncHandler(async (req, res) => {
     const { token } = req.params
     const user = await User.findById(req.user._id);
-
-    let inviteToken = await InviteToken.findOne({ token, email: user.email, isExpired: false });
     const hashedToken = crypto.randomBytes(32).toString('hex');
+
+    let inviteToken = await InviteToken.updateMany(
+        { token, email: user.email, isExpired: false },
+        { token: hashedToken },
+        { new: true, }
+
+    );
 
     if (!inviteToken) {
         inviteToken = await InviteToken.create({
-            token,
+            token: token || hashedToken,
             email: user?.email,
             role: 'admin'
         })
     }
 
-    inviteToken.token = hashedToken;
-    await inviteToken.save();
+    const tokenData = await InviteToken.findOne({ email: user.email, isExpired: false })
 
-    return res.status(200).json(ApiResponse.success(200, { inviteToken: inviteToken.token }, 'Admin invite token successfully generated'))
+    return res.status(200).json(ApiResponse.success(200, { inviteToken: tokenData.token }, 'Admin invite token successfully generated'))
 })
 
 // @desc    Get user profile

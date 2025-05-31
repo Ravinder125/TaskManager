@@ -72,13 +72,14 @@ const Profile = () => {
                     toast.success('Profile successfully updated');
                 }
 
+                window.location.reload();
             }
 
-        } catch (err) {
-            console.error('Error while updating profile:', err);
-            toast.error(err?.response?.data?.message || 'Something went wrong while updating profile')
+        } catch (error) {
+            console.error('Error while updating profile:', error);
+            toast.error(error?.response?.data?.message || 'Something went wrong while updating profile')
         } finally {
-            // window.location.reload();
+
             setLoading(false);
         }
 
@@ -138,10 +139,10 @@ const Profile = () => {
         // This hook will handle the authentication check
         // and redirect to login if not authenticated
         // No need to do anything else here
+        // getUserProfile();
         setProfilePic(user?.profileImageUrl || null);
         setEmail(user?.email || '');
         setFullName(formatName(user?.fullName) || '');
-        console.log(user)
     }, [user]);
 
     if (loading) return <Loading />;
@@ -242,7 +243,7 @@ const Profile = () => {
                                                 />
                                             </Modal>
                                         )
-                                        : (<button className="text-left text-sm">
+                                        : (<button className="text-left text-xs sm:text-sm text-slate-600 ">
                                             Want to change your PASSWORD?
                                             <span onClick={() => setModalOpen(true)} className="text-xs text-primary font-medium ml-1 cursor-pointer">Click here</span>
                                         </button>)
