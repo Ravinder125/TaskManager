@@ -11,11 +11,12 @@ import toast from "react-hot-toast";
 
 const Profile = () => {
     useUserAuth();
+
     const { user, updateUser, inviteToken, setInviteToken } = useContext(UserContext);
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-
+    const [passwordError, setPasswordError] = useState("");
     const [profilePic, setProfilePic] = useState(null);
     const [email, setEmail] = useState('');
     const [fullName, setFullName] = useState('');
@@ -73,9 +74,9 @@ const Profile = () => {
 
             }
 
-        } catch (error) {
-            console.error('Error while updating profile:', error);
-            toast.error(response?.data?.message || 'Something went wrong while updating profile')
+        } catch (err) {
+            console.error('Error while updating profile:', err);
+            toast.error(err?.response?.data?.message || 'Something went wrong while updating profile')
         } finally {
             // window.location.reload();
             setLoading(false);
@@ -84,18 +85,22 @@ const Profile = () => {
     }
 
     const handleChangePassword = async () => {
-        if (!password || !newPassword || !confirmPassword) {
-            setError('Please fill all fields to change your password')
+        setPasswordError("");
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            setPasswordError("Please fill all fields to change your password")
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            setError('New password and confirm password do not match');
+            setPasswordError("New password and confirm password do not match");
             return;
         }
 
+        setPasswordError("");
+
         try {
-            const response = await axiosInstance.put(API_PATHS.AUTH.CHANGE_PASSWORD, {
+            const response = await axiosInstance.post(API_PATHS.AUTH.CHANGE_PASSWORD, {
                 currentPassword,
                 newPassword,
                 confirmPassword,
@@ -103,13 +108,20 @@ const Profile = () => {
 
             if (response?.data?.success) {
                 toast.success('Password successfully changed');
+
                 setModalOpen(false);
                 setCurrentPassword('');
                 setNewPassword('');
                 setConfirmPassword('');
+
             }
         } catch (error) {
             console.error('Error while changing password:', error);
+            if (error?.response?.data?.message) {
+                toast.error(error?.response?.data?.message || 'Something went wrong while changing password');
+                setPasswordError(error?.response?.data?.message || 'Something went wrong while changing password');
+            }
+
         }
     }
 
@@ -129,6 +141,7 @@ const Profile = () => {
         setProfilePic(user?.profileImageUrl || null);
         setEmail(user?.email || '');
         setFullName(formatName(user?.fullName) || '');
+        console.log(user)
     }, [user]);
 
     if (loading) return <Loading />;
@@ -177,10 +190,10 @@ const Profile = () => {
 
                                         {user?.role === 'admin' && (
                                             <button
-                                                className="p-2 mt-2 rounded-lg hover:bg-gray-200 transition-bg duration-300 ease-in-out cursor-pointer"
+                                                className="p-2 mt-2 rounded-lg hover:bg-gray-200 hover:text-black transition-all duration-200 ease-in-out cursor-pointer"
                                                 onClick={() => generateInviteToken()}
                                             >
-                                                <IoMdRefresh className="text-2xl " />
+                                                <IoMdRefresh className="text-xl text-slate-600" />
                                             </button>
                                         )}
                                     </div>
@@ -195,42 +208,50 @@ const Profile = () => {
                                             >
                                                 <Input
                                                     label='Current Password'
-                                                    value={password}
+                                                    value={currentPassword}
                                                     placeholder='Enter new password'
                                                     type='password'
                                                     required={true}
-                                                    onChange={({ target }) => setPassword(target.value)}
+                                                    onChange={({ target }) => setCurrentPassword(target.value)}
                                                 />
 
                                                 <Input
                                                     label='New Password'
-                                                    value={password}
+                                                    value={newPassword}
                                                     placeholder='Enter new password'
                                                     type='password'
                                                     required={true}
-                                                    onChange={({ target }) => setPassword(target.value)}
+                                                    onChange={({ target }) => setNewPassword(target.value)}
                                                 />
 
                                                 <Input
                                                     label='Confirm New Password'
-                                                    value={password}
+                                                    value={confirmPassword}
                                                     placeholder='Enter new password'
                                                     type='password'
                                                     required={true}
-                                                    onChange={({ target }) => setPassword(target.value)}
+                                                    onChange={({ target }) => setConfirmPassword(target.value)}
+                                                />
+
+                                                {passwordError && <p className="text-rose-600 text-xs">{passwordError}</p>}
+
+                                                <SubmitButton
+                                                    label='Change Password'
+                                                    loading={loading}
+                                                    onClick={handleChangePassword}
                                                 />
                                             </Modal>
                                         )
                                         : (<button className="text-left text-sm">
-                                            Want to change your password?
-                                            <span onClick={() => setModalOpen(true)} className="text-xs text-primary font-medium ml-1">Click here</span>
+                                            Want to change your PASSWORD?
+                                            <span onClick={() => setModalOpen(true)} className="text-xs text-primary font-medium ml-1 cursor-pointer">Click here</span>
                                         </button>)
 
                                     }
 
-                                    {error && <p className="text-rose-600 text-xs">{error}</p>}
+                                    {error && <p className='text-red-500 text-xs pb-2-5'>{error}</p>}
 
-                                    <SubmitButton />
+                                    <SubmitButton label='Submit' />
                                 </div>
                             </form>
                         </div>
