@@ -71,7 +71,7 @@ const getTasks = asyncHandler(async (req, res) => {
         ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
     };
 
-    let tasks = await Task.find(filter).populate(isAdmin ? 'assignedTo' : 'createdBy', 'fullName email profileImageUrl');
+    let tasks = await Task.find(filter).populate(isAdmin ? 'assignedTo' : 'createdBy assignedTo', 'fullName email profileImageUrl');
 
     tasks = await Promise.all(
         tasks.map(task => {
@@ -83,6 +83,7 @@ const getTasks = asyncHandler(async (req, res) => {
         isDeleted: false,
         ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
     };
+    console.log(tasks)
 
     const [allTasks, pendingTasks, inProgressTasks, completedTasks] = await Promise.all([
         Task.countDocuments(summaryFilter),

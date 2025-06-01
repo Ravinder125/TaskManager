@@ -32,6 +32,7 @@ const generateToken = async (id) => {
     }
 }
 
+const profileRoute = '/api/v1/auth/profile'
 
 // @desc    Register a new user
 // @route   POST /api/v1/auth/register
@@ -84,7 +85,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors) {
-        return res.status(400).json(ApiResponse.error(400, errors.array(), 'Validation error'));
+        return res.status(400).json(ApiResponse.error(400, errors.array().join(',')));
     }
     const { email, password } = req.body;
     const userExist = await User.findOne({ email }).select('+password');
@@ -93,6 +94,20 @@ const loginUser = asyncHandler(async (req, res) => {
         return res.status(401).json(ApiResponse.error(401, 'Email or password is invalid'));
     }
     const { accessToken, refreshToken, options } = await generateToken(userExist._id)
+    const inviteToken = await InviteToken.findOne({ email })
+    const resData = {
+        user: {
+            _id: userExist._id,
+            email: userExist.email,
+            profileImageUrl: userExist.profileImageUrl,
+            role: userExist.role,
+            fullName: userExist.fullName
+        },
+        inviteToken: inviteToken?.token || ''
+    }
+
+    const pathKey = `${profileRoute}/:${userExist._id}`
+    await redis.set(pathKey, JSON.stringify(resData), 'EX', 300) // 5 min expiry
 
     return res
         .status(200)
@@ -115,6 +130,7 @@ const loginUser = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/auth/logout
 // @access  Private
 const logoutUser = asyncHandler(async (req, res) => {
+
     const options = {
         httpOnly: true,
         secure: true
@@ -132,67 +148,68 @@ const generateInviteToken = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     const hashedToken = crypto.randomBytes(32).toString('hex');
 
-    let inviteToken = await InviteToken.updateMany(
-        { token, email: user.email, isExpired: false },
+    const inviteToken = await InviteToken.updateMany(
+        { token, isExpired: false },
         { token: hashedToken },
         { new: true, }
 
     );
 
+    let newInviteToken
     if (!inviteToken) {
-        inviteToken = await InviteToken.create({
+        newInviteToken = await InviteToken.create({
             token: token || hashedToken,
             email: user?.email,
             role: 'admin'
         })
+        return newInviteToken
     }
 
     const tokenData = await InviteToken.findOne({ email: user.email, isExpired: false })
+    const userId = req.user._id
+    const pathKey = `${profileRoute}:${userId}`
+    await redis.set(pathKey, JSON.stringify({ user, inviteToken: tokenData?.token || '' }), 'EX', 300)
 
-    return res.status(200).json(ApiResponse.success(200, { inviteToken: tokenData.token }, 'Admin invite token successfully generated'))
+    return res.status(200).json(ApiResponse.success(200, { inviteToken: tokenData.token || '' }, 'Admin invite token successfully generated'))
 })
 
 // @desc    Get user profile
 // @route   GET /api/v1/auth/profile
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
-    const userId = req.user._id;
-    // const path = generateCatchKey(req.path)
-    // const profile = await redis.get(path)
 
-    // if (profile) {
-    //     return res.status(200).json(ApiResponse.success(200, JSON.parse(profile), 'User profile successfully fetched redis'))
-    // }
+    const userId = req.user._id;
+    const pathKey = `${profileRoute}:${userId}`
+    const profile = await redis.get(pathKey)
+
+    if (profile) {
+        return res.status(200).json(ApiResponse.success(200, JSON.parse(profile), 'User profile successfully fetched redis'))
+    }
 
     const user = await User.findById(userId).select('-password -refreshToken')
-
     if (!user) {
         return res.status(404).json(ApiResponse.error(400, 'Admin not found'))
     }
 
     let inviteToken = await InviteToken.findOne({ email: user.email })
-    inviteToken = inviteToken?.token || process.env.ADMIN_INVITE_TOKEN
-    // await redis.set(path, JSON.stringify(user))
+    await redis.set(pathKey, JSON.stringify({ user, inviteToken: inviteToken?.token || '' }), 'EX', 300)
 
-    return res.status(200).json(ApiResponse.success(200, { user, inviteToken }, 'User profile successfully fetched'));
+    return res.status(200).json(ApiResponse.success(200, resData, 'User profile successfully fetched'));
 })
 
 // @desc     Update user profile
 // @route    GET /api/v1/auth/profile
 // @access   Private
 const updateUserProfile = asyncHandler(async (req, res) => {
-    // const path = generateCatchKey(req.path)
-    // const profile = await redis.get(path)
-    // if (profile) {
-    //     return res.status(200).json(ApiResponse.success(200, JSON.parse(profile), 'User profile successfully updated'));
-    // }
-
     const userId = req.user._id;
+    const pathKey = `${profileRoute}:${userId}`
+
     const { email, fullName } = req.body;
     const user = await User.findById(userId);
     if (!user) {
         return res.status(404).json(ApiResponse.error(404, 'User not found'))
     }
+
     if (email) user.email = email;
     if (fullName?.firstName || fullName?.lastName) {
         user.fullName = {
@@ -201,8 +218,11 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         }
     }
 
+    const inviteToken = await InviteToken.findOne({ email })
+
     await user.save();
-    // await redis.set(path, JSON.stringify(updatedUser), 'EX', 300) // 5 min expiry
+    await redis.set(pathKey, JSON.stringify({ user, inviteToken: inviteToken?.token || '' }), 'EX', 300) // 5 min expiry
+
     return res.status(200).json(ApiResponse.success(200, user, 'User profile successfully updated'))
 })
 
@@ -210,11 +230,8 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 // @route    GET /api/v1/auth/profile-image
 // @access   Private
 const updateUserProfileImage = asyncHandler(async (req, res) => {
-    // const path = generateCatchKey(req.path);
-    // const imageUrl = await redis.get(path)
-    // if (imageUrl) {
-    //     return res.status(200).json(ApiResponse.success(200, JSON.parse(imageUrl), 'User profile image successfully updated'))
-    // }
+    const userId = req.user._id
+    const pathKey = `${profileRoute}:${userId}`
 
     const profileImageLocalPath = req?.file?.path;
 
@@ -227,12 +244,19 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
     }
 
     const user = await User.findByIdAndUpdate(
-        req.user._id,
+        userId,
         { profileImageUrl: profileImage.url },
         { new: true }
     ).select('-password -refreshToken');
+    if (!user) {
+        return res.status(400).json(ApiResponse.error(400, 'User not found'))
+    }
 
-    // await redis.set(path, JSON.stringify(user.profileImageUrl), 'EX', 300)
+    const inviteToken = await InviteToken.findOne({ email: user?.email })
+
+
+    await redis.set(pathKey, JSON.stringify({ user, inviteToken: inviteToken?.token || '' }), 'EX', 300)
+
     return res.status(200).json(ApiResponse.success(200, user?.profileImageUrl, 'User profile image successfully updated'));
 })
 

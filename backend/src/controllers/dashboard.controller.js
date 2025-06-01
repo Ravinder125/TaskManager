@@ -111,17 +111,17 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/user-dashboard-data
 // @access  Admin 
 const getUserDashboard = asyncHandler(async (req, res) => {
-    const path = generateCatchKey(req.path);
-    const data = await redis.get(path);
-    if (data) {
-        return res
-            .status(200)
-            .json(
-                200,
-                JSON.parse(data),
-                'Employee dashboard  successfully fetched'
-            )
-    }
+    // const path = generateCatchKey(req.path);
+    // const data = await redis.get(path);
+    // if (data) {
+    //     return res
+    //         .status(200)
+    //         .json(
+    //             200,
+    //             JSON.parse(data),
+    //             'Employee dashboard  successfully fetched'
+    //         )
+    // }
 
     const userId = req.user._id; // Only fetch employee data
 
@@ -137,6 +137,7 @@ const getUserDashboard = asyncHandler(async (req, res) => {
     })
 
     // Task distribution by status
+    // console.log(await Task.countDocuments({ assignedTo: userId }))
     const tasksStatuses = ['pending', 'in-progress', 'completed'];
     const taskDistributionRaw = await Task.aggregate([
         { $match: filter },
@@ -166,7 +167,7 @@ const getUserDashboard = asyncHandler(async (req, res) => {
     const recentTasks = await Task.find({ ...filter })
         .sort({ createdAt: -1 })
         .limit(10)
-        .select('title description createdAt dueTo ')
+        .select('title status priority description createdAt dueTo ')
 
     const responseData = {
         statistics: {
@@ -181,8 +182,7 @@ const getUserDashboard = asyncHandler(async (req, res) => {
         },
         recentTasks
     }
-
-    await redis.set(path, JSON.stringify(responseData), 'EX', 300)
+    // await redis.set(path, JSON.stringify(responseData), 'EX', 300)
 
     return res.status(200).json(
         ApiResponse.success(

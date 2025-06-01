@@ -21,7 +21,7 @@ const router = Router();
 
 router
     .route('/')
-    .get(isAuthenticated, adminOnly, getTasks) // get all tasks
+    .get(isAuthenticated, getTasks) // get all tasks
     .post(isAuthenticated, // creating a new task;
         adminOnly,
         [

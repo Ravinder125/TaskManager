@@ -42,7 +42,7 @@ function App() {
           <Route path='/employee/dashboard' element={<EmployeeDashboard />} />
           <Route path='/employee/tasks' element={<Mytasks />} />
           {/* <Route path='/employee/profile' element={<ManageEmployees />} /> */}
-          <Route path='/employee/task-details/:id' element={<ViewTaskDetails />} />
+          <Route path='/employee/task-details/:taskId' element={<ViewTaskDetails />} />
         </Route>
 
         {/* Both Admin and Employee Routes */}
