@@ -6,11 +6,24 @@ import { User } from "../models/user.model.js";
 import { validateObjectId } from "../utils/validateObjectId.js";
 import redis from "../config/redis.js";
 import { generateCatchKey } from "../utils/generateCatcheKey.js";
+import { isValidObjectId } from "mongoose";
+
+const isValidId = (id) => isValidObjectId(id);
+
+const taskRoute = '/api/v1/tasks/tasks'
+const deleteDashboardRedisPreviousData = async (userId) => {
+    const dashboardRoute = '/api/v1/dashboard'
+    await redis.del(`${dashboardRoute}:${userId}`)
+}
 
 // @desc    Create a new task (Admin only)
 // @route   POST /api/tasks
 // @access  Admin
 const createTask = asyncHandler(async (req, res) => {
+    const userId = req.user._id
+    if (isValidId(!userId)) {
+        return res.status(400).json(ApiResponse.error('Invalid user ID'))
+    }
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -40,6 +53,9 @@ const createTask = asyncHandler(async (req, res) => {
 
     if (!task) return res.status(400).json(ApiResponse.error(400, 'Error while creating Task'));
 
+    await deleteDashboardRedisPreviousData(userId)
+    const pathKey = `${taskRoute}:${userId}:${task?._id}`
+    await redis.set(pathKey, JSON.stringify(task), 'EX', 300)
     return res.status(201).json(ApiResponse.success(201, task, 'Task successfully created'));
 });
 
@@ -47,31 +63,27 @@ const createTask = asyncHandler(async (req, res) => {
 // @route   GET /api/tasks
 // @access  Admin/User
 const getTasks = asyncHandler(async (req, res) => {
-    const { status } = req.query;
-    // const path = req.path;
-    // const data = await redis.get(generateCatchKey(path, { status }))
-    // if (data) {
-    //     return res
-    //         .status(200)
-    //         .json(
-    //             ApiResponse.success(
-    //                 200,
-    //                 JSON.parse(data),
-    //                 'Task fetched successfully'
-    //             )
-    //         );
-    // }
-
     const userId = req.user._id;
-    const isAdmin = req.user.role === 'admin';
+    const { status } = req.query;
+    const pathKey = `${taskRoute}:${userId}:${status || 'all'}`
 
+    const data = await redis.get(pathKey)
+    if (data) {
+        return res
+            .status(200)
+            .json(ApiResponse.success(200, JSON.parse(data), 'Task fetched successfully'));
+    }
+
+    const isAdmin = req.user.role === 'admin';
     const filter = {
         isDeleted: false,
         ...(status && { status }),
         ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
     };
 
-    let tasks = await Task.find(filter).populate(isAdmin ? 'assignedTo' : 'createdBy assignedTo', 'fullName email profileImageUrl');
+    let tasks = await Task
+        .find(filter)
+        .populate(isAdmin ? 'assignedTo' : 'createdBy assignedTo', 'fullName email profileImageUrl');
 
     tasks = await Promise.all(
         tasks.map(task => {
@@ -83,7 +95,6 @@ const getTasks = asyncHandler(async (req, res) => {
         isDeleted: false,
         ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
     };
-    console.log(tasks)
 
     const [allTasks, pendingTasks, inProgressTasks, completedTasks] = await Promise.all([
         Task.countDocuments(summaryFilter),
@@ -99,11 +110,11 @@ const getTasks = asyncHandler(async (req, res) => {
         completedTasks
     };
 
-    // await redis.set(path, JSON.stringify(responseData), 'EX', 300)
-    return res.status(200).json(ApiResponse.success(200, {
-        tasks,
-        statusSummary,
-    }, 'Tasks fetched successfully'));
+
+    await redis.set(pathKey, JSON.stringify({ tasks, statusSummary }), 'EX', 300)
+    return res
+        .status(200)
+        .json(ApiResponse.success(200, { tasks, statusSummary, }, 'Tasks fetched successfully'));
 });
 
 // @desc    Update a task
@@ -112,7 +123,7 @@ const getTasks = asyncHandler(async (req, res) => {
 const updateTask = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
     const { title, description, status, attachments, priority, completedAt, dueTo, assignedTo, todoList } = req.body;
-    if (!validateObjectId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid Task ID'));
+    if (!isValidId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid task ID'));
 
     if (!title && !description && !status && !priority && !completedAt && !dueTo) {
         return res.status(400).json(ApiResponse.error(400, 'At least one field is required'));
@@ -151,6 +162,10 @@ const updateTask = asyncHandler(async (req, res) => {
     }
     const updatedTask = await task.save();
     if (!updatedTask) return res.status(500).json(ApiResponse.error(500, 'Error while updating Task'));
+
+    const pathKey = `${taskRoute}:${req.user._id}:${updateTask?._id}`
+    await deleteDashboardRedisPreviousData(req.user._id)
+    await redis.set(pathKey, JSON.stringify(updateTask), 'EX', 300)
 
     return res.status(200).json(ApiResponse.success(200, updatedTask, 'Task successfully updated'));
 });
@@ -233,13 +248,17 @@ const updateTodoList = asyncHandler(async (req, res) => {
 // @access  Admin
 const toggleDeleteTask = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
+    if (!isValidId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid Task ID'));
 
-    if (!validateObjectId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid Task ID'));
-
-    const task = await Task.findById(taskId);
+    const task = await Task.findByIdAndUpdate(
+        taskId,
+        { isDeleted: !task.isDeleted },
+        { new: true });
     if (!task) return res.status(404).json(ApiResponse.error(404, "Task not found"));
 
-    const deletedTask = await Task.findByIdAndUpdate(taskId, { isDeleted: !task.isDeleted }, { new: true });
+    const pathKey = `${taskRoute}:${req.user._id}:${task._id}`
+    await deleteDashboardRedisPreviousData(req.user._id)
+    await redis.del(pathKey)
     return res.status(200).json(ApiResponse.success(200, deletedTask, 'Task deletion toggled successfully'));
 });
 
@@ -249,12 +268,18 @@ const toggleDeleteTask = asyncHandler(async (req, res) => {
 // @access  Admin/User
 const getTaskById = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
+    if (!isValidId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid task ID'));
 
-    if (!validateObjectId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid Task ID'));
+    const pathKey = `${taskRoute}:${req.user._id}:${taskId}`
+    let task = await redis.get(pathKey)
+    if (task) {
+        return res.status(200).json(ApiResponse.success(200, JSON.parse(task)))
+    }
 
-    const task = await Task.findById(taskId).populate('assignedTo', 'fullName avatar coverImage');
+    task = await Task.findById(taskId).populate('assignedTo', 'fullName avatar coverImage');
     if (!task) return res.status(404).json(ApiResponse.error(404, 'Task not found'));
 
+    await redis.set(pathKey, JSON.stringify(task), 'EX', 300)
     return res.status(200).json(ApiResponse.success(200, task, 'Task fetched successfully'));
 });
 
@@ -289,9 +314,10 @@ const addTodoToTask = asyncHandler(async (req, res) => {
 // @route   DELETE /api/tasks/:taskId/todos/:todoId
 // @access  Admin/User
 const removeTodoFromTask = asyncHandler(async (req, res) => {
+
     const { taskId, todoId } = req.params;
 
-    if (!validateObjectId([taskId, todoId])) return res.status(400).json(ApiResponse.error(400, 'Invalid Task or Todo ID'));
+    if (!isValidId([taskId, todoId])) return res.status(400).json(ApiResponse.error(400, 'Invalid Task or Todo ID'));
 
     const task = await Task.findByIdAndUpdate(taskId, {
         $pull: { todoList: { _id: todoId } }

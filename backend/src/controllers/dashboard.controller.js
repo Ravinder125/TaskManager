@@ -4,24 +4,25 @@ import { Task } from "../models/Task.model.js";
 import { generateCatchKey } from "../utils/generateCatcheKey.js";
 import redis from "../config/redis.js";
 
+const dashboardRoute = '/api/v1/dashboard'
 
 // @desc    Get Admin Dashboard Data (Admin only)
 // @route   GET /api/v1/dashboard-data
 // @access  Admin 
 const getAdminDashboard = asyncHandler(async (req, res) => {
     // Stats
-    const path = generateCatchKey(req.path)
-    // const data = await redis.get(path)
-    // if (data) {
-    //     return res.status(200).json(ApiResponse.success(
-    //         200,
-    //         JSON.parse(data),
-    //         "Admin dashboard fetched successfully (redis)"
-    //     ));
-    // }
+    const userId = req.user._id
+    const pathKey = `${dashboardRoute}:${userId}`
+    const data = await redis.get(pathKey)
+    if (data) {
+        return res
+            .status(200)
+            .json(ApiResponse.success(200, JSON.parse(data), "Admin dashboard fetched successfully (redis)"));
+    }
+
     const filter = {
         isDeleted: false,
-        createdBy: req.user._id
+        createdBy: userId
     }
     const totalTasks = await Task.countDocuments(filter);
     const pendingTasks = await Task.countDocuments({ status: 'pending', ...filter });
@@ -97,33 +98,23 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
         recentTasks,
     }
 
-    await redis.set(path, JSON.stringify(responseData), 'EX', 60); // cache for 5 minutes
+    await redis.set(pathKey, JSON.stringify(responseData), 'EX', 300); // cache for 5 minutes
 
 
-    return res.status(200).json(ApiResponse.success(
-        200,
-        responseData,
-        "Admin dashboard fetched successfully"
-    ));
+    return res.status(200).json(ApiResponse.success(200, responseData, "Admin dashboard fetched successfully"));
 });
 
 // @desc    Get Employee Dashboard Data 
 // @route   GET /api/v1/user-dashboard-data
 // @access  Admin 
 const getUserDashboard = asyncHandler(async (req, res) => {
-    // const path = generateCatchKey(req.path);
-    // const data = await redis.get(path);
-    // if (data) {
-    //     return res
-    //         .status(200)
-    //         .json(
-    //             200,
-    //             JSON.parse(data),
-    //             'Employee dashboard  successfully fetched'
-    //         )
-    // }
-
     const userId = req.user._id; // Only fetch employee data
+    const pathKey = `${dashboardRoute}:${userId}`
+    const data = await redis.get(pathKey);
+    if (data) {
+        return res
+            .status(200).json(ApiResponse.success(200, JSON.parse(data), 'Employee dashboard  successfully fetched'))
+    }
 
     // Fetch statistics for user-spacific tasks
     const filter = { assignedTo: userId, isDeleted: false }
@@ -182,16 +173,9 @@ const getUserDashboard = asyncHandler(async (req, res) => {
         },
         recentTasks
     }
-    // await redis.set(path, JSON.stringify(responseData), 'EX', 300)
+    await redis.set(pathKey, JSON.stringify(responseData), 'EX', 300)
 
-    return res.status(200).json(
-        ApiResponse.success(
-            200,
-            responseData,
-            'Employee dashboard successfully fetched'
-        )
-
-    )
+    return res.status(200).json(ApiResponse.success(200, responseData, 'Employee dashboard successfully fetched'))
 })
 
 
