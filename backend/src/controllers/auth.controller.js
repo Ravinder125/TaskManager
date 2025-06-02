@@ -23,7 +23,7 @@ const generateToken = async (id) => {
 
         const options = {
             httpOnly: true,
-            secure: true
+            secure: true,
         }
 
         return { accessToken, refreshToken, options }
@@ -196,6 +196,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     const profile = await redis.get(pathKey)
 
     if (profile) {
+        // console.log(profile)
         return res.status(200).json(ApiResponse.success(200, JSON.parse(profile), 'User profile successfully fetched redis'))
     }
 
@@ -290,17 +291,17 @@ const changeUserPassword = asyncHandler(async (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json(ApiResponse.error(400, errors.array().join(',')));
+        const errMsg = errors.array().map(err => err.msg)
+        return res.status(400).json(ApiResponse.error(400, errMsg[0]));
     }
 
     const { currentPassword, newPassword, confirmPassword } = req.body;
-
     if (newPassword !== confirmPassword) {
         return res.status(400).json(ApiResponse.error(400, 'New password and confirm password do not match'));
     }
 
     const user = await User.findById(req.user._id).select('+password');
-    if (!user || !compareSync(currentPassword, user.password)) {
+    if (!user || !(await user.isPasswordCorrect(currentPassword))) {
         return res.status(401).json(ApiResponse.error(401, 'Password is incorrect'));
     }
 

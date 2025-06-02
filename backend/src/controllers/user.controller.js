@@ -8,7 +8,7 @@ import redis from "../config/redis.js";
 
 const isValidId = (id) => isValidObjectId(id)
 
-const usersRoute = `/api/v1/users/`
+const usersRoute = `/api/v1/users`
 
 // @desc    Get all users (Admin only)
 // @route   Get /api/v1/users/

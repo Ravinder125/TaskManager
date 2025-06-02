@@ -17,8 +17,8 @@ const userSchema = new Schema(
 
 // Hash the password before saving the user document
 userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
     try {
+        if (!this.isModified('password')) return next();
         this.password = await bcryptjs.hash(this.password, 10);
         next();
     } catch (error) {
@@ -28,7 +28,8 @@ userSchema.pre('save', async function (next) {
 
 // Method to check if the provided password is correct
 userSchema.methods.isPasswordCorrect = async function (password) {
-    return await bcryptjs.compare(password, this.password);
+    const isCorrect = await bcryptjs.compare(password, this.password);
+    return isCorrect
 };
 
 // Method to generate a refresh token

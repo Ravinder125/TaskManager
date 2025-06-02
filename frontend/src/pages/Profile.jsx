@@ -26,6 +26,7 @@ const Profile = () => {
     const [modalOpen, setModalOpen] = useState(false);
 
     const handleSubmit = async (e) => {
+
         setError("");
         e.preventDefault();
 
@@ -71,15 +72,12 @@ const Profile = () => {
                     })
                     toast.success('Profile successfully updated');
                 }
-
-                window.location.reload();
             }
 
         } catch (error) {
             console.error('Error while updating profile:', error);
             toast.error(error?.response?.data?.message || 'Something went wrong while updating profile')
         } finally {
-
             setLoading(false);
         }
 
@@ -148,16 +146,16 @@ const Profile = () => {
     if (loading) return <Loading />;
     return (
         <DashboardLayout>
-            <div className="p-4 my-4">
-                <div className="grid grid-cols-1 md:grid-cols-4">
+            <div className="p-4 my-4 ">
+                <div className="grid grid-cols-1  md:grid-cols-4">
                     <div className="form-card col-span-3" >
                         <div className="flex items-center justify-between">
                             <h2 className="font-semibold text-xl">Your Profile</h2>
                         </div>
 
-                        <div className="mt-4">
+                        <div className="mt-4 ">
                             <form onSubmit={handleSubmit} >
-                                <div className="grid grid-cols-1  gap-4">
+                                <div className="grid   grid-cols-1  gap-4">
 
                                     <ProfilePhotoSelector setProfilePic={setProfilePic} profilePic={profilePic} />
 
@@ -210,7 +208,7 @@ const Profile = () => {
                                                 <Input
                                                     label='Current Password'
                                                     value={currentPassword}
-                                                    placeholder='Enter new password'
+                                                    placeholder='Enter current password'
                                                     type='password'
                                                     required={true}
                                                     onChange={({ target }) => setCurrentPassword(target.value)}
@@ -228,7 +226,7 @@ const Profile = () => {
                                                 <Input
                                                     label='Confirm New Password'
                                                     value={confirmPassword}
-                                                    placeholder='Enter new password'
+                                                    placeholder='Confirm your password'
                                                     type='password'
                                                     required={true}
                                                     onChange={({ target }) => setConfirmPassword(target.value)}
