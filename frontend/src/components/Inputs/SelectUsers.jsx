@@ -95,7 +95,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
                                 <input
                                     className='w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded-sm outline-none'
                                     type='checkbox'
-                                    // onChange={() => toggleUserSelection(user?._id)}
+                                    onChange={() => toggleUserSelection(user?._id)}
                                     checked={tempSelectedUsers.includes(user?._id)}
                                 />
                             </div>

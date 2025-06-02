@@ -247,7 +247,7 @@ const CreateTasks = () => {
                             />
                         </div>
 
-                        <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mt-4'>
+                        <div className='grid grid-cols-1 md:grid-cols-4 gap-4 mt-4'>
                             <div className='w-full'>
                                 <label htmlFor='priority' className='form-label'>
                                     Priority
@@ -261,7 +261,7 @@ const CreateTasks = () => {
                                 />
                             </div>
 
-                            <div className='w-full col-span-1'>
+                            <div className='w-full'>
                                 <label htmlFor='dueTo' className='form-label'>
                                     Due Date
                                 </label>

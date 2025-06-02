@@ -6,7 +6,7 @@ import {
     LuLogOut,
 } from 'react-icons/lu';
 
-export const SIDE_MENU_DATA = [
+const SIDE_MENU_DATA = [
     {
         id: '01',
         label: 'Dashboard',
@@ -39,7 +39,7 @@ export const SIDE_MENU_DATA = [
     },
 ];
 
-export const SIDE_MENU_EMPLOYEE_DATA = [
+const SIDE_MENU_EMPLOYEE_DATA = [
     {
         id: '01',
         label: 'Dashboard',
@@ -60,14 +60,21 @@ export const SIDE_MENU_EMPLOYEE_DATA = [
     },
 ]
 
-export const PRIORITY_DATA = [
+const PRIORITY_DATA = [
     { label: 'Low', value: 'low' },
     { label: 'Medium', value: 'medium' },
     { label: 'High', value: 'high' }
 ];
 
-export const STATUS_DATA = [
+const STATUS_DATA = [
     { label: 'Pending', value: 'pending' },
     { label: 'In Progress', value: 'in-progress' },
     { label: 'Completed', value: 'completed' }
 ]
+
+export {
+    SIDE_MENU_DATA,
+    SIDE_MENU_EMPLOYEE_DATA,
+    PRIORITY_DATA,
+    STATUS_DATA,
+}

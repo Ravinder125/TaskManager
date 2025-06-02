@@ -12,6 +12,8 @@ import toast from "react-hot-toast";
 const Profile = () => {
     useUserAuth();
 
+    // TODO: fix the changing password issue
+
     const { user, updateUser, inviteToken, setInviteToken } = useContext(UserContext);
 
     const [loading, setLoading] = useState(false);
@@ -232,7 +234,7 @@ const Profile = () => {
                                                     onChange={({ target }) => setConfirmPassword(target.value)}
                                                 />
 
-                                                {passwordError && <p className="text-rose-600 text-xs">{passwordError}</p>}
+                                                {passwordError && (<p className="text-rose-600 text-xs">Error: {passwordError}</p>)}
 
                                                 <SubmitButton
                                                     label='Change Password'
@@ -241,14 +243,14 @@ const Profile = () => {
                                                 />
                                             </Modal>
                                         )
-                                        : (<button className="text-left text-xs sm:text-sm text-slate-600 ">
+                                        : (<button className="text-left text-xs sm:text-sm text-slate-600 pb-2.5">
                                             Want to change your PASSWORD?
                                             <span onClick={() => setModalOpen(true)} className="text-xs text-primary font-medium ml-1 cursor-pointer">Click here</span>
                                         </button>)
 
                                     }
 
-                                    {error && <p className='text-red-500 text-xs pb-2-5'>{error}</p>}
+                                    {error && (<p className='text-rose-600 text-xs pb-2-5'>Error: {error}</p>)}
 
                                     <SubmitButton label='Submit' />
                                 </div>

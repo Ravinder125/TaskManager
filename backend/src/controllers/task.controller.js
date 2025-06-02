@@ -2,10 +2,8 @@ import { asyncHandler } from "../utils/asynchandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { validationResult } from "express-validator";
 import { Task } from "../models/Task.model.js";
-import { User } from "../models/user.model.js";
 import { validateObjectId } from "../utils/validateObjectId.js";
 import redis from "../config/redis.js";
-import { generateCatchKey } from "../utils/generateCatcheKey.js";
 import { isValidObjectId } from "mongoose";
 
 const isValidId = (id) => isValidObjectId(id);
@@ -57,6 +55,26 @@ const createTask = asyncHandler(async (req, res) => {
     const pathKey = `${taskRoute}:${userId}:${task?._id}`
     await redis.set(pathKey, JSON.stringify(task), 'EX', 300)
     return res.status(201).json(ApiResponse.success(201, task, 'Task successfully created'));
+});
+
+// @desc    Get task by ID
+// @route   GET /api/tasks/:taskId
+// @access  Admin/User
+const getTaskById = asyncHandler(async (req, res) => {
+    const { taskId } = req.params;
+    if (!isValidId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid task ID'));
+
+    const pathKey = `${taskRoute}:${req.user._id}:${taskId}`
+    let task = await redis.get(pathKey)
+    if (task) {
+        return res.status(200).json(ApiResponse.success(200, JSON.parse(task)))
+    }
+
+    task = await Task.findById(taskId).populate('assignedTo', 'fullName avatar coverImage');
+    if (!task) return res.status(404).json(ApiResponse.error(404, 'Task not found'));
+
+    await redis.set(pathKey, JSON.stringify(task), 'EX', 300)
+    return res.status(200).json(ApiResponse.success(200, task, 'Task fetched successfully'));
 });
 
 // @desc    Get all tasks
@@ -262,26 +280,6 @@ const toggleDeleteTask = asyncHandler(async (req, res) => {
     return res.status(200).json(ApiResponse.success(200, deletedTask, 'Task deletion toggled successfully'));
 });
 
-
-// @desc    Get task by ID
-// @route   GET /api/tasks/:taskId
-// @access  Admin/User
-const getTaskById = asyncHandler(async (req, res) => {
-    const { taskId } = req.params;
-    if (!isValidId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid task ID'));
-
-    const pathKey = `${taskRoute}:${req.user._id}:${taskId}`
-    let task = await redis.get(pathKey)
-    if (task) {
-        return res.status(200).json(ApiResponse.success(200, JSON.parse(task)))
-    }
-
-    task = await Task.findById(taskId).populate('assignedTo', 'fullName avatar coverImage');
-    if (!task) return res.status(404).json(ApiResponse.error(404, 'Task not found'));
-
-    await redis.set(pathKey, JSON.stringify(task), 'EX', 300)
-    return res.status(200).json(ApiResponse.success(200, task, 'Task fetched successfully'));
-});
 
 // @desc    Add todo to task
 // @route   POST /api/tasks/:taskId/todos

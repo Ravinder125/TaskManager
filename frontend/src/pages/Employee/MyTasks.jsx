@@ -55,8 +55,7 @@ const MyTasks = () => {
 
     const handleClick = (taskData) => {
         if (taskData && taskData._id) {
-            console.log(taskData._id)
-            navigate('/employee/task-details/:taskId')
+            navigate(`/employee/task-details/${taskData._id}`)
         }
     }
 
