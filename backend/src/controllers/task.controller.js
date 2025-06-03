@@ -70,7 +70,7 @@ const getTaskById = asyncHandler(async (req, res) => {
         return res.status(200).json(ApiResponse.success(200, JSON.parse(task)))
     }
 
-    task = await Task.findById(taskId).populate('assignedTo', 'fullName avatar coverImage');
+    task = await Task.findById(taskId).populate('assignedTo', 'fullName profileImageUrl');
     if (!task) return res.status(404).json(ApiResponse.error(404, 'Task not found'));
 
     await redis.set(pathKey, JSON.stringify(task), 'EX', 300)
