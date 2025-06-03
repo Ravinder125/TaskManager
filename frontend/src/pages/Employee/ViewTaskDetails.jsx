@@ -5,7 +5,7 @@ import { API_PATHS } from '../../utils/apiPaths';
 import { AvatarGroup, DashboardLayout, Loading } from '../../components/index'
 import moment from 'moment';
 import { formatName } from '../../utils/helper';
-import { LuSquareArrowRight } from 'react-icons/lu';
+import { LuSquareArrowOutUpRight } from 'react-icons/lu';
 
 const ViewTaskDetails = () => {
     const { taskId } = useParams();
@@ -42,10 +42,37 @@ const ViewTaskDetails = () => {
         }
     }
 
-    const updateTodoCheckList = async (index) => { }
+    const updateTodoCheckList = async (index) => {
+        const todoChecklist = [...task?.todoList];
+        console.log('jalsdjkfsda')
+
+        if (todoChecklist && todoChecklist[index]) {
+            todoChecklist[index].completed = !todoChecklist[index].completed;
+
+            try {
+                const response = await axiosInstance.put(
+                    API_PATHS.TASKS.UPDATE_TASK_TODO_CHECKLIST(taskId),
+                    { todoChecklist }
+                )
+
+                if (response.status = 200) {
+                    setTask(response.data?.task || task)
+                } else {
+                    // OPtionally revert the toggle if the API call fails
+                    todoChecklist[index].completed = !todoChecklist[index].completed
+                }
+            } catch (err) {
+                console.error('Error while updating todo list', err)
+                setError(err?.response?.data?.message || 'something went wrong')
+            }
+        }
+    }
 
     // handle attachment Link click
     const handleLinkClick = (link) => {
+        if (!/^https?:\/\//i.test(link)) {
+            link = "https://" + link; // Default to HTTPs
+        }
         window.open(link, "_blank")
     }
 
@@ -57,7 +84,7 @@ const ViewTaskDetails = () => {
         }
 
         return () => { };
-    }, [taskId])
+    }, [taskId, setTask])
 
     // handle todo check list
     if (loading) return <Loading />
@@ -131,7 +158,6 @@ const ViewTaskDetails = () => {
                                     <label className='text-xs font-medium text-slate-500'>
                                         Attachments
                                     </label>
-
                                     {task?.attachments?.map((link, idx) => (
                                         <Attachment
                                             key={`link_${idx}`}
@@ -142,6 +168,8 @@ const ViewTaskDetails = () => {
                                     ))}
                                 </div>
                             )}
+
+                            {error && (<p className='text-xs text-rose-600 mt-4'>Error: {error}</p>)}
                         </div>
                     </div>
                 )}
@@ -165,16 +193,39 @@ const InfoBox = ({ label, value }) => {
 }
 
 const TodoCheclist = ({ text, isChanged, onChange }) => {
+    console.log(isChanged)
     return (
-        <div className='flex items-center gap-3 p-3'>
+        <div className='flex items-center gap-3 p-3 mt-2 rounded-md'>
             <input
-                className='w-4 h-4 text-primary bg-gray-200 border-gray-300 rounded-sm cursor-pointer'
-                type="text"
+                className='w-4 h-4 text-primary border border-gray-400 rounded-sm cursor-pointer'
+                type="checkbox"
                 checked={isChanged}
                 onChange={onChange}
             />
 
-            <p className='text-[13px] text-gray-800'>{text}</p>
+            <p className='text-[13px] font-medium text-gray-800'>{text}</p>
+        </div>
+    )
+}
+
+const Attachment = ({ link, index, onClick }) => {
+    return (
+        <div
+            className='flex justify-between bg-gray-50 border-gray-100 px-3 py-2 rounded-md mb-3 mt-2 cursor-pointer'
+            onClick={onClick}
+        >
+            <div className='flex-1 flex items-center gap-3'>
+                <div className='flex items-center text-sm gap-x-2 '>
+                    <span className='font-semibold text-xs text-gray-600'>
+                        {index < 9 ? `0${index + 1}` : index + 1}
+                    </span>
+
+                    <p className='text-xs text-black'>{link}</p>
+                </div>
+
+            </div>
+            <LuSquareArrowOutUpRight />
+
         </div>
     )
 }

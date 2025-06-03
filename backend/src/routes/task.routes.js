@@ -57,7 +57,7 @@ router
         validateParams,
         addTodoToTask, // add new todo to task
     )
-    .put(isAuthenticated, adminOnly, validateParams, updateTodoList)
+    .put(isAuthenticated, validateParams, updateTodoList)
 router.route('/:taskId/todos/:todoId/status').patch(isAuthenticated, updateTodoStatus) // update todo's status
 router
     .route('/:taskId/todos/:todoId')

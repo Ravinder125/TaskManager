@@ -220,24 +220,20 @@ const updateTaskStatus = asyncHandler(async (req, res) => {
 
 // @desc    Update todo list
 // @route   PUT /api/v1/:taskId/todos
-// @access  Admin
+// @access  Admin/User
 const updateTodoList = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
-    const { todos } = req.body;
-
-    if (!Array.isArray(todos)) {
+    const { todoChecklist } = req.body;
+    if (!Array.isArray(todoChecklist)) {
         return res.status(400).json(ApiResponse.error(400, 'Todos must be an array of todos'));
     }
-    if (!validateObjectId([taskId])) {
-        return res.status(400).json(ApiResponse.error(400, 'Invalid id'));
-    }
-    const task = await Task.findOne({ _id: taskId, isDeleted: false })
 
+    const task = await Task.findOne({ _id: taskId, isDeleted: false })
     if (!task) {
         return res.status(404).json(ApiResponse.error(404, 'Task not found'));
     }
 
-    task.todoList = todos
+    task.todoList = todoChecklist
 
     // Auto-update progress based o todo list completion
     const completedTodoCount = task.todoList?.filter(
@@ -255,7 +251,11 @@ const updateTodoList = asyncHandler(async (req, res) => {
     }
 
     await task.save();
-    const updatedTask = await Task.findById(taskId).populate('assignedTo', 'fullName email profileImageUrl')
+    const pathKey = `${taskRoute}:${req.user._id}:${task?._id}`
+    await deleteDashboardRedisPreviousData(req.user._id)
+    await redis.del(pathKey)
+    await redis.set(pathKey, JSON.stringify(updateTask), 'EX', 300)
+    const updatedTask = await Task.findById(task._id).populate('assignedTo', 'fullName email profileImageUrl')
 
     return res.status(200).json(ApiResponse.success(200, updatedTask, 'Task todo list successfully updated'));
 
