@@ -22,6 +22,8 @@ const Register = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
 
+
+        setError("")
         if (!fullName) {
             setError('Please enter your full name')
         }

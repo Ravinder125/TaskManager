@@ -13,7 +13,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate()
 
-    const { updateUser } = useContext(UserContext);
+    const { updateUser, setInviteToken } = useContext(UserContext);
 
     // Handle login logic
     const handleLogin = async (e) => {
@@ -40,17 +40,19 @@ const Login = () => {
                 { email, password }
             );
 
-            const { message, data } = response.data;
-            updateUser(data);
-            console.log(data)
-            console.log(message || 'User successfully logged in');
+            if (response?.data?.data) {
+                const { message, data } = response.data;
+                updateUser(data?.user);
+                setInviteToken(data?.inviteToken)
+                console.log(message || 'User successfully logged in');
 
-            // Redirect Based on role
-            if (data.role === 'admin') {
-                console.log(data.role)
-                navigate('/admin/dashboard')
-            } else {
-                navigate('/employee/dashboard')
+                // Redirect Based on role
+                if (data.role === 'admin') {
+                    console.log(data.role)
+                    navigate('/admin/dashboard')
+                } else {
+                    navigate('/employee/dashboard')
+                }
             }
         } catch (error) {
             if (error.response && error.response.data.message) {

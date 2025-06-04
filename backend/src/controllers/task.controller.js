@@ -224,42 +224,49 @@ const updateTaskStatus = asyncHandler(async (req, res) => {
 const updateTodoList = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
     const { todoChecklist } = req.body;
+
     if (!Array.isArray(todoChecklist)) {
         return res.status(400).json(ApiResponse.error(400, 'Todos must be an array of todos'));
     }
 
-    const task = await Task.findOne({ _id: taskId, isDeleted: false })
+    const task = await Task.findOne({ _id: taskId, isDeleted: false });
     if (!task) {
         return res.status(404).json(ApiResponse.error(404, 'Task not found'));
     }
 
-    task.todoList = todoChecklist
+    task.todoList = todoChecklist;
 
-    // Auto-update progress based o todo list completion
-    const completedTodoCount = task.todoList?.filter(
-        todo => todo.completed)?.length || 0;
+    // Auto-update progress based on todo list completion
+    const completedTodoCount = task.todoList?.filter(todo => todo.completed)?.length || 0;
     const totalTodos = task.todoList?.length || 0;
     task.progress = totalTodos > 0 ? Math.round((completedTodoCount / totalTodos) * 100) : 0;
 
-    // Auto-mark task as completed if all times are checked
+    // Auto-mark task status
     if (task.progress === 100) {
-        task.status = 'completed'
+        task.status = 'completed';
     } else if (task.progress > 0) {
         task.status = 'in-progress';
     } else {
-        task.status = 'pending'
+        task.status = 'pending';
     }
 
     await task.save();
-    const pathKey = `${taskRoute}:${req.user._id}:${task?._id}`
-    await deleteDashboardRedisPreviousData(req.user._id)
-    await redis.del(pathKey)
-    await redis.set(pathKey, JSON.stringify(updateTask), 'EX', 300)
-    const updatedTask = await Task.findById(task._id).populate('assignedTo', 'fullName email profileImageUrl')
+
+    const pathKey = `${taskRoute}:${req.user._id}:${task._id}`;
+    await Promise.all(
+        ['all', 'pending', 'in-progress', 'completed'].map(status => {
+            const allTasksPathKey = `${taskRoute}:${req.user._id}:${status}`;
+            return redis.del(allTasksPathKey);
+        })
+    );
+    await redis.del(pathKey);
+    await deleteDashboardRedisPreviousData(req.user._id);
+
+    const updatedTask = await task.populate('assignedTo', 'fullName email profileImageUrl');
+    await redis.set(pathKey, JSON.stringify(updatedTask), 'EX', 300);
 
     return res.status(200).json(ApiResponse.success(200, updatedTask, 'Task todo list successfully updated'));
-
-})
+});
 
 // @desc    Toggle task deletion
 // @route   PATCH /api/tasks/:taskId/toggle-delete

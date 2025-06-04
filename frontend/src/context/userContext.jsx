@@ -37,7 +37,7 @@ const UserProvider = ({ children }) => {
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [setUser]);
 
     // Update user info (e.g. after profile edit)
     const updateUser = useCallback((userData) => {

@@ -94,7 +94,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const userExist = await User.findOne({ email }).select('+password');
 
     if (!userExist || !(await userExist.isPasswordCorrect(password))) {
-        return res.status(401).json(ApiResponse.error(401, 'Email or password is invalid'));
+        return res.status(401).json(ApiResponse.error(401, 'Email or password is invalid'))
     }
     const { accessToken, refreshToken, options } = await generateToken(userExist._id)
     const inviteToken = await InviteToken.findOne({ email })
@@ -119,13 +119,7 @@ const loginUser = asyncHandler(async (req, res) => {
         .json(
             ApiResponse.success(
                 200,
-                {
-                    _id: userExist._id,
-                    email: userExist.email,
-                    profileImageUrl: userExist.profileImageUrl,
-                    role: userExist.role,
-                    fullName: userExist.fullName
-                },
+                resData,
                 `${userExist.role} successfully logged in`))
 })
 

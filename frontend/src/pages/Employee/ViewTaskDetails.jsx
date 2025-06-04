@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { AvatarGroup, DashboardLayout, Loading } from '../../components/index'
 import moment from 'moment';
 import { formatName } from '../../utils/helper';
-import { LuSquareArrowOutUpRight } from 'react-icons/lu';
+import { LuArrowBigLeft, LuArrowLeft, LuSquareArrowOutUpRight } from 'react-icons/lu';
 
 const ViewTaskDetails = () => {
     const { taskId } = useParams();
@@ -16,7 +16,7 @@ const ViewTaskDetails = () => {
 
     const getStatusTagColor = (status) => {
         switch (status) {
-            case 'InProgress':
+            case 'In progress':
                 return 'text-cyan-500 bg-cyan-50 border broder-cyan-500/10';
             case 'completed':
                 return 'text-lime-500 bg-lime-50 border border-lime-500/10';
@@ -44,7 +44,6 @@ const ViewTaskDetails = () => {
 
     const updateTodoCheckList = async (index) => {
         const todoChecklist = [...task?.todoList];
-        console.log('jalsdjkfsda')
 
         if (todoChecklist && todoChecklist[index]) {
             todoChecklist[index].completed = !todoChecklist[index].completed;
@@ -56,7 +55,7 @@ const ViewTaskDetails = () => {
                 )
 
                 if (response.status = 200) {
-                    setTask(response.data?.task || task)
+                    setTask(response?.data?.data || task)
                 } else {
                     // OPtionally revert the toggle if the API call fails
                     todoChecklist[index].completed = !todoChecklist[index].completed
@@ -79,8 +78,6 @@ const ViewTaskDetails = () => {
     useEffect(() => {
         if (taskId) {
             getTaskById();
-
-
         }
 
         return () => { };
@@ -90,21 +87,33 @@ const ViewTaskDetails = () => {
     if (loading) return <Loading />
     return (
         <DashboardLayout activeMenu='My Tasks'>
-            <div className='mt-5'>
+            <div className='my-5'>
                 {task && (
                     <div className='grid grid-cols-1 md:grid-cols-4 mt-4'>
                         <div className='form-card col-span-3'>
-                            <div className='flex items-cneter justify-between'>
-                                <h2 className='text-sm md:text-xl font-semibold'>
-                                    {task?.title}
-                                </h2>
+                            <div className='flex flex-col'>
+                                <Link
+                                    to='/employee/tasks'
+                                    className='w-fit hover:bg-black/10 hover:text-black text-gray-600 rounded-lg px-2 py-2 transition-all duration-200 ease-in-out'>
+                                    <LuArrowLeft className='text-xl' />
+                                </Link>
 
-                                <div
-                                    className={`text-[13px] font-medium ${getStatusTagColor(
-                                        task?.status
-                                    )} px-4 py-0.5 rounded`}
-                                >
-                                    {task?.status}
+                                <div className='flex items-cneter justify-between'>
+                                    <h2 className='text-sm md:text-xl font-semibold'>
+                                        {task?.title}
+                                    </h2>
+
+                                    <div
+                                        className={`text-[13px] font-medium ${getStatusTagColor(
+                                            task.status === 'in-progress' ?
+                                                task?.status[0].toUpperCase() + task?.status?.slice(1).replace('-', ' ')
+                                                : task?.status
+                                        )} px-4 py-0.5 rounded`}
+                                    >
+                                        {task.status === 'in-progress' ?
+                                            task?.status[0].toUpperCase() + task?.status?.slice(1).replace('-', ' ')
+                                            : formatName(task?.status)}
+                                    </div>
                                 </div>
                             </div>
 
@@ -193,7 +202,6 @@ const InfoBox = ({ label, value }) => {
 }
 
 const TodoCheclist = ({ text, isChanged, onChange }) => {
-    console.log(isChanged)
     return (
         <div className='flex items-center gap-3 p-3 mt-2 rounded-md'>
             <input

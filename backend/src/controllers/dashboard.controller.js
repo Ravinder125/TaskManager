@@ -136,10 +136,14 @@ const getUserDashboard = asyncHandler(async (req, res) => {
     ]);
 
     const taskDistribution = tasksStatuses.reduce((acc, status) => {
-        acc[status] =
-            taskDistributionRaw.find((task) => task._id === status)?.count || 0
-        return acc
-    }, {})
+        let formattedKey = status;
+        if (status === 'in-progress') {
+            formattedKey = 'inProgress';
+        }
+        const found = taskDistributionRaw.find(item => item._id === status);
+        acc[formattedKey] = found ? found.count : 0;
+        return acc;
+    }, {});
 
     taskDistribution['all'] = totalTasks;
 
