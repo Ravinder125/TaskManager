@@ -8,7 +8,7 @@ import axiosInstance from '../../utils/axiosInstance';
 import toast from 'react-hot-toast';
 
 const Register = () => {
-    const [profilePic, setProfilePic] = useState(null);
+    // const [profilePic, setProfilePic] = useState(null);
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -34,9 +34,9 @@ const Register = () => {
             setError('Please enter valid email')
         }
 
-        if (!profilePic) {
-            setError('Profile image is required')
-        }
+        // if (!profilePic) {
+        //     setError('Profile image is required')
+        // }
 
         if (error) return;
         setError("")
@@ -53,10 +53,10 @@ const Register = () => {
             const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, formData);
             if (response?.data?.data) {
                 toast.success(response.data.message)
-                if (profilePic && response) {
-                    const imageUploadRes = await uploadImage(profilePic);
-                    toast.success(imageUploadRes.message)
-                }
+                // if (profilePic && response) {
+                //     const imageUploadRes = await uploadImage(profilePic);
+                //     toast.success(imageUploadRes.message)
+                // }
 
                 // Redirect to login page after successfull registeration
                 navigate('/login')
@@ -81,9 +81,9 @@ const Register = () => {
                 <p className='text-sm text-gray-600 mt-2 mb-6 text-center'>Join us today by entering your details below</p>
 
                 <form onSubmit={handleRegister} >
-                    <ProfilePhotoSelector
+                    {/* <ProfilePhotoSelector
                         setProfilePic={setProfilePic}
-                    />
+                    /> */}
                     <div className='grid md:grid-cols-2 grid-cols-1 gap-2 '>
 
                         <Input
