@@ -85,15 +85,16 @@ function Dashboard() {
     return (
         <DashboardLayout activeMenu='Dashboard'>
             <div className='card my-5'>
-                < div >
-                    <div className=''>
-                        <h2 className='text-xl leading-4 mb-3 md:text-2xl '>Good Morning!
-                            {" "} {formatName(user?.fullName)}
+                <div>
+                    <div className='flex flex-col sm:flex-row sm:justify-between md:justify-start md:gap-4'>
+                        <span className='text-xl md:text-2xl'>Good Morning!</span>
+                        <h2 className='text-xl md:text-2xl font-semibold '>
+                            {formatName(user?.fullName)}
                         </h2>
-                        <p className='text-xs md:text-[13px] text-gray-400 mt-1.5'>
-                            {moment().format('dddd Do MMM YYYY')}
-                        </p>
                     </div>
+                    <p className='text-xs md:text-[13px] text-gray-400 mt-1.5'>
+                        {moment().format('dddd Do MMM YYYY')}
+                    </p>
                 </div >
 
                 {dashboardData && dashboardData.charts && dashboardData.charts.taskDistribution && (

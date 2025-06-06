@@ -243,9 +243,9 @@ const Profile = () => {
                                                 />
                                             </Modal>
                                         )
-                                        : (<button className="text-left text-xs sm:text-sm text-slate-600 pb-2.5">
-                                            Want to change your PASSWORD?
-                                            <span onClick={() => setModalOpen(true)} className="text-xs text-primary font-medium ml-1 cursor-pointer">Click here</span>
+                                        : (<button className="text-left text-[13px] sm:text-sm text-slate-600 pb-2.5">
+                                            Want to change your password?
+                                            <span onClick={() => setModalOpen(true)} className="text-primary font-medium ml-1 cursor-pointer">Click here</span>
                                         </button>)
 
                                     }
