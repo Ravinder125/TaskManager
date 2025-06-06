@@ -1,4 +1,4 @@
-const BASE_URL = "https://taskmanager-i3l0.onrender.com";
+const BASE_URL = "https://taskmanager-1-jur6.onrender.com";
 
 // utils/api/paths.js
 const API_PATHS = {
