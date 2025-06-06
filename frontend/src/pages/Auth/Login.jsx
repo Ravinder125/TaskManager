@@ -41,12 +41,12 @@ const Login = () => {
             );
 
             if (response?.data?.data) {
-                const { message, data } = response.data;
+                const { data } = response.data;
                 updateUser(data?.user);
                 setInviteToken(data?.inviteToken)
 
                 // Redirect Based on role
-                if (data.role === 'admin') {
+                if (data?.user?.role === 'admin') {
                     navigate('/admin/dashboard')
                 } else {
                     navigate('/employee/dashboard')

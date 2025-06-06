@@ -17,17 +17,17 @@ const CustomPieLegend = ({ payload }) => {
     )
 }
 
-// const CustomBarLegend = (pross) => {
+const CustomBarLegend = (pross) => {
 
-//     return (
-//         <div className='flex justify-cener flex-wrap gap-2'>
+    return (
+        <div className='flex justify-cener flex-wrap gap-2'>
 
 
-//         </div>
-//     )
-// }
+        </div>
+    )
+}
 
 export {
     CustomPieLegend,
-    // CustomBarLegend
+    CustomBarLegend
 }
