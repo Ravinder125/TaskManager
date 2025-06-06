@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:4000";
+const BASE_URL = "https://taskmanager-tkq9.onrender.com";
 
 // utils/api/paths.js
 const API_PATHS = {
