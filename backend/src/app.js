@@ -4,7 +4,7 @@ import cors from 'cors';
 
 const app = express();
 
-const whitelist = ['http://localhost:5173', 'https://task-manager-three-swart.vercel.app']
+const whitelist = ['http://localhost:5173', 'https://task-manager-three-swart.vercel.app' || process.env.CORS_ORIGIN]
 const corsOptions = {
     origin: function (origin, callback) {
         if (whitelist.indexOf(origin) !== -1 || !origin) {
