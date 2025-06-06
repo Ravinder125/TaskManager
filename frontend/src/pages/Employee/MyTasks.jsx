@@ -37,7 +37,6 @@ const MyTasks = () => {
             setAllTasks(response.data?.data.tasks.length > 0 ? response.data.data.tasks : [])
             // Map statusSummary data will fixed labels and order
             const statusSummary = response.data?.data?.statusSummary
-            console.log(statusSummary)
             const statusArray = [
                 { label: 'All', count: statusSummary.allTasks || 0 },
                 { label: 'Pending', count: statusSummary.pendingTasks || 0 },

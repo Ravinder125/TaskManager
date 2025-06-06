@@ -1,7 +1,6 @@
 import React from 'react'
 
 const CustomPieLegend = ({ payload }) => {
-    // console.log(payload)
     return (
         <div className='flex justify-center flex-wrap gap-2 mt-4 '>
             {payload.map((status, idx) => (
@@ -18,17 +17,17 @@ const CustomPieLegend = ({ payload }) => {
     )
 }
 
-const CustomBarLegend = (pross) => {
-    console.log(pross)
-    return (
-        <div className='flex justify-cener flex-wrap gap-2'>
+// const CustomBarLegend = (pross) => {
+
+//     return (
+//         <div className='flex justify-cener flex-wrap gap-2'>
 
 
-        </div>
-    )
-}
+//         </div>
+//     )
+// }
 
 export {
     CustomPieLegend,
-    CustomBarLegend
+    // CustomBarLegend
 }

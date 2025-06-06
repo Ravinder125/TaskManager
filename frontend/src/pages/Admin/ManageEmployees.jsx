@@ -28,7 +28,6 @@ const ManageEmployees = () => {
             const response = await axiosInstance.get(API_PATHS.REPORT.EXPORT_USERS, {
                 responseType: 'blob', // Important for downloading files
             })
-            console.log(response)
             // Create a Url for the blob
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');

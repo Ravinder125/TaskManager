@@ -18,7 +18,6 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
             );
             if (response?.data?.data?.length > 0) {
                 setAllUsers(response.data.data);
-                // console.log('All users:', response.data.data);
             }
         } catch (error) {
             console.error("Error fetching the users", error);

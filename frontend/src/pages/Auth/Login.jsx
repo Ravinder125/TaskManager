@@ -44,11 +44,9 @@ const Login = () => {
                 const { message, data } = response.data;
                 updateUser(data?.user);
                 setInviteToken(data?.inviteToken)
-                console.log(message || 'User successfully logged in');
 
                 // Redirect Based on role
                 if (data.role === 'admin') {
-                    console.log(data.role)
                     navigate('/admin/dashboard')
                 } else {
                     navigate('/employee/dashboard')

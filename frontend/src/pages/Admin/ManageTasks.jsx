@@ -37,7 +37,6 @@ const ManageTasks = () => {
             setAllTasks(response.data?.data.tasks.length > 0 ? response.data.data.tasks : [])
             // Map statusSummary data will fixed labels and order
             const statusSummary = response.data?.data?.statusSummary
-            console.log(statusSummary)
             const statusArray = [
                 { label: 'All', count: statusSummary.allTasks || 0 },
                 { label: 'Pending', count: statusSummary.pendingTasks || 0 },
@@ -55,7 +54,6 @@ const ManageTasks = () => {
 
     const handleClick = (taskData) => {
         if (taskData && taskData._id) {
-            console.log(taskData._id)
             navigate('/admin/create-task', { state: { taskId: taskData._id } });
         }
     }

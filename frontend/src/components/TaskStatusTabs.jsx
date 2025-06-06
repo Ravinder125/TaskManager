@@ -1,7 +1,6 @@
 import { formatName } from '../utils/helper'
 
 const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
-    console.log(activeTab)
     return (
         <div className='my-2 mx-auto'>
             <div className='flex w-[300px] sm:w-full  overflow-x-auto hide-scrollbar'>

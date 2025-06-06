@@ -68,7 +68,6 @@ function Dashboard() {
             );
             if (response.data) {
                 setDashboardData(response.data.data);
-                console.log(response.data.data)
                 prepareChartData(response.data.data?.charts || null)
             }
         } catch (error) {

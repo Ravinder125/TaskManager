@@ -190,7 +190,6 @@ const getUserProfile = asyncHandler(async (req, res) => {
     const profile = await redis.get(pathKey)
 
     if (profile) {
-        // console.log(profile)
         return res.status(200).json(ApiResponse.success(200, JSON.parse(profile), 'User profile successfully fetched redis'))
     }
 

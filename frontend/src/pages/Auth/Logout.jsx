@@ -8,11 +8,10 @@ const Logout = () => {
     useEffect(() => {
         const handleLogout = async () => {
             try {
-                const response = await axiosInstance.get(
+                await axiosInstance.get(
                     API_PATHS.AUTH.LOGOUT, { withCredentials: true }
                 );
 
-                console.log(response.data.message)
                 navigate('/login')
             } catch (error) {
                 console.error('Error logout the user:', error)

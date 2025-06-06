@@ -128,7 +128,6 @@ const getUserDashboard = asyncHandler(async (req, res) => {
     })
 
     // Task distribution by status
-    // console.log(await Task.countDocuments({ assignedTo: userId }))
     const tasksStatuses = ['pending', 'in-progress', 'completed'];
     const taskDistributionRaw = await Task.aggregate([
         { $match: filter },
