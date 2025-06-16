@@ -1,6 +1,6 @@
-const BASE_URL = "https://taskmanager-2-au1f.onrender.com";
+const BASE_URL = "https://taskmanager-3-0jvz.onrender.com"; // Update the port if your backend runs on a different port
 
-// utils/api/paths.js
+// utils/apiPaths.js
 const API_PATHS = {
     AUTH: {
         REGISTER: "/api/v1/auth/register", // Register a new user (Admin or Employee)

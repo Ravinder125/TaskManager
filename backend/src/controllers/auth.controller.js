@@ -86,6 +86,7 @@ const registerUser = asyncHandler(async (req, res) => {
 // @route   POST /api/v1/auth/login
 // @access  Public
 const loginUser = asyncHandler(async (req, res) => {
+    console.log("hi")
     const errors = validationResult(req);
     if (!errors) {
         return res.status(400).json(ApiResponse.error(400, errors.array().join(',')));
