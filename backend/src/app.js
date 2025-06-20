@@ -17,7 +17,7 @@ const app = express();
 // }
 const allowedOrigins = [
     "http://localhost:5173",          // local frontend
-    "https://your-frontend.vercel.app" // deployed frontend
+    "https://task-manager-kvk3.vercel.app" // deployed frontend
 ];
 
 app.use(cors({
