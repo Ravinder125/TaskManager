@@ -131,21 +131,21 @@ const loginUser = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/auth/logout
 // @access  Private
 const logoutUser = asyncHandler(async (req, res) => {
-    if (!isValidId) {
-        return res.status(200).json(ApiResponse.error(400, 'Invalid user ID'))
-    }
-
     const options = {
         httpOnly: true,
-        secure: true
-    }
+        secure: true,
+        sameSite: "None" // VERY IMPORTANT for cross-origin logout
+    };
+
+    // Clear access & refresh tokens
+    res.clearCookie("accessToken", options);
+    res.clearCookie("refreshToken", options);
 
     return res
         .status(200)
-        .clearCookie('accessToken', options)
-        .clearCookie('refreshToken', options)
-        .json(ApiResponse.success(200, null, 'User successfully logged out'))
-})
+        .json(ApiResponse.success(200, null, "User successfully logged out"));
+});
+
 
 const generateInviteToken = asyncHandler(async (req, res) => {
     if (!isValidId) {
