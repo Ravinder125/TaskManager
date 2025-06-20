@@ -1,4 +1,4 @@
-const BASE_URL = "https://taskmanager-3-0jvz.onrender.com"; // Update the port if your backend runs on a different port
+const BASE_URL = "https://taskmanager-5-pwv3.onrender.com"; // Update the port if your backend runs on a different port
 
 // utils/apiPaths.js
 const API_PATHS = {
