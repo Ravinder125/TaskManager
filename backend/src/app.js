@@ -4,20 +4,26 @@ import cors from 'cors';
 
 const app = express();
 
-const whitelist = ['http://localhost:5173', 'https://task-manager-three-swart.vercel.app' || process.env.CORS_ORIGIN]
-const corsOptions = {
-    origin: function (origin, callback) {
-        if (whitelist.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true
-}
+// const whitelist = ['http://localhost:5173', 'https://task-manager-three-swart.vercel.app' || process.env.CORS_ORIGIN]
+// const corsOptions = {
+//     origin: function (origin, callback) {
+//         if (whitelist.indexOf(origin) !== -1 || !origin) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Not allowed by CORS'));
+//         }
+//     },
+//     credentials: true
+// }
+const allowedOrigins = [
+    "http://localhost:5173",          // local frontend
+    "https://your-frontend.vercel.app" // deployed frontend
+];
 
-// app.use(cors(corsOptions));
-app.use(cors(corsOptions))
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())

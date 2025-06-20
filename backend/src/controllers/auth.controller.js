@@ -12,6 +12,7 @@ import { isValidObjectId } from 'mongoose';
 
 
 const generateToken = async (id) => {
+
     try {
         const user = await User.findById(id)
         const accessToken = await user.generateAccessToken()
@@ -24,6 +25,8 @@ const generateToken = async (id) => {
         const options = {
             httpOnly: true,
             secure: true,
+            sameSite: "None",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         }
 
         return { accessToken, refreshToken, options }
