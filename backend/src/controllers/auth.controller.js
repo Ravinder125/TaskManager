@@ -4,10 +4,8 @@ import { validationResult } from 'express-validator';
 import { User } from '../models/user.model.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import redis from '../config/redis.js';
-import { generateCatchKey } from '../utils/generateCatcheKey.js';
 import { InviteToken } from '../models/inviteToken.model.js';
 import crypto from 'crypto'
-import { compareSync } from 'bcryptjs';
 import { isValidObjectId } from 'mongoose';
 
 
@@ -256,7 +254,7 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
     const profileImageLocalPath = req?.file?.path;
 
     if (!profileImageLocalPath) {
-        return res.status(400).json(ApiResponse.error(400, 'Profile Image is requird'));
+        return res.status(400).json(ApiResponse.error(400, 'Profile Image is required'));
     }
     const profileImage = await uploadOnCloudinary(profileImageLocalPath);
     if (!profileImage?.url) {
