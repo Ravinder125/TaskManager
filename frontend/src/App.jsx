@@ -25,7 +25,7 @@ function App() {
     <>
       <Routes>
         {/* Public Routes */}
-        <Route path='/' element={<Route />} >
+        <Route path='/' element={<RouteNavigator />} >
           <Login />
         </Route>
         <Route path='/login' element={<Login />} />
@@ -74,7 +74,7 @@ function App() {
 
 export default App
 
-const Route = () => {
+const RouteNavigator = () => {
   const { user, loading } = useContext(UserContext);
 
   if (loading) return <Loading />
