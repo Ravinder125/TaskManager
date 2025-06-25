@@ -25,8 +25,10 @@ function App() {
     <>
       <Routes>
         {/* Public Routes */}
-        {/* <Route path='/' element={<Routee />} /> */}
-        <Route path='/' element={<Login />} />
+        <Route path='/' element={<Route />} >
+          <Login />
+        </Route>
+        <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
 
         {/* Admin Routes */}
@@ -72,13 +74,13 @@ function App() {
 
 export default App
 
-const Routee = () => {
+const Route = () => {
   const { user, loading } = useContext(UserContext);
 
   if (loading) return <Loading />
 
   if (!user) {
-    return <Navigate to='/login' />
+    return <Outlet />
   }
 
   return user.role === 'admin'
