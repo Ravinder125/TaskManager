@@ -25,8 +25,8 @@ function App() {
     <>
       <Routes>
         {/* Public Routes */}
-        <Route path='/' element={<Routee />} />
-        <Route path='/login' element={<Login />} />
+        {/* <Route path='/' element={<Routee />} /> */}
+        <Route path='/' element={<Login />} />
         <Route path='/register' element={<Register />} />
 
         {/* Admin Routes */}

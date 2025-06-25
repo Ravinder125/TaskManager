@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import axiosInstance from '../../utils/axiosInstance'
 import { API_PATHS } from '../../utils/apiPaths'
 import { useNavigate } from 'react-router-dom'
-import Loading from '../../components/index'
+import { Loading } from '../../components/index'
 
 const Logout = () => {
     const navigate = useNavigate();

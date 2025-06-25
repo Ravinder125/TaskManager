@@ -37,7 +37,7 @@ router
         [
             body('email').isEmail().withMessage('Email is invalid'),
             body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
-            body('comfirmPassword').isLength({ min: 8 }).withMessage('Comfirm password must be at least 8 characters long'),
+            body('confirmPassword').isLength({ min: 8 }).withMessage('Confirm password must be at least 8 characters long'),
         ],
         loginUser
     )
