@@ -22,14 +22,26 @@ import { UserContext } from './context/userContext'
 import { Toaster } from 'react-hot-toast'
 import { Loading } from './components'
 
+const AuthRedirect = () => {
+  const { user, loading } = useContext(UserContext);
+
+  if (loading) return <Loading />
+
+  if (!user) {
+    return <Start />
+  }
+
+  return user.role === 'admin'
+    ? <Navigate to='/admin/dashboard' />
+    : <Navigate to='/employee/dashboard' />;
+}
+
 function App() {
   return (
     <>
       <Routes>
         {/* Public Routes */}
-        <Route path='/' element={<RouteNavigator />} >
-          <Route element={<Start />}></Route>
-        </Route>
+        <Route path='/' element={<AuthRedirect />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
 
@@ -75,17 +87,3 @@ function App() {
 }
 
 export default App
-
-const RouteNavigator = ({ children }) => {
-  const { user, loading } = useContext(UserContext);
-
-  if (loading) return <Loading />
-
-  if (!user) {
-    return;
-  }
-
-  return user.role === 'admin'
-    ? <Navigate to='/admin/dashboard' />
-    : <Navigate to='/employee/dashboard' />;
-}

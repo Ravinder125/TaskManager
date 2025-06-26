@@ -20,6 +20,7 @@
   /* Chrome, Safari, Opera */
 }
 
+
 @layer base {
   html {
     font-family: var(--font-family);
@@ -69,4 +70,12 @@
 
 .user-card {
   @apply bg-white p-4 rounded-xl shadow-md shadow-gray-300 border border-gray-200/50;
+}
+
+.auth-btn {
+  @apply bg-primary text-sm text-white px-4 py-1 w-fit rounded-sm hover:bg-primary/90 transition duration-200 cursor-pointer
+}
+
+.start-container {
+  @apply max-w-[1200px] mx-auto
 }
