@@ -3,38 +3,50 @@ import hero from '../assets/hero.webp'
 
 const Start = () => {
     return (
-        <div >
-            <header className='start-container flex flex-col sm:flex-row justify-between items-center px-2'>
+        <div>
+            <header className="start-container mt-6 flex flex-col sm:flex-row justify-between items-center px-4">
                 <div>
-                    <h3 className='text-2xl font-semibold '>Task Manager</h3>
+                    <h3 className="text-3xl font-bold tracking-wide text-primary mb-2">Task Manager</h3>
                 </div>
-                <nav className='flex gap-x-8'>
-                    <button className='auth-btn'>
-                        <Link to='/login'>Login</Link>
-                    </button>
-                    <button className='auth-btn'>
-                        <Link to='/register'>Register</Link>
-                    </button>
+                <nav className="flex gap-x-8 mt-4">
+                    <Link to="/login">
+                        <button className="auth-btn px-6 py-2 rounded-lg shadow-md hover:bg-primary hover:text-white transition-all duration-200">
+                            Login
+                        </button>
+                    </Link>
+                    <Link to="/register">
+                        <button className="auth-btn px-6 py-2 rounded-lg shadow-md hover:bg-primary hover:text-white transition-all duration-200">
+                            Register
+                        </button>
+                    </Link>
                 </nav>
             </header>
             <main>
-                <div className='start-container grid sm:grid-cols-2 grid-cols-1 items-center justify-center p-6'>
-                    <div className='order-2 mb-3 mt-3 sm:mt-0 sm:mb-0 sm:order-1'>
-                        <h1 className='text-6xl font-bold text-primary'>TASK</h1>
-                        <h2 className='text-3xl font-semibold'>MANAGER</h2>
-                        <p className='mt-3 mb-6 text-xs text-slate-700'>Take control of your productivity with our powerful task manager. Whether you're managing personal goals or leading a team, our intuitive platform helps you create, assign, and track tasks effortlessly—all in one place. Prioritize what matters, stay focused, and achieve more every day</p>
-                        <button className='auth-btn'>Login</button>
+                <div className="start-container grid sm:grid-cols-2 grid-cols-1 items-center justify-center p-8 gap-8">
+                    <div className="order-2 mb-6 mt-6 sm:mt-0 sm:mb-0 sm:order-1">
+                        <div className="mb-6">
+                            <h1 className="text-6xl font-extrabold text-primary leading-tight mb-2 drop-shadow-lg">TASK</h1>
+                            <h2 className="text-3xl font-semibold text-gray-800 tracking-wider mb-4">MANAGER</h2>
+                        </div>
+                        <p className="mt-4 mb-8 text-base text-slate-700 leading-relaxed">
+                            Take control of your productivity with our powerful task manager.<br />
+                            Whether you're managing personal goals or leading a team, our intuitive platform helps you create, assign, and track tasks effortlessly—all in one place.<br />
+                            <span className="font-medium text-primary">Prioritize what matters, stay focused, and achieve more every day.</span>
+                        </p>
+                        <Link to="/login">
+                            <button className="auth-btn px-8 py-3 rounded-lg bg-primary text-white font-semibold shadow-lg hover:bg-primary-dark transition-all duration-200">
+                                Get Started
+                            </button>
+                        </Link>
                     </div>
-
-                    <div className='order-1 sm:order-2 flex justify-center items-center'>
+                    <div className="order-1 sm:order-2 flex justify-center items-center">
                         <img
                             src={hero}
                             alt="A girl creating a task"
-                            className='sm:w-[82%] w-[70%] h-full '
+                            className="sm:w-[82%] w-[70%] h-full rounded-xl shadow-xl"
                         />
                     </div>
                 </div>
-
             </main>
         </div>
     )
