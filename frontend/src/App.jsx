@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import PrivateRoute from './routes/PrivateRoute'
 
+import Start from './pages/Start'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
 import Logout from './pages/Auth/Logout'
@@ -16,6 +17,7 @@ import ManageEmployees from './pages/Admin/ManageEmployees'
 import EmployeeDashboard from './pages/Employee/EmployeeDashboard'
 import Mytasks from './pages/Employee/MyTasks'
 import ViewTaskDetails from './pages/Employee/ViewTaskDetails'
+
 import { UserContext } from './context/userContext'
 import { Toaster } from 'react-hot-toast'
 import { Loading } from './components'
@@ -25,7 +27,9 @@ function App() {
     <>
       <Routes>
         {/* Public Routes */}
-        <Route path='/' element={<RouteNavigator />} />
+        <Route path='/' element={<RouteNavigator />} >
+          <Route element={<Start />}></Route>
+        </Route>
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
 
@@ -78,7 +82,7 @@ const RouteNavigator = ({ children }) => {
   if (loading) return <Loading />
 
   if (!user) {
-  <Login/>
+    return;
   }
 
   return user.role === 'admin'
