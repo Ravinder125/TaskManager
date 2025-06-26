@@ -24,7 +24,7 @@ import { Loading } from './components'
 
 const AuthRedirect = () => {
   const { user, loading } = useContext(UserContext);
-
+  console.log('this is')
   if (loading) return <Loading />
 
   if (!user) {

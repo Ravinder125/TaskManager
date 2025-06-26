@@ -1,6 +1,5 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
-import hero from '../assets/hero.webP'
+import hero from '../assets/hero.webp'
 
 const Start = () => {
     return (
@@ -9,14 +8,14 @@ const Start = () => {
                 <div>
                     <h3 className='text-2xl font-semibold '>Task Manager</h3>
                 </div>
-                <navbar className='flex gap-x-8'>
+                <nav className='flex gap-x-8'>
                     <button className='auth-btn'>
                         <Link to='/login'>Login</Link>
                     </button>
                     <button className='auth-btn'>
                         <Link to='/register'>Register</Link>
                     </button>
-                </navbar>
+                </nav>
             </header>
             <main>
                 <div className='start-container grid sm:grid-cols-2 grid-cols-1 items-center justify-center p-6'>
