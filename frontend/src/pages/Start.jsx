@@ -15,7 +15,7 @@ const Start = () => {
                         </button>
                     </Link>
                     <Link to="/register">
-                        <button className="auth-btn px-6 py-2 rounded-lg shadow-md hover:bg-primary hover:text-white transition-all duration-200">
+                        <button className="auth-btn ">
                             Register
                         </button>
                     </Link>
@@ -34,7 +34,7 @@ const Start = () => {
                             <span className="font-medium text-primary">Prioritize what matters, stay focused, and achieve more every day.</span>
                         </p>
                         <Link to="/login">
-                            <button className="auth-btn px-8 py-3 rounded-lg bg-primary text-white font-semibold shadow-lg hover:bg-primary-dark transition-all duration-200">
+                            <button className="auth-btn rounded-lg bg-primary  font-semibold shadow-lg hover:bg-primary-dark">
                                 Get Started
                             </button>
                         </Link>
