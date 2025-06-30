@@ -53,6 +53,12 @@ const createTask = asyncHandler(async (req, res) => {
 
     await deleteDashboardRedisPreviousData(userId)
     const pathKey = `${taskRoute}:${userId}:${task?._id}`
+    await Promise.all(
+        ['all', 'pending', 'in-progress', 'completed'].map(status => {
+            const allTasksRoute = `${taskRoute}:${req.user._id}:${status}`;
+            redis.del(`${allTasksRoute}`);
+        })
+    )
     await redis.set(pathKey, JSON.stringify(task), 'EX', 300)
     return res.status(201).json(ApiResponse.success(201, task, 'Task successfully created'));
 });
@@ -183,6 +189,12 @@ const updateTask = asyncHandler(async (req, res) => {
 
     const pathKey = `${taskRoute}:${req.user._id}:${updateTask?._id}`
     await deleteDashboardRedisPreviousData(req.user._id)
+    await Promise.all(
+        ['all', 'pending', 'in-progress', 'completed'].map(status => {
+            const taskRoute = `${taskRoute}:${req.user._id}:${status}`;
+            redis.del(`${taskRoute}`);
+        })
+    )
     await redis.set(pathKey, JSON.stringify(updateTask), 'EX', 300)
 
     return res.status(200).json(ApiResponse.success(200, updatedTask, 'Task successfully updated'));

@@ -1,8 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../context/userContext'
 import { Link, useNavigate } from 'react-router-dom';
-import axiosInstance from '../../utils/axiosInstance';
-import { API_PATHS } from '../../utils/apiPaths';
 import { SIDE_MENU_DATA, SIDE_MENU_EMPLOYEE_DATA, } from '../../utils/data';
 import { LuUser } from 'react-icons/lu';
 import { formatName } from '../../utils/helper';
@@ -48,13 +46,14 @@ const SideMenu = ({ activeMenu }) => {
                     </div>
                 )}
 
-                <h5 className='text-gray-950 font-medium leading-6 mt-3'>
-                    {user?.fullName && formatName(user?.fullName)}
-                </h5>
+                <div className='leading-4 mt-2'>
+                    <h5 className='text-gray-700 font-medium mt-3'>
+                        {user?.fullName && formatName(user?.fullName)}
+                    </h5>
+                    <p className='text-[12px] text-gray-400'>{user?.email || ''}</p>
+                </div>
 
-                <p className='text-[12px] text-gray-500'>{user?.email || ''}</p>
-
-                <Link to='/profile' className='rounded-md font-medium  px-5 py-1 bg-lime-500 hover:bg-primary transition-bg duration-1000 ease-in-out  text-white mt-4 mb-8 cursor-pointer'>
+                <Link to='/profile' className='rounded-md font-medium  px-5 py-1 bg-blue-500 hover:bg-primary transition-bg duration-300 ease-in-out  text-white mt-4 mb-8 cursor-pointer'>
                     Edit Profile
                 </Link>
 

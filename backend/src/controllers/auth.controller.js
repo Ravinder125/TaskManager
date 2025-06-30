@@ -280,10 +280,6 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
 // @route    POST /api/v1/auth/change-password
 // @access   Private
 const changeUserPassword = asyncHandler(async (req, res) => {
-    if (!isValidId) {
-        return res.status(200).json(ApiResponse.error(400, 'Invalid user ID'))
-    }
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         const errMsg = errors.array().map(err => err.msg)

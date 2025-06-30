@@ -58,7 +58,7 @@ function Dashboard() {
         navigate('/admin/tasks')
     }
 
-    const getDashboarData = async () => {
+    const getDashboardData = async () => {
         try {
             setLoading(true);
 
@@ -78,10 +78,98 @@ function Dashboard() {
     }
 
     useEffect(() => {
-        getDashboarData();
+        getDashboardData();
     }, [])
 
-    if (loading) return <Loading />
+    if (loading) return (
+        <DashboardLayout activeMenu='Dashboard'>
+            <div className='card my-5'>
+                <div>
+                    <div className='flex flex-col sm:flex-row sm:justify-between md:justify-start md:gap-4'>
+                        <span className='text-xl md:text-2xl'>Good Morning!</span>
+                        <h2 className='text-xl md:text-2xl font-semibold '>
+                            {formatName(user?.fullName)}
+                        </h2>
+                    </div>
+                    <p className='text-xs md:text-[13px] text-gray-400 mt-1.5'>
+                        {moment().format('dddd Do MMM YYYY')}
+                    </p>
+                </div >
+
+                {dashboardData && dashboardData.charts && dashboardData.charts.taskDistribution && (
+                    <div className='grid grid-cols-2 sm:grid-cols-2  gap-3 md:gap-6 mt-5'>
+                        <InfoCard
+                            label='Total Tasks'
+                            value={addThousandsSeprator(
+                                dashboardData.charts.taskDistribution.all || 0
+                            )}
+                            color='bg-primary'
+                        />
+                        <InfoCard
+                            label='Pending Tasks'
+                            value={addThousandsSeprator(
+                                dashboardData.charts.taskDistribution.pending || 0
+                            )}
+                            color='bg-violet-500'
+                        />
+                        <InfoCard
+                            label='In Progress Tasks'
+                            value={addThousandsSeprator(
+                                dashboardData.charts.taskDistribution.inProgress || 0
+                            )}
+                            color='bg-cyan-500'
+                        />
+                        <InfoCard
+                            label='Complete Tasks'
+                            value={addThousandsSeprator(
+                                dashboardData.charts.taskDistribution.completed || 0
+                            )}
+                            color='bg-lime-500'
+                        />
+                    </div>
+                )}
+
+            </div>
+            <div className='grid grid-cols-1  md:grid-cols-2 gap-3 my-4  '>
+                <div >
+                    <div className='card '>
+                        <div className='flex items-center justify-bewteen mb-2'>
+                            <h5 className='font-medium'>Task Distribution</h5>
+                        </div>
+
+                        <CustomPieChart
+                            data={pieChartData}
+                            label='Total Balance'
+                            colors={COLORS}
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <div className='card'>
+                        <div className='flex items-center justify-beween mb-2'>
+                            <h5 className='font-medium'>Task Priority Levels</h5>
+                        </div>
+
+                        <CustomBarChart data={barChartData} c />
+                    </div>
+                </div>
+
+                <div className='md:col-span-2'>
+                    <div className='card '>
+                        <div className='flex items-center justify-between'>
+                            <h5 className='text-lg font-medium'>Recent Tasks</h5>
+
+                            <Link to='/admin/tasks' className='card-btn' onClick={onSeeMore}>
+                                See All <LuArrowRight className='text-base' />
+                            </Link>
+                        </div>
+                        <TaskListTable tableData={dashboardData?.recentTasks || []} />
+                    </div>
+                </div>
+            </div >
+        </DashboardLayout >
+    )
     return (
         <DashboardLayout activeMenu='Dashboard'>
             <div className='card my-5'>
