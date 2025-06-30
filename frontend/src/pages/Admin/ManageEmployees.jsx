@@ -20,7 +20,7 @@ const ManageEmployees = () => {
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {
-            setLoading(true)
+            setLoading(false)
         }
     }
 

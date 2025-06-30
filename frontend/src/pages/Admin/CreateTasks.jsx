@@ -16,6 +16,7 @@ import {
     Modal,
     DeleteAlert,
 } from '../../components/index';
+import CreateTaskSkeleton from '../../components/Skeletons/CreateTaskSkeleton';
 
 const CreateTasks = () => {
     const location = useLocation();
@@ -196,7 +197,7 @@ const CreateTasks = () => {
         }
     }, [taskId]);
 
-    if (loading) return <Loading />;
+    if (loading) return <CreateTaskSkeleton />;
 
     return (
         <DashboardLayout activeMenu='Create Task'>
