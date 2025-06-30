@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { LuFileSpreadsheet } from 'react-icons/lu';
+import ManageTasksSkeleton from '../../components/Skeletons/ManageTasksSkeleton';
 
 const ManageTasks = () => {
     const [allTasks, setAllTasks] = useState([]);
@@ -84,7 +85,7 @@ const ManageTasks = () => {
         getAllTasks();
     }, [filterStatus])
 
-    if (loading) return <Loading />
+    if (loading) return <ManageTasksSkeleton />
     return (
         <DashboardLayout activeMenu='Manage Tasks'>
             <div className='my-8 w-full '>

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import axiosInstance from '../../utils/axiosInstance'
 import { API_PATHS } from '../../utils/apiPaths'
 import { LuFileSpreadsheet } from 'react-icons/lu'
+import ManageEmployeeSkeleton from '../../components/Skeletons/ManageEmployeeSkeleton'
 
 const ManageEmployees = () => {
     const [allUsers, setAllUsers] = useState([])
@@ -19,7 +20,7 @@ const ManageEmployees = () => {
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {
-            setLoading(false)
+            setLoading(true)
         }
     }
 
@@ -51,7 +52,7 @@ const ManageEmployees = () => {
         }
     }, [])
 
-    if (loading) return <Loading />
+    if (loading) return <ManageEmployeeSkeleton />
     return (
         <DashboardLayout activeMenu='Team Members' >
             <div className='mt-5 mb-10'>
