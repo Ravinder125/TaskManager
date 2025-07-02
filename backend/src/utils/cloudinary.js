@@ -12,7 +12,14 @@ cloudinary.config({
 // Upload an image
 const uploadOnCloudinary = async (localFilePath) => {
     const upload = await cloudinary.uploader
-        .upload(localFilePath, { resource_type: 'auto' })
+        .upload(localFilePath, {
+            resource_type: 'image',
+            folder: 'TaskManager',
+            use_filename: true,
+            unique_filename: true,
+            overwrite: true,
+            format: 'webp',
+        })
         .then(result => {
             return result
         }

@@ -7,6 +7,7 @@ import redis from '../config/redis.js';
 import { InviteToken } from '../models/inviteToken.model.js';
 import crypto from 'crypto'
 import { isValidObjectId } from 'mongoose';
+import sharp from 'sharp';
 
 
 const generateToken = async (id) => {
@@ -253,10 +254,19 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
 
     const profileImageLocalPath = req?.file?.path;
 
+
+
     if (!profileImageLocalPath) {
         return res.status(400).json(ApiResponse.error(400, 'Profile Image is required'));
     }
-    const profileImage = await uploadOnCloudinary(profileImageLocalPath);
+
+    // Formatting Image through Sharp
+    await sharp(profileImageLocalPath)
+        .resize({ width: 800 }) // Resize to a maximum width of 800px
+        .toFormat('webp')
+        .webp({ quality: 80 }) // Convert to WebP format with quality 80
+        .toFile('./public/temp/profileImage.webp')
+    const profileImage = await uploadOnCloudinary('./public/temp/profileImage.webp');
     if (!profileImage?.url) {
         return res.status(400).json(ApiResponse.error(500, 'Error while uploading image. Please try again'))
     }
