@@ -1,26 +1,28 @@
-import React, { useContext } from 'react'
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { useContext, lazy, Suspense } from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import PrivateRoute from './routes/PrivateRoute'
-
-import Start from './pages/Start'
-import Login from './pages/Auth/Login'
-import Register from './pages/Auth/Register'
-import Logout from './pages/Auth/Logout'
-
-import Profile from './pages/Profile'
-
-import Dashboard from './pages/Admin/Dashboard'
-import ManageTasks from './pages/Admin/ManageTasks'
-import CreateTasks from './pages/Admin/CreateTasks'
-import ManageEmployees from './pages/Admin/ManageEmployees'
-
-import EmployeeDashboard from './pages/Employee/EmployeeDashboard'
-import Mytasks from './pages/Employee/MyTasks'
-import ViewTaskDetails from './pages/Employee/ViewTaskDetails'
-
 import { UserContext } from './context/userContext'
 import { Toaster } from 'react-hot-toast'
 import { Loading } from './components'
+
+
+// Lazy load Pages
+const Start = lazy(() => import('./pages/Start'))
+const Login = lazy(() => import('./pages/Auth/Login'))
+const Register = lazy(() => import('./pages/Auth/Register'))
+const Logout = lazy(() => import('./pages/Auth/Logout'))
+const Profile = lazy(() => import('./pages/Profile'))
+
+const Dashboard = lazy(() => import('./pages/Admin/Dashboard'))
+const ManageTasks = lazy(() => import('./pages/Admin/ManageTasks'))
+const CreateTasks = lazy(() => import('./pages/Admin/CreateTasks'))
+const ManageEmployees = lazy(() => import('./pages/Admin/ManageEmployees'))
+
+const EmployeeDashboard = lazy(() => import('./pages/Employee/EmployeeDashboard'))
+const Mytasks = lazy(() => import('./pages/Employee/MyTasks'))
+const ViewTaskDetails = lazy(() => import('./pages/Employee/ViewTaskDetails'))
+
+
 
 const AuthRedirect = () => {
   const { user, loading } = useContext(UserContext);
@@ -38,34 +40,36 @@ const AuthRedirect = () => {
 function App() {
   return (
     <>
-      <Routes>
-        {/* Public Routes */}
-        <Route path='/' element={<AuthRedirect />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path='/' element={<AuthRedirect />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
 
-        {/* Admin Routes */}
-        <Route element={<PrivateRoute allowedRoles={['admin']} />} >
-          <Route path='/admin/dashboard' element={<Dashboard />} />
-          <Route path='/admin/tasks' element={<ManageTasks />} />
-          <Route path='/admin/create-task' element={<CreateTasks />} />
-          <Route path='/admin/employees' element={<ManageEmployees />} />
-        </Route>
+          {/* Admin Routes */}
+          <Route element={<PrivateRoute allowedRoles={['admin']} />} >
+            <Route path='/admin/dashboard' element={<Dashboard />} />
+            <Route path='/admin/tasks' element={<ManageTasks />} />
+            <Route path='/admin/create-task' element={<CreateTasks />} />
+            <Route path='/admin/employees' element={<ManageEmployees />} />
+          </Route>
 
-        {/* Employee Routes */}
-        <Route element={<PrivateRoute allowedRoles={['employee']} />} >
-          <Route path='/employee/dashboard' element={<EmployeeDashboard />} />
-          <Route path='/employee/tasks' element={<Mytasks />} />
-          {/* <Route path='/employee/profile' element={<ManageEmployees />} /> */}
-          <Route path='/employee/task-details/:taskId' element={<ViewTaskDetails />} />
-        </Route>
+          {/* Employee Routes */}
+          <Route element={<PrivateRoute allowedRoles={['employee']} />} >
+            <Route path='/employee/dashboard' element={<EmployeeDashboard />} />
+            <Route path='/employee/tasks' element={<Mytasks />} />
+            {/* <Route path='/employee/profile' element={<ManageEmployees />} /> */}
+            <Route path='/employee/task-details/:taskId' element={<ViewTaskDetails />} />
+          </Route>
 
-        {/* Both Admin and Employee Routes */}
-        <Route element={<PrivateRoute allowedRoles={['admin', 'employee']} />} >
-          <Route path='/logout' element={<Logout />} />
-          <Route path='/profile' element={<Profile />} />
-        </Route>
-      </Routes>
+          {/* Both Admin and Employee Routes */}
+          <Route element={<PrivateRoute allowedRoles={['admin', 'employee']} />} >
+            <Route path='/logout' element={<Logout />} />
+            <Route path='/profile' element={<Profile />} />
+          </Route>
+        </Routes>
+      </Suspense>
 
       <Toaster
         toastOptions={{
