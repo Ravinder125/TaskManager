@@ -11,7 +11,7 @@ const ManageEmployeeSkeleton = () => {
 
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-20 mt-20'>
                     {[1, 2, 3, 4, 5, 6].map((_, idx) => (
-                        <div key={idx} className='w-full flex gap-5 flex-col '>
+                        <div key={idx} className='bg-white w-full flex gap-5 flex-col shadow-md p-5 rounded-lg'>
                             <div className='w-full flex items-center gap-2'>
                                 <span className='bg-slate-200 h-15 w-20 rounded-full'></span>
                                 <div className='w-full'>
@@ -20,7 +20,7 @@ const ManageEmployeeSkeleton = () => {
                                 </div>
                             </div>
 
-                            <div className='flex items-end gap-5 mt-5'>
+                            <div className='flex items-end gap-5 mt-2'>
                                 {[1, 2, 3].map((_, idx) => (
                                     <div key={idx} className='w-40 h-20 bg-slate-200 rounded'>
                                     </div>
