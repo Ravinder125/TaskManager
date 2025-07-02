@@ -11,9 +11,9 @@ const ManageTasksSkeleton = () => {
                             <button className='flex lg:hidden self-end lg:self-normal bg-slate-200 rounded h-8 w-20'></button>
                         </div>
 
-                        <div className="flex mt-5 justify-center items-center gap-4">
+                        <div className="grid grid-cols-4 w-full mt-5 justify-center items-center gap-4">
                             {[1, 2, 3, 4].map((_, idx) => (
-                                <div key={idx} className="bg-slate-200 h-6 w-20 rounded "></div>
+                                <div key={idx} className="bg-slate-200 h-6 w-full rounded "></div>
                             ))}
                         </div>
                     </div>
