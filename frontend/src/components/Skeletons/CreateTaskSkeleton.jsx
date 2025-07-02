@@ -14,7 +14,7 @@ const CreateTaskSkeleton = () => {
 
                         <div className='mt-10'>
                             {[1, 2, 3].map((_, idx) => (
-                                <div className='mt-6 '>
+                                <div key={idx} className='mt-6 '>
                                     <h3 className='h-6 w-30 rounded bg-slate-200'></h3>
                                     <div className='mt-3 w-full h-8 bg-slate-200 rounded '></div>
                                 </div>
