@@ -19,7 +19,7 @@ const UserProvider = ({ children }) => {
                 const { data } = await axiosInstance.get(
                     API_PATHS.AUTH.GET_PROFILE,
                 );
-                if (isMounted) {
+                if (isMounted) { 
                     setUser(data.data.user);
                     setInviteToken(data.data.inviteToken)
                 }
