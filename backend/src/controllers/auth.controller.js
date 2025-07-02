@@ -8,6 +8,7 @@ import { InviteToken } from '../models/inviteToken.model.js';
 import crypto from 'crypto'
 import { isValidObjectId } from 'mongoose';
 import sharp from 'sharp';
+import fs from 'fs'
 
 
 const generateToken = async (id) => {
@@ -266,6 +267,13 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
         .toFormat('webp')
         .webp({ quality: 80 }) // Convert to WebP format with quality 80
         .toFile('./public/temp/profileImage.webp')
+
+    fs.unlink(profileImageLocalPath, (err) => {
+        if (err) {
+            console.error('Error while deleting temporary profile image:', err);
+        }
+    });
+
     const profileImage = await uploadOnCloudinary('./public/temp/profileImage.webp');
     if (!profileImage?.url) {
         return res.status(400).json(ApiResponse.error(500, 'Error while uploading image. Please try again'))
