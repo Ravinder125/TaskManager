@@ -191,8 +191,8 @@ const updateTask = asyncHandler(async (req, res) => {
     await deleteDashboardRedisPreviousData(req.user._id)
     await Promise.all(
         ['all', 'pending', 'in-progress', 'completed'].map(status => {
-            const taskRoute = `${taskRoute}:${req.user._id}:${status}`;
-            redis.del(`${taskRoute}`);
+            const allTasksPathKey = `${taskRoute}:${req.user._id}:${status}`;
+            redis.del(allTasksPathKey);
         })
     )
     await redis.set(pathKey, JSON.stringify(updateTask), 'EX', 300)

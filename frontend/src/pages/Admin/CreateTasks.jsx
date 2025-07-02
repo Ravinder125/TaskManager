@@ -12,7 +12,6 @@ import {
     SelectDropdown,
     TodoListInput,
     AddAttachmentsInput,
-    Loading,
     Modal,
     DeleteAlert,
 } from '../../components/index';

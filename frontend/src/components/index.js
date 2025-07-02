@@ -11,7 +11,7 @@ import CustomBarChart from "./Charts/CustomBarChart";
 import { CustomBarTooltip, CustomPieTooltip } from "./Charts/CustomTooltip";
 import SelectDropdown from "./Inputs/SelectDropdown";
 import Loading from "./layouts/Loading";
-import SelectUsers from "../../../SelectUsers";
+import SelectUsers from "./SelectUsers";
 import Modal from './Modal';
 import AvatarGroup from "./AvatarGroup";
 import TodoListInput from "./Inputs/TodoListInput";
