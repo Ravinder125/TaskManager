@@ -9,8 +9,15 @@ import { isValidObjectId } from "mongoose";
 const isValidId = (id) => isValidObjectId(id);
 
 const taskRoute = '/api/v1/tasks/tasks'
-const deleteDashboardRedisPreviousData = async (userId) => {
+const deletePreviousRedisCache = async (userId) => {
     const dashboardRoute = '/api/v1/dashboard'
+
+    await Promise.all(
+        ['all', 'pending', 'in-progress', 'completed'].map(status => {
+            const allTasksRoute = `${taskRoute}:${userId}:${status}`;
+            redis.del(`${allTasksRoute}`);
+        })
+    )
     await redis.del(`${dashboardRoute}:${userId}`)
 }
 
@@ -51,14 +58,8 @@ const createTask = asyncHandler(async (req, res) => {
 
     if (!task) return res.status(400).json(ApiResponse.error(400, 'Error while creating Task'));
 
-    await deleteDashboardRedisPreviousData(userId)
+    await deletePreviousRedisCache(userId)
     const pathKey = `${taskRoute}:${userId}:${task?._id}`
-    await Promise.all(
-        ['all', 'pending', 'in-progress', 'completed'].map(status => {
-            const allTasksRoute = `${taskRoute}:${req.user._id}:${status}`;
-            redis.del(`${allTasksRoute}`);
-        })
-    )
     await redis.set(pathKey, JSON.stringify(task), 'EX', 300)
     return res.status(201).json(ApiResponse.success(201, task, 'Task successfully created'));
 });
@@ -188,7 +189,7 @@ const updateTask = asyncHandler(async (req, res) => {
     if (!updatedTask) return res.status(500).json(ApiResponse.error(500, 'Error while updating Task'));
 
     const pathKey = `${taskRoute}:${req.user._id}:${updateTask?._id}`
-    await deleteDashboardRedisPreviousData(req.user._id)
+    await deletePreviousRedisCache(req.user._id)
     await Promise.all(
         ['all', 'pending', 'in-progress', 'completed'].map(status => {
             const allTasksPathKey = `${taskRoute}:${req.user._id}:${status}`;
@@ -272,7 +273,7 @@ const updateTodoList = asyncHandler(async (req, res) => {
         })
     );
     await redis.del(pathKey);
-    await deleteDashboardRedisPreviousData(req.user._id);
+    await deletePreviousRedisCache(req.user._id);
 
     const updatedTask = await task.populate('assignedTo', 'fullName email profileImageUrl');
     await redis.set(pathKey, JSON.stringify(updatedTask), 'EX', 300);
@@ -287,16 +288,18 @@ const toggleDeleteTask = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
     if (!isValidId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid Task ID'));
 
-    const task = await Task.findByIdAndUpdate(
+    const task = await Task.findById(taskId);
+    if (!task) return res.status(404).json(ApiResponse.error(404, 'Task not found'))
+
+    await Task.findByIdAndUpdate(
         taskId,
         { isDeleted: !task.isDeleted },
         { new: true });
-    if (!task) return res.status(404).json(ApiResponse.error(404, "Task not found"));
 
     const pathKey = `${taskRoute}:${req.user._id}:${task._id}`
-    await deleteDashboardRedisPreviousData(req.user._id)
+    await deletePreviousRedisCache(req.user._id)
     await redis.del(pathKey)
-    return res.status(200).json(ApiResponse.success(200, deletedTask, 'Task deletion toggled successfully'));
+    return res.status(200).json(ApiResponse.success(200, null, 'Task deletion toggled successfully'));
 });
 
 
