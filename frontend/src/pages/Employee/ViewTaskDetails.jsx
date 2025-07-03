@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
-import { AvatarGroup, DashboardLayout, Loading } from '../../components/index'
+import { AvatarGroup, CreateTaskSkeleton, DashboardLayout, Loading } from '../../components/index'
 import moment from 'moment';
 import { formatName } from '../../utils/helper';
 import { LuArrowBigLeft, LuArrowLeft, LuSquareArrowOutUpRight } from 'react-icons/lu';
@@ -84,7 +84,7 @@ const ViewTaskDetails = () => {
     }, [taskId, setTask])
 
     // handle todo check list
-    if (loading) return <Loading />
+    if (loading) return <CreateTaskSkeleton />
     return (
         <DashboardLayout activeMenu='My Tasks'>
             <div className='my-5'>

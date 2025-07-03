@@ -14,8 +14,8 @@ import {
     AddAttachmentsInput,
     Modal,
     DeleteAlert,
+    CreateTaskSkeleton
 } from '../../components/index';
-import CreateTaskSkeleton from '../../components/Skeletons/CreateTaskSkeleton';
 
 const CreateTasks = () => {
     const location = useLocation();

@@ -13,9 +13,8 @@ import {
     TaskListTable,
     CustomPieChart,
     CustomBarChart,
-    Loading
+    DashboardSkeleton,
 } from '../../components/index';
-import DashboardSkeleton from '../../components/Skeletons/DashboardSkeleton';
 
 const COLORS = ['#8051FF', '#00B8DB', '#7BCE00']
 
@@ -131,44 +130,48 @@ function Dashboard() {
                 )}
 
             </div>
-            <div className='grid grid-cols-1  md:grid-cols-2 gap-3 my-4  '>
-                <div >
-                    <div className='card '>
-                        <div className='flex items-center justify-bewteen mb-2'>
-                            <h5 className='font-medium'>Task Distribution</h5>
+
+            {dashboardData?.statistics?.totalTasks === 0
+                ? <NotAssigned className='mt-6' /> : (
+                    <div className='grid grid-cols-1  md:grid-cols-2 gap-3 my-4  '>
+                        <div >
+                            <div className='card '>
+                                <div className='flex items-center justify-bewteen mb-2'>
+                                    <h5 className='font-medium'>Task Distribution</h5>
+                                </div>
+
+                                <CustomPieChart
+                                    data={pieChartData}
+                                    label='Total Balance'
+                                    colors={COLORS}
+                                />
+                            </div>
                         </div>
 
-                        <CustomPieChart
-                            data={pieChartData}
-                            label='Total Balance'
-                            colors={COLORS}
-                        />
-                    </div>
-                </div>
+                        <div>
+                            <div className='card'>
+                                <div className='flex items-center justify-beween mb-2'>
+                                    <h5 className='font-medium'>Task Priority Levels</h5>
+                                </div>
 
-                <div>
-                    <div className='card'>
-                        <div className='flex items-center justify-beween mb-2'>
-                            <h5 className='font-medium'>Task Priority Levels</h5>
+                                <CustomBarChart data={barChartData} c />
+                            </div>
                         </div>
 
-                        <CustomBarChart data={barChartData} c />
-                    </div>
-                </div>
+                        <div className='md:col-span-2'>
+                            <div className='card '>
+                                <div className='flex items-center justify-between'>
+                                    <h5 className='text-lg font-medium'>Recent Tasks</h5>
 
-                <div className='md:col-span-2'>
-                    <div className='card '>
-                        <div className='flex items-center justify-between'>
-                            <h5 className='text-lg font-medium'>Recent Tasks</h5>
-
-                            <Link to='/admin/tasks' className='card-btn' onClick={onSeeMore}>
-                                See All <LuArrowRight className='text-base' />
-                            </Link>
+                                    <Link to='/admin/tasks' className='card-btn' onClick={onSeeMore}>
+                                        See All <LuArrowRight className='text-base' />
+                                    </Link>
+                                </div>
+                                <TaskListTable tableData={dashboardData?.recentTasks || []} />
+                            </div>
                         </div>
-                        <TaskListTable tableData={dashboardData?.recentTasks || []} />
-                    </div>
-                </div>
-            </div >
+                    </div >
+                )}
         </DashboardLayout >
     )
 }

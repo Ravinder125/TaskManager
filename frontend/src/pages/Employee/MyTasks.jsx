@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     DashboardLayout,
-    Loading,
+    ManageTasksSkeleton,
+    NotAssigned,
     TaskCard,
     TaskStatusTabs
 } from '../../components/index'
@@ -84,7 +85,7 @@ const MyTasks = () => {
         getAllTasks();
     }, [filterStatus])
 
-    if (loading) return <Loading />
+    if (loading) return <ManageTasksSkeleton />
     return (
         <DashboardLayout activeMenu='Manage Tasks'>
             <div className='my-8 w-full '>
@@ -119,27 +120,30 @@ const MyTasks = () => {
                     )}
                 </div>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4'>
-                    {allTasks?.map((task, idx) => (
-                        <TaskCard
-                            key={idx}
-                            title={task.title}
-                            description={task.description}
-                            priority={task.priority}
-                            status={task.status}
-                            progress={task.progress}
-                            dueData={task.dueTo}
-                            createdAt={task.createdAt}
-                            assignedTo={task.assignedTo}
-                            attachmentCount={task.attachments.length}
-                            completedTodoCount={task.completedTodoCount}
-                            todoCheckList={task.todoList}
-                            onClick={() => {
-                                handleClick(task)
-                            }}
-                        />
-                    ))}
-                </div>
+                {allTasks.length === 0
+                    ? <NotAssigned className='mt-10' /> : (
+                        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4'>
+                            {allTasks?.map((task, idx) => (
+                                <TaskCard
+                                    key={idx}
+                                    title={task.title}
+                                    description={task.description}
+                                    priority={task.priority}
+                                    status={task.status}
+                                    progress={task.progress}
+                                    dueData={task.dueTo}
+                                    createdAt={task.createdAt}
+                                    assignedTo={task.assignedTo}
+                                    attachmentCount={task.attachments.length}
+                                    completedTodoCount={task.completedTodoCount}
+                                    todoCheckList={task.todoList}
+                                    onClick={() => {
+                                        handleClick(task)
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    )}
             </div>
         </DashboardLayout>
     )

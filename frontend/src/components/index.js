@@ -22,7 +22,11 @@ import Progress from "./Progress";
 import DeleteAlert from "./DeleteAlert";
 import UserCard from "./UserCard";
 import SubmitButton from "./Inputs/SubmitButton";
-
+import DashboardSkeleton from "./Skeletons/DashboardSkeleton"
+import CreateTaskSkeleton from "./Skeletons/CreateTaskSkeleton"
+import ManageTasksSkeleton from "./Skeletons/ManageTasksSkeleton"
+import ManageEmployeeSkeleton from "./Skeletons/ManageEmployeeSkeleton"
+import NotAssigned from "./NotAssigned";
 
 export {
     Loading,
@@ -51,4 +55,9 @@ export {
     DeleteAlert,
     UserCard,
     SubmitButton,
+    DashboardSkeleton,
+    ManageEmployeeSkeleton,
+    CreateTaskSkeleton,
+    ManageTasksSkeleton,
+    NotAssigned,
 }

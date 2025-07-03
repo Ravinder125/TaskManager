@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react'
-import { DashboardLayout, Loading, UserCard } from '../../components/index'
+import { DashboardLayout, ManageEmployeeSkeleton, UserCard } from '../../components/index'
 import { useState } from 'react'
 import axiosInstance from '../../utils/axiosInstance'
 import { API_PATHS } from '../../utils/apiPaths'
 import { LuFileSpreadsheet } from 'react-icons/lu'
-import ManageEmployeeSkeleton from '../../components/Skeletons/ManageEmployeeSkeleton'
 
 const ManageEmployees = () => {
     const [allUsers, setAllUsers] = useState([])
