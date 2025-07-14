@@ -36,16 +36,15 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
         const uniqueNewUsers = tempSelectedUsers.filter(
             (id) => !selectedUsers?.includes(id)
         );
+
         setSelectedUsers((prev) => [...prev, ...uniqueNewUsers]);
         setIsModalOpen(false);
     };
 
-    const selectedUsersAvatar = allUsers.reduce((acc, user) => {
-        if (selectedUsers?.includes(user?._id)) {
-            acc.push(user?.profileImageUrl);
-        }
-        return acc;
-    }, []);
+    const selectedUsersAvatar = allUsers
+        .filter((user) => selectedUsers?.includes(user?._id))
+        .map((user) => user?.profileImageUrl);
+
 
     useEffect(() => {
         getAllUsers();

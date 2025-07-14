@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { LuFileSpreadsheet } from 'react-icons/lu';
+import { motion } from 'motion/react';
 
 const MyTasks = () => {
     const [allTasks, setAllTasks] = useState([]);
@@ -121,26 +122,46 @@ const MyTasks = () => {
                 </div>
 
                 {allTasks.length === 0
-                    ? <NotAssigned className='mt-10' /> : (
-                        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4'>
+                    ? <NotAssigned />
+                    : (
+                        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 mt-4'>
                             {allTasks?.map((task, idx) => (
-                                <TaskCard
-                                    key={idx}
-                                    title={task.title}
-                                    description={task.description}
-                                    priority={task.priority}
-                                    status={task.status}
-                                    progress={task.progress}
-                                    dueData={task.dueTo}
-                                    createdAt={task.createdAt}
-                                    assignedTo={task.assignedTo}
-                                    attachmentCount={task.attachments.length}
-                                    completedTodoCount={task.completedTodoCount}
-                                    todoCheckList={task.todoList}
-                                    onClick={() => {
-                                        handleClick(task)
+                                <motion.div
+                                    initial={{
+                                        filter: "blur(5px)",
+                                        opacity: 0,
+                                        y: 100
+
                                     }}
-                                />
+                                    animate={{
+                                        filter: "blur(0px)",
+                                        opacity: 1,
+                                        y: 0,
+                                    }}
+                                    transition={{
+                                        duration: 0.3,
+                                        delay: idx * 0.1,
+                                        ease: 'easeInOut'
+                                    }}
+                                    key={idx}
+                                >
+                                    <TaskCard
+                                        title={task.title}
+                                        description={task.description}
+                                        priority={task.priority}
+                                        status={task.status}
+                                        progress={task.progress}
+                                        dueData={task.dueTo}
+                                        createdAt={task.createdAt}
+                                        assignedTo={task.assignedTo}
+                                        attachmentCount={task.attachments.length}
+                                        completedTodoCount={task.completedTodoCount}
+                                        todoCheckList={task.todoList}
+                                        onClick={() => {
+                                            handleClick(task)
+                                        }}
+                                    />
+                                </motion.div>
                             ))}
                         </div>
                     )}

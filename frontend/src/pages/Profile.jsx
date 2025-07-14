@@ -8,9 +8,16 @@ import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
 import { uploadImage } from "../utils/uploadImag";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 
 const Profile = () => {
     useUserAuth();
+
+    const pageVariants = {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -20 }
+    }
 
     // TODO: fix the changing password issue
 
@@ -148,7 +155,14 @@ const Profile = () => {
     if (loading) return <Loading />;
     return (
         <DashboardLayout>
-            <div className="p-4 my-4 ">
+            <motion.div
+                variants={pageVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: 0.4 }}
+                className="p-4 my-4 "
+            >
                 <div className="grid grid-cols-1  md:grid-cols-4">
                     <div className="form-card col-span-3" >
                         <div className="flex items-center justify-between">
@@ -259,7 +273,7 @@ const Profile = () => {
                     </div>
 
                 </div>
-            </div>
+            </motion.div>
         </DashboardLayout >
     )
 }

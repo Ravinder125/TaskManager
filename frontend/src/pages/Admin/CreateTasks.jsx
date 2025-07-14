@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
 import moment from 'moment';
 import { LuTrash2 } from 'react-icons/lu';
+import z from 'zod'
 import {
     DashboardLayout,
     SelectUsers,
@@ -17,6 +18,46 @@ import {
     CreateTaskSkeleton
 } from '../../components/index';
 
+
+
+const createTaskSchema = z.object({
+    title: z
+        .string()
+        .nonempty({ message: "Title is required" })
+        .min(3, { message: "Title must be at least 3 characters long" }),
+
+    description: z
+        .string()
+        .nonempty({ message: "Description is required" })
+        .min(3, { message: "Description must be at least 3 characters long" }),
+
+    priority: z.enum(["medium", "high", "low"], {
+        required_error: "Priority is required",
+    }),
+
+    dueTo: z
+        .preprocess((arg) => (typeof arg === "string" || arg instanceof Date) ? new Date(arg) : arg, z.date({
+            required_error: "Due date is required",
+        }))
+        .refine((date) => !isNaN(date.getTime()), {
+            message: "Invalid due date",
+        }),
+
+    assignedTo: z
+        .array(z.string(), {
+            required_error: "Assigned users are required",
+        })
+        .nonempty("Assigned users are required"),
+
+    todoList: z
+        .array(z.string(), {
+            required_error: "Todo list is required",
+        })
+        .nonempty("Add at least one todo"),
+
+    attachments: z.array(z.string()).optional(),
+});
+
 const CreateTasks = () => {
     const location = useLocation();
     const { taskId } = location.state || {};
@@ -25,7 +66,7 @@ const CreateTasks = () => {
     const [taskData, setTaskData] = useState({
         title: '',
         description: '',
-        priority: '',
+        priority: 'medium',
         dueTo: '',
         assignedTo: [],
         todoList: [],
@@ -55,35 +96,36 @@ const CreateTasks = () => {
         setSelectedUsers([]);
     };
 
-    const validateFields = (payload) => {
-        switch (true) {
-            case !payload.title:
-                setError("Title is required");
-                return false;
-            case !payload.description:
-                setError("Description is required");
-                return false;
-            case !payload.priority:
-                setError("Priority is required");
-                return false;
-            case !payload.dueTo:
-                setError("Due date is required");
-                return false;
-            case !Array.isArray(payload.assignedTo) || payload.assignedTo.length === 0:
-                setError("Task not assigned to any member");
-                return false;
-            case !Array.isArray(payload.todoList) || payload.todoList.length === 0:
-                setError("Add at least one todo");
-                return false;
-            default:
-                return true;
-        }
-    };
+    // const validateFields = (payload) => {
+    //     switch (true) {
+    //         case !payload.title:
+    //             setError("Title is required");
+    //             return false;
+    //         case !payload.description:
+    //             setError("Description is required");
+    //             return false;
+    //         case !payload.priority:
+    //             setError("Priority is required");
+    //             return false;
+    //         case !payload.dueTo:
+    //             setError("Due date is required");
+    //             return false;
+    //         case !Array.isArray(payload.assignedTo) || payload.assignedTo.length === 0:
+    //             setError("Task not assigned to any member");
+    //             return false;
+    //         case !Array.isArray(payload.todoList) || payload.todoList.length === 0:
+    //             setError("Add at least one todo");
+    //             return false;
+    //         default:
+    //             return true;
+    //     }
+    // };
 
     const createTask = async () => {
         setError("");
 
         taskData.todoList = taskData.todoList
+        console.log(selectedUsers.map(user => typeof user === 'string' ? user : user._id))
         const payload = {
             ...taskData,
             assignedTo: selectedUsers.map(user =>
@@ -92,14 +134,21 @@ const CreateTasks = () => {
             dueTo: new Date(taskData.dueTo),
         };
 
-        if (!validateFields(payload)) {
-            toast.error('Please fill in all required fields.');
-            return;
+        const result = createTaskSchema.safeParse(payload)
+
+        if (!result.success) {
+            const fieldErrors = result.error.formErrors.fieldErrors
+            console.log(result)
+            const firstError = Object
+                .values(fieldErrors)?.[0]?.[0]
+            setError(firstError)
+            return
         }
+
 
         try {
             setLoading(true);
-            const response = await axiosInstance.post(API_PATHS.TASKS.CREATE_TASK, payload);
+            await axiosInstance.post(API_PATHS.TASKS.CREATE_TASK, payload);
             clearData();
             toast.success('Task created successfully');
             navigate('/admin/tasks');
@@ -187,6 +236,7 @@ const CreateTasks = () => {
     };
     useEffect(() => {
         if (taskId) {
+            console.log(taskId)
             getTaskById(taskId);
         } else {
             // If not editing, clear task data and currentTask
@@ -200,7 +250,7 @@ const CreateTasks = () => {
 
     return (
         <DashboardLayout activeMenu='Create Task'>
-            <div className=''>
+            <div>
                 <div className='grid grid-cols-1 md:grid-cols-4 my-4'>
                     <div className='form-card col-span-3'>
                         <div className='flex justify-between items-center'>
@@ -316,7 +366,7 @@ const CreateTasks = () => {
                                 <button
                                     disabled={loading}
                                     onClick={updateTask}
-                                    className='px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50'
+                                    className='px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 cursor-pointer'
                                 >
                                     Update Task
                                 </button>
@@ -324,7 +374,7 @@ const CreateTasks = () => {
                                 <button
                                     disabled={loading}
                                     onClick={createTask}
-                                    className='px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50'
+                                    className='px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 cursor-pointer'
                                 >
                                     Create Task
                                 </button>

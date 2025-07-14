@@ -4,6 +4,7 @@ import { useState } from 'react'
 import axiosInstance from '../../utils/axiosInstance'
 import { API_PATHS } from '../../utils/apiPaths'
 import { LuFileSpreadsheet } from 'react-icons/lu'
+import { motion } from 'motion/react'
 
 const ManageEmployees = () => {
     const [allUsers, setAllUsers] = useState([])
@@ -68,8 +69,28 @@ const ManageEmployees = () => {
                 </div>
 
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4'>
-                    {allUsers?.map((user) => (
-                        <UserCard key={user._id} userInfo={user} />
+                    {allUsers?.map((user, idx) => (
+                        <motion.div
+                            initial={{
+                                filter: "blur(5px)",
+                                opacity: 0,
+                                y: 100
+
+                            }}
+                            animate={{
+                                filter: "blur(0px)",
+                                opacity: 1,
+                                y: 0,
+                            }}
+                            transition={{
+                                duration: 0.3,
+                                delay: idx * 0.1,
+                                ease: 'linear'
+                            }}
+                            key={user._id}
+                        >
+                            <UserCard userInfo={user} />
+                        </motion.div>
                     ))}
                 </div>
             </div>

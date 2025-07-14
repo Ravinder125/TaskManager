@@ -3,9 +3,24 @@ import { AuthLayout, Input, Loading, ProfilePhotoSelector } from '../../componen
 import { validateEmail } from '../../utils/helper';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_PATHS } from '../../utils/apiPaths';
-import { uploadImage } from '../../utils/uploadImag';
 import axiosInstance from '../../utils/axiosInstance';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
+import z from 'zod'
+
+const registerSchema = z.object({
+    fullName: z.
+        string()
+        .nonempty({ message: "Enter you full name" })
+        .min(3, { message: "Full name must 3 characters long" }),
+    email: z
+        .string()
+        .nonempty({ message: "Email is required" })
+        .email({ message: "Invalid email" }),
+    password: z
+        .string()
+        .min(8, { message: "Password must be 8 characters long" })
+})
 
 const Register = () => {
     // const [profilePic, setProfilePic] = useState(null);
@@ -21,24 +36,6 @@ const Register = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-
-
-        setError("")
-        if (!fullName) {
-            setError('Please enter your full name')
-        }
-        if (!password || password.length < 8) {
-            setError('Please ensure password')
-        }
-        if (!validateEmail(email)) {
-            setError('Please enter valid email')
-        }
-
-        // if (!profilePic) {
-        //     setError('Profile image is required')
-        // }
-
-        if (error) return;
         setError("")
 
         try {
@@ -48,17 +45,25 @@ const Register = () => {
                 password,
                 adminInviteToken
             }
+
+            const result = registerSchema.safeParse({
+                fullName, email, password
+            })
+
+            if (!result.success) {
+                const fieldErrors = result.error.formErrors.fieldErrors
+                const firstError = Object
+                    .values(fieldErrors)?.[0]?.[0]
+                setError(firstError)
+                return
+            }
+
             setLoading(true)
-            // Regiseration API logic
+            // Registration API logic
             const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, formData);
             if (response?.data?.data) {
                 toast.success(response.data.message)
-                // if (profilePic && response) {
-                //     const imageUploadRes = await uploadImage(profilePic);
-                //     toast.success(imageUploadRes.message)
-                // }
-
-                // Redirect to login page after successfull registeration
+                // Redirect to login page after successfully registration
                 navigate('/login')
             }
         } catch (error) {
@@ -73,10 +78,24 @@ const Register = () => {
             setLoading(false)
         }
     }
+
+    const pageVariants = {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -20 }
+    }
+
     if (loading) return <Loading />
     return (
         <AuthLayout>
-            <div className='mt-6 mx-auto bg-white p-6 rounded-lg shadow-md'>
+            <motion.div
+                variants={pageVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: 0.4 }}
+                className='sm:mt-6 mx-auto bg-white p-6 rounded-lg shadow-md'
+            >
                 <h3 className='text-2xl text-black font-semibold text-center'>Create an Account</h3>
                 <p className='text-sm text-gray-600 mt-2 mb-6 text-center'>Join us today by entering your details below</p>
 
@@ -120,7 +139,7 @@ const Register = () => {
                         />
 
                     </div>
-                    {error && <p className='text-red-500 text-xs text-center'>{error}</p>}
+                    {error && <p className='text-red-500 text-xs'>Error: {error}</p>}
 
                     <p className='text-center text-xs text-gray-700 mt-3 mb-2'>
                         Already have an account?{' '}
@@ -133,7 +152,7 @@ const Register = () => {
                         Register
                     </button>
                 </form>
-            </div>
+            </motion.div>
         </AuthLayout>
     )
 }

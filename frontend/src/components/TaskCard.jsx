@@ -4,6 +4,7 @@ import { LuPaperclip } from 'react-icons/lu';
 import moment from 'moment';
 import { formatName } from '../utils/helper';
 
+
 const TaskCard = ({
     title,
     description,
@@ -49,7 +50,7 @@ const TaskCard = ({
 
     return (
         <div
-            className="bg-white rounded-lg shadow-md p-5 mb-4 cursor-pointer hover:shadow-lg transition-shadow duration-200 hover:scale-[1.01] hover:translate-y-[-2px] transition-transform duration-500 ease-in-out"
+            className="bg-white rounded-lg shadow-md p-5 mb-4 cursor-pointer"
             onClick={onClick}
             style={{ transition: 'box-shadow 0.2s, transform 0.2s' }}
         >

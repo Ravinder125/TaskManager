@@ -15,6 +15,7 @@ import {
     CustomBarChart,
     DashboardSkeleton,
 } from '../../components/index';
+import { motion } from 'motion/react';
 
 const COLORS = ['#8051FF', '#00B8DB', '#7BCE00']
 
@@ -83,8 +84,25 @@ function Dashboard() {
     if (loading) return <DashboardSkeleton />
     return (
         <DashboardLayout activeMenu='Dashboard'>
-            <div className='card my-5'>
-                <div>
+            <motion.div
+                initial={{
+                    filter: "blur(5px)",
+                    opacity: 0,
+                }}
+                animate={{
+                    filter: "blur(0px)",
+                    opacity: 1,
+                    y: 0,
+                    x: 0,
+                }}
+                transition={{
+                    duration: 0.3,
+                    ease: 'linear'
+                }}
+                className='origin-center'
+            >
+                <div className='card my-5'>
+
                     <div className='flex flex-col sm:flex-row sm:justify-between md:justify-start md:gap-4'>
                         <span className='text-xl md:text-2xl'>Good Morning!</span>
                         <h2 className='text-xl md:text-2xl font-semibold '>
@@ -94,84 +112,85 @@ function Dashboard() {
                     <p className='text-xs md:text-[13px] text-gray-400 mt-1.5'>
                         {moment().format('dddd Do MMM YYYY')}
                     </p>
-                </div >
 
-                {dashboardData && dashboardData.charts && dashboardData.charts.taskDistribution && (
-                    <div className='grid grid-cols-2 sm:grid-cols-2  gap-3 md:gap-6 mt-5'>
-                        <InfoCard
-                            label='Total Tasks'
-                            value={addThousandsSeprator(
-                                dashboardData.charts.taskDistribution.all || 0
-                            )}
-                            color='bg-primary'
-                        />
-                        <InfoCard
-                            label='Pending Tasks'
-                            value={addThousandsSeprator(
-                                dashboardData.charts.taskDistribution.pending || 0
-                            )}
-                            color='bg-violet-500'
-                        />
-                        <InfoCard
-                            label='In Progress Tasks'
-                            value={addThousandsSeprator(
-                                dashboardData.charts.taskDistribution.inProgress || 0
-                            )}
-                            color='bg-cyan-500'
-                        />
-                        <InfoCard
-                            label='Complete Tasks'
-                            value={addThousandsSeprator(
-                                dashboardData.charts.taskDistribution.completed || 0
-                            )}
-                            color='bg-lime-500'
-                        />
-                    </div>
-                )}
 
-            </div>
-
-            {dashboardData?.statistics?.totalTasks === 0
-                ? <NotAssigned className='mt-6' /> : (
-                    <div className='grid grid-cols-1  md:grid-cols-2 gap-3 my-4  '>
-                        <div >
-                            <div className='card '>
-                                <div className='flex items-center justify-bewteen mb-2'>
-                                    <h5 className='font-medium'>Task Distribution</h5>
-                                </div>
-
-                                <CustomPieChart
-                                    data={pieChartData}
-                                    label='Total Balance'
-                                    colors={COLORS}
-                                />
-                            </div>
+                    {dashboardData && dashboardData.charts && dashboardData.charts.taskDistribution && (
+                        <div className='grid grid-cols-2 sm:grid-cols-2  gap-3 md:gap-6 mt-5'>
+                            <InfoCard
+                                label='Total Tasks'
+                                value={addThousandsSeprator(
+                                    dashboardData.charts.taskDistribution.all || 0
+                                )}
+                                color='bg-primary'
+                            />
+                            <InfoCard
+                                label='Pending Tasks'
+                                value={addThousandsSeprator(
+                                    dashboardData.charts.taskDistribution.pending || 0
+                                )}
+                                color='bg-violet-500'
+                            />
+                            <InfoCard
+                                label='In Progress Tasks'
+                                value={addThousandsSeprator(
+                                    dashboardData.charts.taskDistribution.inProgress || 0
+                                )}
+                                color='bg-cyan-500'
+                            />
+                            <InfoCard
+                                label='Complete Tasks'
+                                value={addThousandsSeprator(
+                                    dashboardData.charts.taskDistribution.completed || 0
+                                )}
+                                color='bg-lime-500'
+                            />
                         </div>
+                    )}
+                </div>
 
-                        <div>
-                            <div className='card'>
-                                <div className='flex items-center justify-beween mb-2'>
-                                    <h5 className='font-medium'>Task Priority Levels</h5>
+
+                {dashboardData?.statistics?.totalTasks === 0
+                    ? <NotAssigned className='mt-6' /> : (
+                        <div className='grid grid-cols-1  md:grid-cols-2 gap-3 my-4  '>
+                            <div >
+                                <div className='card '>
+                                    <div className='flex items-center justify-bewteen mb-2'>
+                                        <h5 className='font-medium'>Task Distribution</h5>
+                                    </div>
+
+                                    <CustomPieChart
+                                        data={pieChartData}
+                                        label='Total Balance'
+                                        colors={COLORS}
+                                    />
                                 </div>
-
-                                <CustomBarChart data={barChartData} c />
                             </div>
-                        </div>
 
-                        <div className='md:col-span-2'>
-                            <div className='card '>
-                                <div className='flex items-center justify-between'>
-                                    <h5 className='text-lg font-medium'>Recent Tasks</h5>
+                            <div>
+                                <div className='card'>
+                                    <div className='flex items-center justify-beween mb-2'>
+                                        <h5 className='font-medium'>Task Priority Levels</h5>
+                                    </div>
 
-                                    <Link to='/admin/tasks' className='card-btn' onClick={onSeeMore}>
-                                        See All <LuArrowRight className='text-base' />
-                                    </Link>
+                                    <CustomBarChart data={barChartData} c />
                                 </div>
-                                <TaskListTable tableData={dashboardData?.recentTasks || []} />
                             </div>
-                        </div>
-                    </div >
-                )}
+
+                            <div className='md:col-span-2'>
+                                <div className='card '>
+                                    <div className='flex items-center justify-between'>
+                                        <h5 className='text-lg font-medium'>Recent Tasks</h5>
+
+                                        <Link to='/admin/tasks' className='card-btn' onClick={onSeeMore}>
+                                            See All <LuArrowRight className='text-base' />
+                                        </Link>
+                                    </div>
+                                    <TaskListTable tableData={dashboardData?.recentTasks || []} />
+                                </div>
+                            </div>
+                        </div >
+                    )}
+            </motion.div>
         </DashboardLayout >
     )
 }

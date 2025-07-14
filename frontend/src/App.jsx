@@ -4,6 +4,7 @@ import PrivateRoute from './routes/PrivateRoute'
 import { UserContext } from './context/userContext'
 import { Toaster } from 'react-hot-toast'
 import { Loading } from './components'
+import { AnimatePresence } from 'framer-motion'
 
 
 // Lazy load Pages
@@ -41,34 +42,36 @@ function App() {
   return (
     <>
       <Suspense fallback={<Loading />}>
-        <Routes>
-          {/* Public Routes */}
-          <Route path='/' element={<AuthRedirect />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/register' element={<Register />} />
+        <AnimatePresence mode='wait'>
+          <Routes location={location} key={location.pathname}>
+            {/* Public Routes */}
+            <Route path='/' element={<AuthRedirect />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register />} />
 
-          {/* Admin Routes */}
-          <Route element={<PrivateRoute allowedRoles={['admin']} />} >
-            <Route path='/admin/dashboard' element={<Dashboard />} />
-            <Route path='/admin/tasks' element={<ManageTasks />} />
-            <Route path='/admin/create-task' element={<CreateTasks />} />
-            <Route path='/admin/employees' element={<ManageEmployees />} />
-          </Route>
+            {/* Admin Routes */}
+            <Route element={<PrivateRoute allowedRoles={['admin']} />} >
+              <Route path='/admin/dashboard' element={<Dashboard />} />
+              <Route path='/admin/tasks' element={<ManageTasks />} />
+              <Route path='/admin/create-task' element={<CreateTasks />} />
+              <Route path='/admin/employees' element={<ManageEmployees />} />
+            </Route>
 
-          {/* Employee Routes */}
-          <Route element={<PrivateRoute allowedRoles={['employee']} />} >
-            <Route path='/employee/dashboard' element={<EmployeeDashboard />} />
-            <Route path='/employee/tasks' element={<Mytasks />} />
-            {/* <Route path='/employee/profile' element={<ManageEmployees />} /> */}
-            <Route path='/employee/task-details/:taskId' element={<ViewTaskDetails />} />
-          </Route>
+            {/* Employee Routes */}
+            <Route element={<PrivateRoute allowedRoles={['employee']} />} >
+              <Route path='/employee/dashboard' element={<EmployeeDashboard />} />
+              <Route path='/employee/tasks' element={<Mytasks />} />
+              {/* <Route path='/employee/profile' element={<ManageEmployees />} /> */}
+              <Route path='/employee/task-details/:taskId' element={<ViewTaskDetails />} />
+            </Route>
 
-          {/* Both Admin and Employee Routes */}
-          <Route element={<PrivateRoute allowedRoles={['admin', 'employee']} />} >
-            <Route path='/logout' element={<Logout />} />
-            <Route path='/profile' element={<Profile />} />
-          </Route>
-        </Routes>
+            {/* Both Admin and Employee Routes */}
+            <Route element={<PrivateRoute allowedRoles={['admin', 'employee']} />} >
+              <Route path='/logout' element={<Logout />} />
+              <Route path='/profile' element={<Profile />} />
+            </Route>
+          </Routes>
+        </AnimatePresence>
       </Suspense>
 
       <Toaster
