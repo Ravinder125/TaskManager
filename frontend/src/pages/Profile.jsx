@@ -171,7 +171,7 @@ const Profile = () => {
 
                         <div className="mt-4 ">
                             <form onSubmit={handleSubmit} >
-                                <div className="grid   grid-cols-1  gap-4">
+                                <div className="grid grid-cols-1  gap-4">
 
                                     <ProfilePhotoSelector setProfilePic={setProfilePic} profilePic={profilePic} />
 

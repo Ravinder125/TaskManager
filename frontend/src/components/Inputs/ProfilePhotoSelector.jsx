@@ -45,7 +45,7 @@ const ProfilePhotoSelector = ({ setProfilePic, profilePic }) => {
                             <img
                                 src={profilePic}
                                 alt="profile photo"
-                                className='w-20 h-20 object-cover rounded-full'
+                                className='w-20 h-20 object-contain rounded-full'
                             />
                             <button
                                 type='button'
