@@ -97,30 +97,30 @@ const CreateTasks = () => {
         setSelectedUsers([]);
     };
 
-    // const validateFields = (payload) => {
-    //     switch (true) {
-    //         case !payload.title:
-    //             setError("Title is required");
-    //             return false;
-    //         case !payload.description:
-    //             setError("Description is required");
-    //             return false;
-    //         case !payload.priority:
-    //             setError("Priority is required");
-    //             return false;
-    //         case !payload.dueTo:
-    //             setError("Due date is required");
-    //             return false;
-    //         case !Array.isArray(payload.assignedTo) || payload.assignedTo.length === 0:
-    //             setError("Task not assigned to any member");
-    //             return false;
-    //         case !Array.isArray(payload.todoList) || payload.todoList.length === 0:
-    //             setError("Add at least one todo");
-    //             return false;
-    //         default:
-    //             return true;
-    //     }
-    // };
+    const validateFields = (payload) => {
+        switch (true) {
+            case !payload.title:
+                setError("Title is required");
+                return false;
+            case !payload.description:
+                setError("Description is required");
+                return false;
+            case !payload.priority:
+                setError("Priority is required");
+                return false;
+            case !payload.dueTo:
+                setError("Due date is required");
+                return false;
+            case !Array.isArray(payload.assignedTo) || payload.assignedTo.length === 0:
+                setError("Task not assigned to any member");
+                return false;
+            case !Array.isArray(payload.todoList) || payload.todoList.length === 0:
+                setError("Add at least one todo");
+                return false;
+            default:
+                return true;
+        }
+    };
 
     const createTask = async () => {
         setError("");
