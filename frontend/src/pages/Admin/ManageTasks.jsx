@@ -137,7 +137,7 @@ const ManageTasks = () => {
                                     initial={{
                                         filter: "blur(5px)",
                                         opacity: 0,
-                                        y: 20,
+                                        y: 100,
                                     }}
                                     animate={{ filter: "blur(0px)", opacity: 1, y: 0, }}
                                     transition={{
