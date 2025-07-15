@@ -141,7 +141,7 @@ const MyTasks = () => {
                                     transition={{
                                         duration: 0.3,
                                         delay: idx * 0.1,
-                                        ease: 'easeInOut'
+                                        ease: 'linear'
                                     }}
                                     key={idx}
                                 >

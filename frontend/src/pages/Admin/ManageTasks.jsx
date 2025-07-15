@@ -143,7 +143,7 @@ const ManageTasks = () => {
                                     transition={{
                                         duration: 0.3,
                                         delay: idx * 0.1,
-                                        ease: 'easeInOut'
+                                        ease: 'linear'
                                     }}
                                     key={idx}
                                     className='transform-scale  hover:scale-1.1 transition-scale duration-300'
