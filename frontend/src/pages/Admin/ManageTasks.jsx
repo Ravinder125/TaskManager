@@ -110,7 +110,7 @@ const ManageTasks = () => {
                     </div>
 
                     {tabs.length > 0 && (
-                        <div className='flex items-center gap-4'>
+                        <div className='flex items-center gap-4 my-10 '>
                             <TaskStatusTabs
                                 tabs={tabs}
                                 activeTab={filterStatus}
