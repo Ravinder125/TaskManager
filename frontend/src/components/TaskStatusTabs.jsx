@@ -15,6 +15,7 @@ const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
         <div className='my-2 relative mx-auto'>
             <motion.div
                 animate={{
+                    top: scrolled ? "70px" : "",
                     boxShadow: scrolled
                         ? `
                         0 2px 4px rgba(0, 0, 0, 0.1),
@@ -22,16 +23,17 @@ const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
                         0 8px 16px rgba(0, 0, 0, 0.06),
                         0 16px 32px rgba(0, 0, 0, 0.04),
                         0 0 15px rgba(0, 200, 255, 0.25)
-                        `: "",
+                        `: "0px",
                     borderRadius: scrolled ? 20 : 0,
-                    backdropFilter: scrolled ? "blur(2px)" : ""
+                    backdropFilter: scrolled ? "blur(2px)" : "blur(0px)"
+
                 }}
                 transition={{
                     duration: 0.3,
                     ease: 'linear'
                 }}
 
-                className="flex fixed z-50 sm:top-20 sm:top-45 lg:top-28 xl:top-32 left-10 sm:left-[20%] lg:left-[40%] w-[300px] sm:w-fit overflow-x-auto hide-scrollbar"
+                className="flex fixed z-10 sm:top-20 sm:top-45 lg:top-28 xl:top-32 left-10 sm:left-[20%] lg:left-[40%] w-[300px] sm:w-fit overflow-x-auto hide-scrollbar"
             >
                 {tabs.map((tab, idx) => (
                     <button
@@ -62,7 +64,7 @@ const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
                             </span>
                         </div>
                         {tab.label === formatName(activeTab) && (
-                            <div className='absolute z-20 bottom-0 left-0 w-full h-0.5 bg-primary' />
+                            <div className='absolute z-10 bottom-0 left-0 w-full h-0.5 bg-primary' />
                         )}
                     </button>
                 ))}

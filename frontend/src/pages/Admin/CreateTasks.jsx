@@ -3,7 +3,7 @@ import { PRIORITY_DATA } from '../../utils/data';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { toast } from 'react-hot-toast';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import moment from 'moment';
 import { LuTrash2 } from 'react-icons/lu';
 import z from 'zod'
@@ -59,8 +59,9 @@ const createTaskSchema = z.object({
 });
 
 const CreateTasks = () => {
-    const location = useLocation();
-    const { taskId } = location.state || {};
+    const [searchParams] = useSearchParams()
+    const taskId = searchParams.get("taskId")
+
     const navigate = useNavigate();
 
     const [taskData, setTaskData] = useState({
@@ -125,7 +126,7 @@ const CreateTasks = () => {
         setError("");
 
         taskData.todoList = taskData.todoList
-        console.log(selectedUsers.map(user => typeof user === 'string' ? user : user._id))
+        // console.log(selectedUsers.map(user => typeof user === 'string' ? user : user._id))
         const payload = {
             ...taskData,
             assignedTo: selectedUsers.map(user =>
@@ -138,7 +139,6 @@ const CreateTasks = () => {
 
         if (!result.success) {
             const fieldErrors = result.error.formErrors.fieldErrors
-            console.log(result)
             const firstError = Object
                 .values(fieldErrors)?.[0]?.[0]
             setError(firstError)
@@ -236,7 +236,6 @@ const CreateTasks = () => {
     };
     useEffect(() => {
         if (taskId) {
-            console.log(taskId)
             getTaskById(taskId);
         } else {
             // If not editing, clear task data and currentTask

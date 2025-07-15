@@ -11,7 +11,6 @@ import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { LuFileSpreadsheet } from 'react-icons/lu';
 import { motion } from 'motion/react'
-import { useInView } from 'react-intersection-observer';
 
 
 const ManageTasks = () => {
@@ -58,7 +57,7 @@ const ManageTasks = () => {
 
     const handleClick = (taskData) => {
         if (taskData && taskData._id) {
-            navigate('/admin/create-task', { state: { taskId: taskData._id } });
+            navigate(`/admin/create-task?taskId=${taskData._id}`);
         }
     }
 
@@ -87,11 +86,6 @@ const ManageTasks = () => {
     useEffect(() => {
         getAllTasks();
     }, [filterStatus])
-
-    const { ref, inView } = useInView({
-        triggerOnce: true,
-        threshold: 0.2
-    })
 
     if (loading) return <ManageTasksSkeleton />
     return (
@@ -134,12 +128,8 @@ const ManageTasks = () => {
                         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 mt-4'>
                             {allTasks?.map((task, idx) => (
                                 <motion.div
-                                    initial={{
-                                        filter: "blur(5px)",
-                                        opacity: 0,
-                                        y: 100,
-                                    }}
-                                    animate={{ filter: "blur(0px)", opacity: 1, y: 0, }}
+                                    initial={{ opacity: 0, y: 50, }}
+                                    animate={{ opacity: 1, y: 0, }}
                                     transition={{
                                         duration: 0.3,
                                         delay: idx * 0.1,
