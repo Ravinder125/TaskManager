@@ -1,7 +1,6 @@
 import { asyncHandler } from "../utils/asynchandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Task } from "../models/Task.model.js";
-import { generateCatchKey } from "../utils/generateCatcheKey.js";
 import redis from "../config/redis.js";
 
 const dashboardRoute = '/api/v1/dashboard'
