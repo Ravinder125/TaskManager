@@ -34,7 +34,7 @@ const SideMenu = ({ activeMenu }) => {
                         ? <img
                             src={user?.profileImageUrl}
                             alt="Profile Image"
-                            className='w-20 h-20 bg-slate-400 rounded-full object-contain'
+                            className='w-20 h-20 bg-slate-400 rounded-full '
                         />
                         : <LuUser className='text-4xl text-primary rounded-full w-20 h-20  border-2' />
                     }
