@@ -1,4 +1,3 @@
-import React from 'react'
 
 const Loading = () => {
     return (
@@ -20,7 +19,7 @@ const Loading = () => {
                 />
             </svg>
             <span className='text-2xl text-primary font-semibold'>Loading...</span>
-        </div>
+        // </div>
     )
 }
 

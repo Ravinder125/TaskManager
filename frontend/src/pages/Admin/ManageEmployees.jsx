@@ -71,22 +71,9 @@ const ManageEmployees = () => {
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4'>
                     {allUsers?.map((user, idx) => (
                         <motion.div
-                            initial={{
-                                filter: "blur(5px)",
-                                opacity: 0,
-                                y: 100
-
-                            }}
-                            animate={{
-                                filter: "blur(0px)",
-                                opacity: 1,
-                                y: 0,
-                            }}
-                            transition={{
-                                duration: 0.3,
-                                delay: idx * 0.1,
-                                ease: 'linear'
-                            }}
+                            initial={{ filter: "blur(5px)", opacity: 0, y: 100 }}
+                            whileInView={{ filter: "blur(0px)", opacity: 1, y: 0, }}
+                            transition={{ duration: 0.3, delay: 0.1, ease: 'linear' }}
                             key={user._id}
                         >
                             <UserCard userInfo={user} />
