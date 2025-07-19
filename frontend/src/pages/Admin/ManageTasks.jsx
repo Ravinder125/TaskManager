@@ -128,16 +128,13 @@ const ManageTasks = () => {
                         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 mt-4'>
                             {allTasks?.map((task, idx) => (
                                 <motion.div
-                                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                                    initial={{ opacity: 0, y: 100, scale: 0 }}
-                                    // animate={{ opacity: 1, y: 0, }}
+                                    whileInView={{ scale: 1 }}
+                                    initial={{ scale: 0.9 }}
                                     transition={{
                                         duration: 0.3,
-                                        // delay: 0.1,
-                                        ease: "linear"
                                     }}
                                     key={idx}
-                                    className='transform-scale  hover:scale-1.1 transition-scale duration-300'
+                                    className='transform-scale hover:scale-1.1 transition-scale duration-300'
                                 >
                                     <TaskCard
                                         title={task.title}

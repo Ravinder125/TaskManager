@@ -127,22 +127,9 @@ const MyTasks = () => {
                         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 mt-4'>
                             {allTasks?.map((task, idx) => (
                                 <motion.div
-                                    initial={{
-                                        filter: "blur(5px)",
-                                        opacity: 0,
-                                        y: 100
-
-                                    }}
-                                    animate={{
-                                        filter: "blur(0px)",
-                                        opacity: 1,
-                                        y: 0,
-                                    }}
-                                    transition={{
-                                        duration: 0.3,
-                                        delay: idx * 0.1,
-                                        ease: 'linear'
-                                    }}
+                                    whileInView={{ scale: 1 }}
+                                    initial={{ scale: 0.9 }}
+                                    transition={{ duration: 0.3, }}
                                     key={idx}
                                 >
                                     <TaskCard
