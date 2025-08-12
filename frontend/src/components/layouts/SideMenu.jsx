@@ -27,7 +27,7 @@ const SideMenu = ({ activeMenu }) => {
         }
     }, [user])
     return (
-        <div className='z-100 bg-white w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-200/50 sticky top-[61px] z-20'>
+        <aside className='z-100 bg-white w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-200/50 sticky top-[61px] z-20'>
             <div className='flex flex-col items-center justify-center mb-7 pt-5'>
                 <div className='relative '>
                     {user?.profileImageUrl
@@ -41,12 +41,12 @@ const SideMenu = ({ activeMenu }) => {
                 </div>
 
                 {user?.role === 'admin' && (
-                    <div className='text-[10px] font-medium text-white bg-primary px-3 py-0.5 rounded mt-1'>
+                    <div className='text-[10px]  font-medium text-white bg-primary px-3 py-0.5 rounded mt-1'>
                         Admin
                     </div>
                 )}
 
-                <div className='leading-4 mt-2'>
+                <div className='leading-4 mt-2 text-center'>
                     <h5 className='text-gray-700 font-medium mt-3'>
                         {user?.fullName && formatName(user?.fullName)}
                     </h5>
@@ -71,7 +71,7 @@ const SideMenu = ({ activeMenu }) => {
                     </button>
                 ))}
             </div>
-        </div >
+        </aside >
     )
 }
 

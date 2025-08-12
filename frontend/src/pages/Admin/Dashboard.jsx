@@ -14,6 +14,7 @@ import {
     CustomPieChart,
     CustomBarChart,
     DashboardSkeleton,
+    NotAssigned,
 } from '../../components/index';
 import { motion } from 'motion/react';
 
