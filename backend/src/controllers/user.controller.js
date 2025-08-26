@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { Task } from "../models/Task.model.js";
 import { isValidObjectId } from "mongoose";
 import redis from "../config/redis.js";
+import { InviteToken } from "../models/inviteToken.model.js";
 
 
 const isValidId = (id) => isValidObjectId(id)
@@ -22,7 +23,29 @@ const getUsers = asyncHandler(async (req, res) => {
             .status(200)
             .json(ApiResponse.success(200, JSON.parse(usersWithTaskCounts), 'Users successfully fetched'))
     }
-    const users = await User.find({ role: 'employee' }).select('-password -refreshToken');
+
+    const inviteToken = await InviteToken.findOne({ email: req.user.email });
+    const usersEmail = await InviteToken.find({ token: inviteToken });
+    const users = await Promise.all([
+        usersEmail?.map(email => User
+            .findOne({ email, role: "employee" })
+            .select('-password -refreshToken'))
+    ]);
+
+    // const employees = await InviteToken.aggregate([
+    //     {
+    //         $match: {
+    //             email: req.user.email
+    //         }
+    //     },
+    //     {
+    //         $lookup: {
+
+    //         }
+    //     }
+    // ])
+
+    // const users = await User.find({ role: 'employee' }).select('-password -refreshToken');
 
     usersWithTaskCounts = await Promise.all(users.map(async (user) => {
         const tasksFilter = { assignedTo: user._id, createdBy: userId, }
