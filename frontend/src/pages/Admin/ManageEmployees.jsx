@@ -16,6 +16,7 @@ const ManageEmployees = () => {
             const response = await axiosInstance.get(API_PATHS.USERS.GET_ALL_USERS);
             if (response?.data?.data?.length > 0) {
                 setAllUsers(response.data.data || []);
+
             }
         } catch (error) {
             console.error('Error fetching users:', error);

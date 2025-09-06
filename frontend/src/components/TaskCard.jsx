@@ -53,7 +53,7 @@ const TaskCard = ({
 
     return (
         <div
-            className="bg-white max-h-[300px] relative rounded-lg shadow-md cursor-pointer overflow-hidden"
+            className="bg-white relative rounded-lg shadow-md cursor-pointer overflow-hidden"
             onClick={onClick}
             onMouseOver={() => setIsHover(true)}
             onMouseLeave={() => setIsHover(false)}
@@ -75,9 +75,7 @@ const TaskCard = ({
             </AnimatePresence>
 
 
-            <div
-                className="p-5 mb-4"
-            >
+            <div className="p-5 mb-4">
                 {/* Status + Priority */}
                 <div className="flex items-center justify-between mb-2">
                     <span className={`text-xs font-semibold px-3 py-1 rounded-full ${getStatusTagColor(status)}`}>
@@ -90,15 +88,16 @@ const TaskCard = ({
 
                 {/* Title + Description */}
                 <div
-                    className={`px-4 py-2 border-l-4 mb-3 ${status === 'in-progress'
-                        ? 'border-cyan-500'
-                        : status === 'completed'
-                            ? 'border-lime-500'
-                            : 'border-violet-500'
+                    className={`px-4 py-2 border-l-4 mb-3 
+                        ${status === 'in-progress'
+                            ? 'border-cyan-500'
+                            : status === 'completed'
+                                ? 'border-lime-500'
+                                : 'border-violet-500'
                         }`}
                 >
-                    <h3 className="text-lg font-bold mb-1 text-gray-800">{title}</h3>
-                    <p className="text-gray-500 overflow-hidden line-clamp-3 text-xs mt-4">{description}</p>
+                    <h3 className="text-lg md:text-[16px] 2xl:text-lg font-bold mb-1 text-gray-800">{title}</h3>
+                    <p className="text-gray-500 overflow-hidden line-clamp-2 text-xs mt-4">{description}</p>
                     <p className="text-[13px] text-gray-700 font-bold mt-2 mb-2 leading-[18px]">
                         Task Done:{' '}
                         <span className="font-semibold text-gray-700">{completedTodoCount}/{todoCheckList?.length || 0}</span>

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { HiMiniPlus, HiOutlineTrash } from 'react-icons/hi2';
 import { LuPaperclip } from 'react-icons/lu';
+import { AnimatePresence, motion } from 'framer-motion'
+import { todoListAnimation } from '../../utils/motionAnimations';
 
 const AddAttachmentsInput = ({ attachments, setAttachments }) => {
     const [input, setInput] = useState("");
@@ -20,26 +22,33 @@ const AddAttachmentsInput = ({ attachments, setAttachments }) => {
     };
     return (
         <div>
-            {attachments.map((attachments, idx) => (
-                <div
-                    key={idx}
-                    className='flex justify-between bg-gray-50 border border-gray-100 px-3 py-2 rounded-sm mb-3 mt-2'
-                >
-                    <div className='flex-1 flex items-center gap-3 border border-gray-100'>
-                        <LuPaperclip className='text-gray-400' />
-                        <p className='text-xs text-black'>{attachments}</p>
-                    </div>
+            <AnimatePresence>
 
-                    <button
-                        className='cursor-pointer'
-                        onClick={() => {
-                            handleDeleteInput(idx);
-                        }}
+                {attachments.map((attachments, idx) => (
+                    <motion.div
+                        initial={todoListAnimation.initial}
+                        animate={todoListAnimation.animate}
+                        exit={todoListAnimation.exit}
+                        transition={todoListAnimation.transition}
+                        key={idx}
+                        className='flex justify-between bg-gray-50 border border-gray-100 px-3 py-2 rounded-sm mb-3 mt-2'
                     >
-                        <HiOutlineTrash className='text-lg text-red-500' />
-                    </button>
-                </div>
-            ))}
+                        <div className='flex-1 flex items-center gap-3 border border-gray-100'>
+                            <LuPaperclip className='text-gray-400' />
+                            <p className='text-xs text-black'>{attachments}</p>
+                        </div>
+
+                        <button
+                            className='cursor-pointer'
+                            onClick={() => {
+                                handleDeleteInput(idx);
+                            }}
+                        >
+                            <HiOutlineTrash className='text-lg text-red-500' />
+                        </button>
+                    </motion.div>
+                ))}
+            </AnimatePresence>
 
             <div className='flex items-center gap-5 mt-4'>
                 <div className='flex-1 flex items-center gap-3 border border-gray-100 rounded-md px-3'>

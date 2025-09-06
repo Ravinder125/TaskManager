@@ -139,7 +139,6 @@ const CreateTasks = () => {
             ),
             dueTo: new Date(taskData.dueTo),
         };
-        console.log(payload)
 
         const result = createTaskSchema.safeParse(payload)
 
