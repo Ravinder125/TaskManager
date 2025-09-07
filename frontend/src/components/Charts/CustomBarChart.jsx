@@ -1,4 +1,5 @@
-import React from 'react'
+
+import useTheme from '../../hooks/useTheme'
 import {
     CustomBarTooltip, CustomBarLegend
 } from '../index'
@@ -15,7 +16,7 @@ import {
 } from 'recharts'
 
 const CustomBarChart = ({ data }) => {
-
+    const { theme } = useTheme()
     // Function to alternate colors
     // Returns a distinct color for each priority level
     const getBarColor = (entry) => {
@@ -32,7 +33,7 @@ const CustomBarChart = ({ data }) => {
     }
 
     return (
-        <div className='bg-white mt-6'>
+        <div className='bg-white dark:bg-inherit mt-6'>
             <ResponsiveContainer width='100%' height={300}>
                 <BarChart data={data} dataKey='priority' nameKey='count'>
                     <CartesianGrid stroke='none' />
@@ -41,13 +42,17 @@ const CustomBarChart = ({ data }) => {
                     <XAxis
                         dataKey='priority'
                         nameKey='count'
-                        tick={{ fontSize: 13, fontWeight: 600, fill: '#555' }}
+                        tick={{
+                            fontSize: 13,
+                            fontWeight: 600,
+                            fill: theme === "light" ? '#555' : "white"
+                        }}
                         stroke='none'
                     />
                     <YAxis />
                     <Bar
                         dataKey='count'
-                        fill='#FF8042'
+                        fill={theme === "light" ? "#FF8042" : "white"}
                         radius={[10, 10, 0, 0]}
                         activeDot={{ r: 8, fill: 'yellow' }}
                         activeStyle={{ fill: 'green' }}

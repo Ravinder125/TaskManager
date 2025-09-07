@@ -103,14 +103,13 @@ function Dashboard() {
                 className='origin-center'
             >
                 <div className='card my-5'>
-
-                    <div className='flex flex-col sm:flex-row sm:justify-between md:justify-start md:gap-4'>
+                    <div className='flex flex-col sm:flex-row sm:justify-between md:justify-start md:gap-4 dark:text-slate-300'>
                         <span className='text-xl md:text-2xl'>Good Morning!</span>
                         <h2 className='text-xl md:text-2xl font-semibold '>
                             {formatName(user?.fullName)}
                         </h2>
                     </div>
-                    <p className='text-xs md:text-[13px] text-gray-400 mt-1.5'>
+                    <p className='text-xs md:text-[13px] text-gray-400 mt-1.5 dark:text-slate-200'>
                         {moment().format('dddd Do MMM YYYY')}
                     </p>
 
@@ -169,7 +168,7 @@ function Dashboard() {
 
                             <div>
                                 <div className='card'>
-                                    <div className='flex items-center justify-beween mb-2'>
+                                    <div className='flex items-center justify-between mb-2'>
                                         <h5 className='font-medium'>Task Priority Levels</h5>
                                     </div>
 

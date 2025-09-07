@@ -1,13 +1,17 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { SideMenu } from '../index';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi'
+import ThemeSwitch from '../ThemeSwitch';
+
+
 
 const Navbar = ({ activeMenu }) => {
   const [openSideMenu, setOpenSideMenu] = useState(false)
+
   return (
-    <div className='flex gap-5 bg-white border border-b border-gray-100 backdrop-blur-[2px] py-4 px-7 sticky top-0 z-30'>
+    <nav className='flex gap-5 bg-white border border-b border-gray-100 backdrop-blur-[2px] py-2 px-7 sticky top-0 z-30 dark:bg-[var(--dark-bg-card)] dark:text-white dark:border-[var(--dark-bg-card)]'>
       <button
-        className='block lg:hidden text-black'
+        className='block lg:hidden text-black dark:text-white'
         onClick={() => {
           setOpenSideMenu(prev => !prev);
         }}
@@ -19,7 +23,11 @@ const Navbar = ({ activeMenu }) => {
         )}
       </button>
 
-      <h2 className='text-lg font-medium text-black'>Task Manager</h2>
+      <h2 className='text-lg font-medium text-black dark:text-white'>Task Manager</h2>
+
+      <div className='ml-auto'>
+        <ThemeSwitch />
+      </div>
 
       {/* SideMenu with smooth transition */}
       <div
@@ -31,7 +39,7 @@ const Navbar = ({ activeMenu }) => {
       >
         <SideMenu activeMenu={activeMenu} />
       </div>
-    </div>
+    </nav>
   )
 }
 

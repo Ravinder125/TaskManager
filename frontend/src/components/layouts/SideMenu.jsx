@@ -27,8 +27,8 @@ const SideMenu = ({ activeMenu }) => {
         }
     }, [user])
     return (
-        <aside className='z-100 bg-white w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-200/50 sticky top-[61px] z-20'>
-            <div className='flex flex-col items-center justify-center mb-7 pt-5'>
+        <aside className='z-100 bg-white w-64 h-[calc(100vh-61px)] rounded-md bg-white border-r border-gray-200/50 sticky shadow-md top-[61px] z-20 dark:bg-[var(--dark-bg-card)] dark:border-[var(--dark-bg-surface)]'>
+            <div className='flex bg-inherit flex-col items-center justify-center mb-7 pt-5'>
                 <div className='relative '>
                     {user?.profileImageUrl
                         ? <img
@@ -47,7 +47,7 @@ const SideMenu = ({ activeMenu }) => {
                 )}
 
                 <div className='leading-4 mt-2 text-center'>
-                    <h5 className='text-gray-700 font-medium mt-3'>
+                    <h5 className='text-gray-700 font-medium mt-3 dark:text-white'>
                         {user?.fullName && formatName(user?.fullName)}
                     </h5>
                     <p className='text-[12px] text-gray-400'>{user?.email || ''}</p>
@@ -56,20 +56,21 @@ const SideMenu = ({ activeMenu }) => {
                 <Link to='/profile' className='rounded-md font-medium  px-5 py-1 bg-blue-500 hover:bg-primary transition-bg duration-300 ease-in-out  text-white mt-4 mb-8 cursor-pointer'>
                     Edit Profile
                 </Link>
-
-                {sideMenuData.map((item, idx) => (
-                    <button
-                        key={`menu_${idx}`}
-                        className={`w-full flex items-center gap-4 text-[15px] 
+                <div className='w-full dark:text-gray-100'>
+                    {sideMenuData.map((item, idx) => (
+                        <button
+                            key={`menu_${idx}`}
+                            className={`w-full  flex items-center gap-4 text-[15px] 
                     ${activeMenu == item.label
-                                ? "text-primary bg-linear-to-r from-blue-50/40 to-blue-100/50 border-r-3"
-                                : ''} py-3 px-6 mb-3 cursor-pointer`}
-                        onClick={() => handleClick(item.path)}
-                    >
-                        <item.icon className={`text-xl ${item.label === 'Logout' ? 'text-rose-600' : ''}`} />
-                        {item.label}
-                    </button>
-                ))}
+                                    ? "text-primary bg-linear-to-r from-blue-100/40 to-blue-400/50 border-r-3 dark:text-[var(--dark-primary)]"
+                                    : ''} py-3 px-6 mb-3 cursor-pointer`}
+                            onClick={() => handleClick(item.path)}
+                        >
+                            <item.icon className={`text-xl ${item.label === 'Logout' ? 'text-rose-600 dark:text-rose-400' : ''} `} />
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
             </div>
         </aside >
     )
