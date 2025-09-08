@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { formatName } from '../utils/helper'
-import { hover, motion, useMotionValueEvent, useScroll, useTransform } from 'motion/react'
+import { motion, useMotionValueEvent, useScroll } from 'framer-motion'
 
 const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
     const [hovered, setHovered] = useState(null);
@@ -9,38 +9,19 @@ const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
 
     useMotionValueEvent(scrollY, "change", (latest) => {
         latest > 20 ? setScrolled(true) : setScrolled(false);
+        console.log(latest);
     })
 
     return (
         <div className='my-2 relative mx-auto'>
-            <motion.div
-                animate={{
-                    top: scrolled ? "70px" : "",
-                    boxShadow: scrolled
-                        ? `
-                        0 2px 4px rgba(0, 0, 0, 0.1),
-                        0 4px 8px rgba(0, 0, 0, 0.08),
-                        0 8px 16px rgba(0, 0, 0, 0.06),
-                        0 16px 32px rgba(0, 0, 0, 0.04),
-                        0 0 15px rgba(0, 200, 255, 0.25)
-                        `: "0px",
-                    borderRadius: scrolled ? 20 : 0,
-                    backdropFilter: scrolled ? "blur(2px)" : "blur(0px)"
-
-                }}
-                transition={{
-                    duration: 0.3,
-                    ease: 'linear'
-                }}
-
-                className="flex fixed z-10 sm:top-20 sm:top-45 lg:top-28 xl:top-32 left-10 sm:left-[20%] lg:left-[40%] w-[300px] sm:w-fit overflow-x-auto hide-scrollbar"
+            <div className={`flex fixed z-10 dark:text-gray-300 sm:top-12 lg:top-28 xl:top-32 left-10 sm:left-[20%] lg:left-[40%] w-[300px] sm:w-fit overflow-x-auto hide-scrollbar dark:shadow-neutral-700 ${scrolled ? "shadow-md rounded-full backdrop-blur-md" : "shadow-none rounded-none backdrop-blur-0"} transition-all duration-1000`}
             >
                 {tabs.map((tab, idx) => (
                     <button
                         key={idx}
                         className={`relative px-3 md:px-4 py-3 text-sm font-medium ${tab.label === formatName(activeTab)
-                            ? 'text-primary'
-                            : 'text-gray-500 hover:text-gray-700'
+                            ? 'text-primary dark:text-[var(--dark-primary)]'
+                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200'
                             } cursor-pointer`}
                         onClick={() => setActiveTab(formatName(tab.label))}
                         onMouseEnter={() => setHovered(idx)}
@@ -49,14 +30,14 @@ const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
                         {hovered === idx && (
                             <motion.span
                                 layoutId='hovered-span'
-                                className='absolute z-0 inset-0 h-full w-full rounded-md bg-neutral-800/6 dark:neutral-400'
+                                className='absolute z-0 inset-0 h-full w-full rounded-md bg-neutral-800/6 dark:bg-neutral-700'
                             />
                         )}
-                        <div className='relative z-20 flex  items-center'>
+                        <div className='relative z-20 flex items-center'>
                             <span className='text-xs'> {tab.label}</span>
                             <span
                                 className={`text-xs ml-2 px-2 py-0.5 rounded-full ${tab.label === formatName(activeTab)
-                                    ? 'bg-primary text-white'
+                                    ? 'bg-primary text-white dark:text-gray-200 dark:bg-[var(--dark-primary)]'
                                     : 'bg-gray-200/70 text-gray-600'
                                     }`}
                             >
@@ -68,7 +49,7 @@ const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
                         )}
                     </button>
                 ))}
-            </motion.div>
+            </div>
         </div >
     )
 }

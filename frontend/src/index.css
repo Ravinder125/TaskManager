@@ -6,23 +6,52 @@
 :root {
   --dark-bg-surface: #121212;
   --dark-bg-card: #282828;
-  --dark-card-border: ##3f3f3f;
-  --dark-card-shadow: ##575757;
+  --dark-card-shadow: #575757;
   --dark-primary: #4F8CFF;
+  --dark-card-border: #3f3f3f;
 }
 
 @theme {
   --font-family: 'Poppins', sans-serif;
   --breakpoint-3xl: 1920px;
   --color-primary: #1368EC;
+  --color-dark-primary: var(--dark-primary);
+  --color-dark-border: var(--dark-card-border);
+  --color-dark-card: var(--dark-bg-card);
+  --shadow-dark-shadow: var(--dark-card-shadow);
+  --color-dark-surface: var(--dark-bg-surface);
 }
 
 /* Hide scrollbars  */
+/* Scrollbar styling for light and dark themes */
 .hide-scrollbar {
-  scrollbar-width: none;
-  /* Firefox */
-  -ms-overflow-style: none;
-  /* IE and Edge */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+  /* thumb and track for light theme */
+}
+
+.dark .hide-scrollbar {
+  scrollbar-color: #3f3f3f #121212;
+  /* thumb and track for dark theme */
+}
+
+/* Chrome, Safari, Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background: #f8fafc;
+}
+
+.hide-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+
+.dark .hide-scrollbar::-webkit-scrollbar {
+  background: #121212;
+}
+
+.dark .hide-scrollbar::-webkit-scrollbar-thumb {
+  background: #3f3f3f;
 }
 
 .hide-scrollbar::-webkit-scrollbar {
@@ -34,6 +63,8 @@
 @layer base {
   html {
     font-family: var(--font-family);
+    overflow: hidden;
+    height: 100%;
   }
 
   body {
@@ -42,9 +73,14 @@
   }
 
   .dark body {
-    background-color: var(--dark-bg-surface) !important;
+    background-color: var(--color-dark-surface) !important;
     color: white;
   }
+}
+
+
+.dark-bg-card {
+  @apply dark:bg-neutral-800
 }
 
 .input-box {
@@ -59,16 +95,6 @@
   @apply bg-white dark:bg-[var(--dark-bg-card)] p-6 rounded-2xl shadow-md shadow-gray-100 dark:shadow-[var(--dark-card-border)] border-2 border-gray-200 dark:border-[var(--dark-bg-card)];
 }
 
-
-/* 
-.dark .card {
-  background-color: var(--dark-bg-card);
-  box-shadow: 0 1px 3px 0 rgba(31, 41, 55, 0.8);
-  border-color: var(--dark-bg-card);
-  box-shadow: 0 1px 30px 0 var(--dark-card-border);
-} */
-
-
 .card-btn {
   @apply flex items-center gap-3 text-[12px] font-medium text-gray-700 hover:text-primary bg-gray-50 hover:bg-blue-50 px-4 py-3 rounded-lg border border-gray-200/50 cursor-pointer dark:bg-gray-200
 }
@@ -77,16 +103,24 @@
   @apply flex items-center gap-3 text-[12px] font-medium text-white bg-primary hover:text-primary hover:bg-blue-50 px-4 py-1.5 rounded-lg border border-primary cursor-pointer;
 }
 
+.member-btn {
+  @apply flex gap-x-2 text-sm items-center px-2 py-3 rounded-md bg-inherit border border-neutral-200 dark:border-neutral-600 dark:text-neutral-100
+}
+
+.add-btn {
+  @apply flex items-center gap-3 text-[12px] font-medium text-gray-700 hover:text-primary bg-gray-50 hover:bg-blue-50 px-4 py-3 rounded-lg border border-gray-200/50 cursor-pointer dark:bg-neutral-700 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-600 dark:hover:text-dark-primary;
+}
+
 .form-card {
-  @apply bg-white p-6 rounded-lg shadow-md shadow-gray-100 border border-gray-200/50;
+  @apply bg-white p-6 rounded-lg shadow-md shadow-gray-100 border border-gray-200/50 dark:bg-[var(--dark-bg-card)] dark:shadow-neutral-800 dark:border-neutral-700;
 }
 
 .form-input {
-  @apply w-full text-sm text-black outline-none bg-white border border-slate-100 px-2.5 py-3 rounded-md mt-2 placeholder:text-gray-500;
+  @apply w-full text-sm text-black outline-none bg-white border border-neutral-200 px-2.5 py-3 rounded-md mt-2 placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-400 dark:border-neutral-600 dark:bg-inherit;
 }
 
 .form-label {
-  @apply text-xs font-medium text-slate-600;
+  @apply text-xs font-medium text-slate-600 dark:text-gray-200;
 }
 
 .download-btn {

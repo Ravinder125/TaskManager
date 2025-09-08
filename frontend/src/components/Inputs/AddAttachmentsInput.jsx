@@ -51,7 +51,9 @@ const AddAttachmentsInput = ({ attachments, setAttachments }) => {
             </AnimatePresence>
 
             <div className='flex items-center gap-5 mt-4'>
-                <div className='flex-1 flex items-center gap-3 border border-gray-100 rounded-md px-3'>
+                <div className='flex-1 flex items-center gap-3  rounded-md px-3 border 
+border-neutral-200
+dark:border-neutral-600'>
                     <LuPaperclip className='text-gray-400' />
 
                     <input
@@ -59,11 +61,11 @@ const AddAttachmentsInput = ({ attachments, setAttachments }) => {
                         placeholder='Add File Link'
                         value={input}
                         onChange={({ target }) => setInput(target.value)}
-                        className='w-full text-[13px] text-black outline-none bg-white py-2'
+                        className='w-full text-[13px] text-black outline-none bg-inherit  px-3 py-3 rounded-md dark:text-gray-200   dark:placeholder:text-neutral-400'
                     />
                 </div>
 
-                <button className='card-btn text-nowrap' onClick={handleAddInput}>
+                <button className='add-btn text-nowrap' onClick={handleAddInput}>
                     <HiMiniPlus className='text-lg' />
                     Add
                 </button>

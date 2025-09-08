@@ -100,7 +100,7 @@ function Dashboard() {
                     duration: 0.3,
                     ease: 'linear'
                 }}
-                className='origin-center'
+                className='origin-center mb-5 '
             >
                 <div className='card my-5'>
                     <div className='flex flex-col sm:flex-row sm:justify-between md:justify-start md:gap-4 dark:text-slate-300'>
@@ -181,7 +181,7 @@ function Dashboard() {
                                     <div className='flex items-center justify-between'>
                                         <h5 className='text-lg font-medium'>Recent Tasks</h5>
 
-                                        <Link to='/admin/tasks' className='card-btn' onClick={onSeeMore}>
+                                        <Link to='/admin/tasks' className='add-btn' onClick={onSeeMore}>
                                             See All <LuArrowRight className='text-base' />
                                         </Link>
                                     </div>

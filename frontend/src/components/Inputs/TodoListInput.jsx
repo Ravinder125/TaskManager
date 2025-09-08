@@ -41,7 +41,7 @@ const TodoListInput = ({ isUpdate, todoList, setTodoList }) => {
                         duration={todoListAnimation.duration}
                         exit={todoListAnimation.exit}
                         key={idx}
-                        className='flex gap-2 bg-gray-50 items-center border border-gray-100 px-3 py-2 rounded-sm mb-3 mt-2'
+                        className='flex gap-2 bg-gray-500 items-center border border-gray-100 px-3 py-2 rounded-sm mb-3 mt-2'
                     >
                         <input
                             className='self-start'
@@ -78,11 +78,11 @@ const TodoListInput = ({ isUpdate, todoList, setTodoList }) => {
                     placeholder='Enter Task'
                     value={option}
                     onChange={({ target }) => setOption(target.value)}
-                    className='w-full text-[13px] text-black outline-none bg-white border border-gray-100 px-3 py-3 rounded-md'
+                    className='w-full text-[13px] text-black outline-none bg-inherit border border-neutral-200 px-3 py-3 rounded-md dark:text-gray-200  dark:border-neutral-600 dark:placeholder:text-neutral-400'
                 />
 
-                <button className='card-btn text-nowwrap' onClick={handleAddOption}>
-                    <HiMiniPlus className='text-lg' />
+                <button className='add-btn text-nowrap' onClick={handleAddOption}>
+                    <HiMiniPlus className='text-lg ' />
                     Add
                 </button>
             </div>

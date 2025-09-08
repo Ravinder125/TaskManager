@@ -1,0 +1,6 @@
+# Ignore formatting for the following files and folders
+node_modules/
+dist/
+build/
+.env
+*.log

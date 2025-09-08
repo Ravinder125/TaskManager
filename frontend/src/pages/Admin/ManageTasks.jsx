@@ -93,7 +93,7 @@ const ManageTasks = () => {
             <div className='my-8 w-full '>
                 <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
                     <div className='flex flex-col sm:flex-row lg:items-center justify-center sm:gap-4'>
-                        <h2 className='text-2xl font-semibold text-gray-800'>My Tasks</h2>
+                        <h2 className='text-2xl font-semibold text-gray-800 dark:text-gray-400'>My Tasks</h2>
                         <button
                             className='flex lg:hidden self-end lg:self-normal download-btn'
                             onClick={handleDownloadReport}

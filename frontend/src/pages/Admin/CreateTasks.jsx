@@ -256,10 +256,10 @@ const CreateTasks = () => {
     return (
         <DashboardLayout activeMenu='Create Task'>
             <div>
-                <div className='grid grid-cols-1 md:grid-cols-4 my-4'>
-                    <div className='form-card col-span-3'>
+                <div className='grid grid-cols-1 md:grid-cols-4 my-4 '>
+                    <div className='form-card col-span-3 '>
                         <div className='flex justify-between items-center'>
-                            <h2 className='text-xl font-medium'>
+                            <h2 className='text-xl font-medium text-black dark:text-gray-300'>
                                 {taskId ? 'Update Task' : 'Create Task'}
                             </h2>
                             {taskId && (
