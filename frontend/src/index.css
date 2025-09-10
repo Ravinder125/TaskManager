@@ -128,7 +128,7 @@
 }
 
 .user-card {
-  @apply bg-white p-4 rounded-xl shadow-md shadow-gray-300 border border-gray-200/50;
+  @apply bg-white p-4 rounded-xl shadow-md shadow-gray-300 border border-gray-200/50 dark:bg-dark-card dark:shadow-dark-shadow dark:border-dark-border;
 }
 
 .auth-btn {

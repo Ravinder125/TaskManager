@@ -14,9 +14,12 @@ const ThemeSwitch = () => {
     return (
         <div
             onClick={() => toggleTheme()}
-            className={`bg-gray-500 flex cursor-pointer w-12 h-8 p-1 rounded-full ${isOn ? "justify-end" : "justify-start"}`}>
+            className={`bg-neutral-300 flex cursor-pointer w-12 h-8 p-1 rounded-full dark:bg-neutral-600`}>
             <div
-                className={`bg-gray-300 flex justify-center items-center w-6 h-full rounded-full transition-all duration-500`}
+                className={`bg-neutral-100 flex justify-center items-center w-6 h-full rounded-full transition-transform duration-200 dark:bg-neutral-500`}
+                style={{
+                    transform: isOn ? 'translateX(16px)' : 'translateX(0)'
+                }}
             >
                 {isOn
                     ? <MdNightlight />

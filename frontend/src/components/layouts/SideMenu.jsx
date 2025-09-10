@@ -27,7 +27,7 @@ const SideMenu = ({ activeMenu }) => {
         }
     }, [user])
     return (
-        <aside className='z-100 mx-auto w-62 max-w-70 min-[1080px]:w-full h-[calc(98vh-61px)] top-[61px] rounded-md bg-white border-r border-gray-200/50 sticky shadow-md dark:bg-dark-card dark:border-none '>
+        <aside className='z-100 mx-auto w-62 max-w-70 min-[1080px]:w-full h-[calc(98vh-61px)] top-[61px] rounded-md bg-white border-r border-gray-200/50 sticky shadow-md dark:bg-dark-card dark:border-dark-border '>
             <div className='flex rounded-2xl bg-inherit flex-col items-center justify-center mb-7 pt-5'>
                 <div className='relative '>
                     {user?.profileImageUrl

@@ -69,8 +69,8 @@ const ManageEmployees = () => {
                     </button>
                 </div>
 
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4'>
-                    {allUsers?.map((user, idx) => (
+                <section className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4'>
+                    {allUsers?.map((user) => (
                         <motion.div
                             initial={{ filter: "blur(5px)", opacity: 0, y: 100 }}
                             whileInView={{ filter: "blur(0px)", opacity: 1, y: 0, }}
@@ -80,7 +80,7 @@ const ManageEmployees = () => {
                             <UserCard userInfo={user} />
                         </motion.div>
                     ))}
-                </div>
+                </section>
             </div>
         </DashboardLayout>
     )

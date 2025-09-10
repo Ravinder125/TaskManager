@@ -125,7 +125,7 @@ const ManageTasks = () => {
                 {allTasks.length === 0
                     ? <NotAssigned />
                     : (
-                        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 mt-4'>
+                        <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 mt-4'>
                             {allTasks?.map((task, idx) => (
                                 <motion.div
                                     whileInView={{ scale: 1 }}
@@ -154,7 +154,7 @@ const ManageTasks = () => {
                                     />
                                 </motion.div>
                             ))}
-                        </div>
+                        </section>
                     )}
             </div>
         </DashboardLayout >

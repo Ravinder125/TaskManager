@@ -14,13 +14,13 @@ const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
 
     return (
         <div className='my-2 relative mx-auto'>
-            <div className={`flex fixed z-10 dark:text-gray-300 sm:top-12 lg:top-28 xl:top-32 left-10 sm:left-[20%] lg:left-[40%] w-[300px] sm:w-fit overflow-x-auto hide-scrollbar dark:shadow-neutral-700 ${scrolled ? "shadow-md rounded-full backdrop-blur-md" : "shadow-none rounded-none backdrop-blur-0"} transition-all duration-1000`}
+            <div className={`flex fixed z-10 dark:text-gray-300 sm:top-12 md:top-40 lg:top-28 xl:top-32 left-10 sm:left-[20%] lg:left-[38%] w-[300px] sm:w-fit overflow-x-auto hide-scrollbar dark:shadow-neutral-700 ${scrolled ? "shadow-md rounded-full backdrop-blur-md" : "shadow-none rounded-none backdrop-blur-0"} transition-all duration-1000`}
             >
                 {tabs.map((tab, idx) => (
                     <button
                         key={idx}
                         className={`relative px-3 md:px-4 py-3 text-sm font-medium ${tab.label === formatName(activeTab)
-                            ? 'text-primary dark:text-[var(--dark-primary)]'
+                            ? 'text-primary dark:text-dark-primary'
                             : 'text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200'
                             } cursor-pointer`}
                         onClick={() => setActiveTab(formatName(tab.label))}
