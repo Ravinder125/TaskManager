@@ -58,7 +58,7 @@ const ManageEmployees = () => {
         <DashboardLayout activeMenu='Team Members' >
             <div className='mt-5 mb-10'>
                 <div className='flex md:flex-row gap-2 md:gap-0 flex-col justify-between md:items-center'>
-                    <h2 className='text-xl md:text-xl  font-medium'>Team Members</h2>
+                    <h2 className='text-xl md:text-xl font-medium dark:text-neutral-300'>Team Members</h2>
 
                     <button
                         className='flex self-end md:flex w-fit download-btn'

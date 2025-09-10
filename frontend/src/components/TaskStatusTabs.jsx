@@ -1,20 +1,24 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { formatName } from '../utils/helper'
 import { motion, useMotionValueEvent, useScroll } from 'framer-motion'
 
 const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
     const [hovered, setHovered] = useState(null);
-    const [scrolled, setScrolled] = useState(false)
+    const [scrolled, setScrolled] = useState(false);
     const { scrollY } = useScroll();
 
-    useMotionValueEvent(scrollY, "change", (latest) => {
-        latest > 20 ? setScrolled(true) : setScrolled(false);
-        console.log(latest);
-    })
+    // Ensure useMotionValueEvent is used inside useEffect
+    useEffect(() => {
+        const unsubscribe = scrollY.on("change", (latest) => {
+            setScrolled(latest > 20);
+            console.log(latest);
+        });
+        return () => unsubscribe();
+    }, [scrollY]);
 
     return (
         <div className='my-2 relative mx-auto'>
-            <div className={`flex fixed z-10 dark:text-gray-300 sm:top-12 md:top-40 lg:top-28 xl:top-32 left-10 sm:left-[20%] lg:left-[38%] w-[300px] sm:w-fit overflow-x-auto hide-scrollbar dark:shadow-neutral-700 ${scrolled ? "shadow-md rounded-full backdrop-blur-md" : "shadow-none rounded-none backdrop-blur-0"} transition-all duration-1000`}
+            <div className={`flex fixed z-10 dark:text-gray-300 sm:top-40 md:top-40 lg:top-28 xl:top-32 left-10 sm:left-[20%] lg:left-[38%] max-[450px]:w-[80%] max-w-fit sm:w-fit overflow-x-auto hide-scrollbar dark:shadow-neutral-700 ${scrolled ? "shadow-md rounded-full backdrop-blur-md" : "shadow-none rounded-none backdrop-blur-0"} transition-all duration-1000`}
             >
                 {tabs.map((tab, idx) => (
                     <button

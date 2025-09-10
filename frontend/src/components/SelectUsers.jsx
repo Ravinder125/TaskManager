@@ -72,26 +72,33 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
                     onClose={() => setIsModalOpen(false)}
                     title='Select Users'
                 >
-                    <div className='space-y-4 h-[60vh] overflow-y-auto'>
+                    <div className='h-[60vh] overflow-y-auto'>
                         {allUsers.map((user, idx) => (
                             <div
                                 key={`user-${idx}`}
-                                className='flex items-center gap-4 p-3 border-b border-gray-200 cursor-pointer'
+                                className='flex items-center gap-4 p-3 border-b border-neutral-600 cursor-pointer dark:hover:bg-neutral-700'
                                 onClick={() => toggleUserSelection(user?._id)}
                             >
-                                <img
-                                    src={user?.profileImageUrl}
-                                    alt={formatName(user?.fullName)}
-                                    className='w-10 h-10 rounded-full'
-                                />
+                                {user?.profileImageUrl
+                                    ? (
+                                        <img
+                                            src={user.profileImageUrl}
+                                            alt={user.fullName}
+                                            className='w-12 h-12 rounded-full border-1 border-white dark:border-neutral-500'
+                                        />
+                                    ) : (
+                                        <LuUsers className='text-4xl text-primary rounded-full dark:text-dark-primary bg-inherit w-12 h-12 border-2' />
+                                    )
+
+                                }
                                 <div className='flex-1'>
-                                    <p className='font-medium text-gray-600 '>
+                                    <p className='font-medium text-neutral-600 dark:text-neutral-200'>
                                         {formatName(user?.fullName)}
                                     </p>
-                                    <p className='text-[13px] text-gray-500'>{user?.email}</p>
+                                    <p className='text-[13px] text-neutral-500 dark:text-neutral-400'>{user?.email}</p>
                                 </div>
                                 <input
-                                    className='w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded-sm outline-none'
+                                    className='w-4 h-4 text-primary bg-neutral-100 border-neutral-300 rounded-sm outline-none'
                                     type='checkbox'
                                     onChange={() => toggleUserSelection(user?._id)}
                                     checked={tempSelectedUsers.includes(user?._id)}
@@ -101,7 +108,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
                     </div>
 
                     <div className='flex justify-between items-center'>
-                        <button className='card-btn' onClick={() => setIsModalOpen(false)}>
+                        <button className='add-btn' onClick={() => setIsModalOpen(false)}>
                             CANCEL
                         </button>
                         <button className='card-btn-fill' onClick={handleAssign}>

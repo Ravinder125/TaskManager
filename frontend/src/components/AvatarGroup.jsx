@@ -1,16 +1,21 @@
-import React, { useCallback } from 'react'
+import React from 'react'
+import { LuUser } from 'react-icons/lu'
 
 const AvatarGroup = ({ avatars = [], maxVisible = 3 }) => {
     return (
         <div className='flex items-center '>
-            {avatars.slice(0, maxVisible).map((avatar, idx) => (
-                <img
-                    key={idx}
-                    src={avatar}
-                    alt={`Avatar ${idx}`}
-                    className='w-9 h-9 object-conain rounded-full border-2 border-white -ml-3  first:ml-0'
-                />
-            ))}
+            {avatars.slice(0, maxVisible).map((avatar, idx) =>
+                !!avatar ? (
+                    <img
+                        key={idx}
+                        src={avatar}
+                        alt={`Avatar ${idx}`}
+                        className='w-9 h-9 rounded-full border-1 border-white -ml-3 first:ml-0 dark:border-neutral-400'
+                    />
+                ) : (
+                    <LuUser key={idx} className='text-4xl text-primary rounded-full -ml-3 dark:text-dark-primary bg-neutral-700 w-9 h-9 border-2' />
+                )
+            )}
             {avatars.length > maxVisible && (
                 <div className='w-9 h-9 flex items-center justify-center bg-blue-50 text-sm font-medium rounded-full border-2 border-white -ml-3'>
                     +{avatars.length - maxVisible}

@@ -255,7 +255,7 @@ const CreateTasks = () => {
 
     return (
         <DashboardLayout activeMenu='Create Task'>
-            <div>
+            <div className='my-5'>
                 <div className='grid grid-cols-1 md:grid-cols-4 my-4 '>
                     <div className='form-card col-span-3 '>
                         <div className='flex justify-between items-center'>
@@ -264,7 +264,9 @@ const CreateTasks = () => {
                             </h2>
                             {taskId && (
                                 <button
-                                    className='flex items-center gap-1.5 text-[13px] font-medium text-rose-500 bg-rose-50 rounded px-2 py-1 border border-rose-100 hover:border-rose-300'
+                                    className='flex items-center gap-1.5 text-[13px] font-medium cursor-pointer text-rose-500 bg-rose-50 rounded px-2 py-1 border border-rose-100 hover:border-rose-300 dark:bg-rose-500 
+                                    dark:border-rose-500
+                                    dark:text-rose-200 dark:hover:border-rose-100'
                                     onClick={() => setOpenDeleteAlert(true)}
                                 >
                                     <LuTrash2 className='text-base' />

@@ -17,7 +17,7 @@ const Modal = ({ children, isOpen, onClose, title }) => {
                         stiffness: 100,
                         damping: 20,
                     }}
-                    className='fixed top-0 right-0 left-0 z-100 flex justify-center items-center w-full h-full max-h-full overflow-y-auto overflow-x-hidden bg-black/20 bg-opacity-50'
+                    className='fixed top-0 right-0 left-0 z-100 flex justify-center items-center w-full h-screen overflow-y-auto overflow-x-hidden bg-black/20 bg-opacity-50'
                 >
                     <motion.div
                         initial={{ scale: 0.95, x: 300 }}
@@ -27,14 +27,15 @@ const Modal = ({ children, isOpen, onClose, title }) => {
                         className='relative p-4 w-full max-w-2xl max-h-full'
                     >
                         {/* Modal content */}
-                        <div className='relative bg-white rounded-lg shadow-sm'>
+                        <div className='relative bg-white border border-neutral-300 rounded-lg shadow-sm dark:bg-dark-card dark:border-dark-border'>
                             {/* Modal header */}
-                            <div className='flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200'>
-                                <h3 className='text-lg font-medium text-gray-900'>
+                            <div className='flex items-center justify-between p-4 md:p-5 border-b rounded-t border-neutral-200 dark:border-neutral-400'>
+                                <h3 className='text-lg font-medium text-neutral-900 dark:text-neutral-300'>
                                     {title}
                                 </h3>
                                 <button
-                                    className='text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center dark:hover-bg-gray-600 cursor-pointer'
+                                    className='text-neutral-400 bg-transparent hover:bg-neutral-200 hover:text-neutral-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center  
+                                    cursor-pointer dark:hover:bg-neutral-600 dark:hover:text-neutral-200'
                                     type='button'
                                     onClick={onClose}
                                 >

@@ -41,7 +41,7 @@ const TodoListInput = ({ isUpdate, todoList, setTodoList }) => {
                         duration={todoListAnimation.duration}
                         exit={todoListAnimation.exit}
                         key={idx}
-                        className='flex gap-2 bg-gray-500 items-center border border-gray-100 px-3 py-2 rounded-sm mb-3 mt-2'
+                        className='flex gap-2 bg-neutral-200 items-center border border-neutral-100 px-3 py-2 rounded-sm mb-3 mt-2 dark:bg-neutral-700 dark:border-dark-border'
                     >
                         <input
                             className='self-start'
@@ -51,11 +51,19 @@ const TodoListInput = ({ isUpdate, todoList, setTodoList }) => {
                             disabled={!isUpdate}
                             onChange={({ target }) => handleInputChange(target, idx)}
                         />
-                        <p className='text-xs text-black self-start overflow-hidden line-clamp-1'>
-                            <span className='text-xs text-gray-400 font-semibold mr-2'>
+                        <p
+                            className='text-xs  self-start overflow-hidden line-clamp-1  duration-200'
+                        >
+                            <span className='text-xs text-neutral-600 font-semibold mr-2 dark:text-neutral-300'>
                                 {idx < 9 ? `0${idx + 1}` : idx + 1}
                             </span>
-                            {todo.text}
+                            <span className='text-black dark:text-neutral-100'
+                                style={{
+                                    textDecoration: todo.completed ? "line-through" : "none",
+                                }}
+                            >
+                                {todo.text}
+                            </span>
                         </p>
 
                         <button
@@ -64,7 +72,7 @@ const TodoListInput = ({ isUpdate, todoList, setTodoList }) => {
                                 handleDeleteOption(idx)
                             }}
                         >
-                            <HiOutlineTrash className='text-lg text-red-500' />
+                            <HiOutlineTrash className='text-lg text-red-500 dark:text-red-400' />
                         </button>
                     </motion.div>
                 ))}
@@ -78,7 +86,7 @@ const TodoListInput = ({ isUpdate, todoList, setTodoList }) => {
                     placeholder='Enter Task'
                     value={option}
                     onChange={({ target }) => setOption(target.value)}
-                    className='w-full text-[13px] text-black outline-none bg-inherit border border-neutral-200 px-3 py-3 rounded-md dark:text-gray-200  dark:border-neutral-600 dark:placeholder:text-neutral-400'
+                    className='w-full text-[13px] text-black outline-none bg-inherit border border-neutral-200 px-3 py-3 rounded-md dark:text-neutral-200  dark:border-neutral-600 dark:placeholder:text-neutral-400'
                 />
 
                 <button className='add-btn text-nowrap' onClick={handleAddOption}>
@@ -86,7 +94,7 @@ const TodoListInput = ({ isUpdate, todoList, setTodoList }) => {
                     Add
                 </button>
             </div>
-        </div>
+        </div >
     )
 }
 

@@ -67,7 +67,7 @@ const TaskCard = ({
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="absolute inset-0 bg-gradient-to-t from-neutral-500 to-transparent flex justify-center items-center pointer-events-none dark:bg-gradient-to-t dark:from-neutral-800 to-transparent"
+                        className="absolute inset-0 bg-gradient-to-t from-neutral-500 to-transparent flex justify-center items-center pointer-events-none dark:bg-gradient-to-t dark:from-neutral-800 dark:to-transparent"
                     >
                         <MdTransitEnterexit className="text-5xl text-neutral-500 opacity-90 dark:text-neutral-200" />
                     </motion.div>
@@ -96,11 +96,11 @@ const TaskCard = ({
                                 : 'border-violet-500'
                         }`}
                 >
-                    <h3 className="text-lg md:text-[16px] 2xl:text-lg font-bold mb-1 text-gray-800 dark:text-gray-300">{title}</h3>
-                    <p className="text-gray-500 overflow-hidden line-clamp-2 text-xs mt-4 dark:text-gray-200">{description}</p>
-                    <p className="text-[13px] text-gray-700 font-bold mt-2 mb-2 leading-[18px] dark:text-gray-200">
+                    <h3 className="text-lg md:text-[16px] 2xl:text-lg font-bold mb-1 text-neutral-800 dark:text-neutral-300">{title}</h3>
+                    <p className="text-neutral-500 overflow-hidden line-clamp-2 text-xs mt-4 dark:text-neutral-200">{description}</p>
+                    <p className="text-[13px] text-neutral-700 font-bold mt-2 mb-2 leading-[18px] dark:text-neutral-200">
                         Task Done:{' '}
-                        <span className="font-semibold text-gray-700 dark:text-gray-100">{completedTodoCount}/{todoCheckList?.length || 0}</span>
+                        <span className="font-semibold text-neutral-700 dark:text-neutral-100">{completedTodoCount}/{todoCheckList?.length || 0}</span>
                     </p>
 
                     <Progress progress={progress} status={status} />
@@ -110,21 +110,21 @@ const TaskCard = ({
                 <div className="px-4">
                     <div className="flex justify-between items-center my-1">
                         <div>
-                            <label className="text-xs text-gray-500 dark:text-gray-300">Start Date</label>
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-100">{moment(createdAt).format("Do MMM YYYY")}</p>
+                            <label className="text-xs text-neutral-500 dark:text-neutral-300">Start Date</label>
+                            <p className="text-sm font-medium text-neutral-700 dark:text-neutral-100">{moment(createdAt).format("Do MMM YYYY")}</p>
                         </div>
                         <div>
-                            <label className="text-xs text-gray-500 dark:text-gray-300">Due Date</label>
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{moment(dueDate).format("Do MMM YYYY")}</p>
+                            <label className="text-xs text-neutral-500 dark:text-neutral-300">Due Date</label>
+                            <p className="text-sm font-medium text-neutral-700 dark:text-neutral-200">{moment(dueDate).format("Do MMM YYYY")}</p>
                         </div>
                     </div>
 
                     <div className="flex items-center justify-between mt-3">
                         <AvatarGroup avatars={avatars} />
                         {attachmentCount > 0 && (
-                            <div className="flex items-center gap-2 text-gray-500 px-2.5 py-1.5 rounded-lg">
+                            <div className="flex items-center gap-2 text-neutral-500 px-2.5 py-1.5 rounded-lg">
                                 <LuPaperclip className="w-4 h-4" />
-                                <span className="text-xs text-gray-900 dark:text-gray-200">{attachmentCount}</span>
+                                <span className="text-xs text-neutral-900 dark:text-neutral-200">{attachmentCount}</span>
                             </div>
                         )}
                     </div>

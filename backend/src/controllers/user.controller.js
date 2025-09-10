@@ -33,7 +33,7 @@ const getUsers = asyncHandler(async (req, res) => {
     //         .select('-password -refreshToken'))
     // ]);
 
-    const users = await User.find({}).select(["fullName", "email", "profileImageUrl"]);
+    const users = await User.find({ role: "employee" }).select(["fullName", "email", "profileImageUrl"]);
     const usersWithTaskCounts = await Promise.all(users.map(async (user) => {
         const tasksFilter = { assignedTo: user._id }
         const pendingTasks = await Task.countDocuments({ ...tasksFilter, status: 'pending' });

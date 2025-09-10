@@ -31,11 +31,11 @@ const AddAttachmentsInput = ({ attachments, setAttachments }) => {
                         exit={todoListAnimation.exit}
                         transition={todoListAnimation.transition}
                         key={idx}
-                        className='flex justify-between bg-gray-50 border border-gray-100 px-3 py-2 rounded-sm mb-3 mt-2'
+                        className='flex justify-between bg-neutral-50 border px-3 py-2 rounded-sm mb-3 mt-2  border-neutral-100 dark:bg-neutral-700 dark:border-dark-border'
                     >
-                        <div className='flex-1 flex items-center gap-3 border border-gray-100'>
+                        <div className='flex-1 flex items-center gap-3 '>
                             <LuPaperclip className='text-gray-400' />
-                            <p className='text-xs text-black'>{attachments}</p>
+                            <p className='text-xs text-black dark:text-neutral-200'>{attachments}</p>
                         </div>
 
                         <button
@@ -44,16 +44,14 @@ const AddAttachmentsInput = ({ attachments, setAttachments }) => {
                                 handleDeleteInput(idx);
                             }}
                         >
-                            <HiOutlineTrash className='text-lg text-red-500' />
+                            <HiOutlineTrash className='text-lg text-red-500 dark:text-red-400' />
                         </button>
                     </motion.div>
                 ))}
             </AnimatePresence>
 
             <div className='flex items-center gap-5 mt-4'>
-                <div className='flex-1 flex items-center gap-3  rounded-md px-3 border 
-border-neutral-200
-dark:border-neutral-600'>
+                <div className='flex-1 flex items-center gap-3  rounded-md px-3 border border-neutral-200 dark:border-neutral-600'>
                     <LuPaperclip className='text-gray-400' />
 
                     <input

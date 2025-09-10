@@ -15,14 +15,16 @@ const UserCard = ({ userInfo }) => {
                                 className='w-12 h-12 rounded-full border-1 border-white dark:border-neutral-500'
                             />
                         ) : (
-                            <LuUser className='text-4xl text-primary rounded-full dark:text-dark-primary bg-inherit w-12 h-12  border-2' />
+                            <LuUser className='text-4xl text-primary rounded-full dark:text-dark-primary bg-inherit w-12 h-12 border-2' />
                         )
 
                     }
 
-                    <div className=''>
-                        <p className='text-sm font-medium'>{formatName(userInfo?.fullName)}</p>
-                        <p className='text-xs text-gray-500'>{userInfo?.email}</p>
+                    <div>
+                        <p className='text-sm font-medium'>
+                            {formatName(userInfo?.fullName)}
+                        </p>
+                        <p className='text-xs text-neutral-500 dark:text-neutral-200'>{userInfo?.email}</p>
                     </div>
                 </div>
             </div>

@@ -5,16 +5,16 @@ function DashboardSkeleton() {
         <DashboardLayout activeMenu='Dashboard'>
             <div className='card my-5 animate-pulse'>
                 <div>
-                    <div className='flex flex-col sm:flex-row sm:justify-between md:justify-start md:gap-4'>
-                        <span className='text-xl md:text-2xl bg-slate-200 rounded w-32 h-6 mb-2'></span>
-                        <span className='text-xl md:text-2xl font-semibold bg-slate-200 rounded w-40 h-6'></span>
+                    <div className='flex flex-col sm:flex-row sm:justify-between md:justify-start md:gap-4 '>
+                        <span className='md:text-2xl rounded w-32 h-6 mb-2 dark-skeleton'></span>
+                        <span className='md:text-2xl font-semibold bg-neutral-200 rounded w-40 h-6 dark-skeleton'></span>
                     </div>
-                    <div className='text-xs md:text-[13px] text-gray-400 mt-1.5 bg-slate-200 rounded w-48 h-4'></div>
+                    <div className='mt-1.5 bg-neutral-200 rounded w-48 h-4 dark-skeleton'></div>
                 </div>
 
                 <div className='grid grid-cols-2 sm:grid-cols-2 gap-3 md:gap-6 mt-5'>
                     {[...Array(4)].map((_, i) => (
-                        <div key={i} className='h-20 bg-slate-200 rounded'></div>
+                        <div key={i} className='h-20 bg-neutral-200 rounded dark-skeleton'></div>
                     ))}
                 </div>
             </div>
@@ -22,28 +22,28 @@ function DashboardSkeleton() {
                 <div>
                     <div className='card animate-pulse'>
                         <div className='flex items-center justify-between mb-2'>
-                            <div className='h-5 w-32 bg-slate-200 rounded'></div>
+                            <div className='h-5 w-32 bg-neutral-200 rounded dark-skeleton'></div>
                         </div>
-                        <div className='h-64 mx-auto w-64 bg-slate-200 flex items-center justify-center rounded-full'>
-                            <div className='h-[85%] w-[85%] bg-slate-100 rounded-full'></div>
+                        <div className='h-64 mx-auto w-64 bg-neutral-200 flex items-center justify-center rounded-full dark-skeleton'>
+                            <div className='h-[85%] w-[85%] bg-neutral-100 rounded-full dark:bg-neutral-400'></div>
                         </div>
                     </div>
                 </div>
                 <div>
                     <div className='card animate-pulse'>
                         <div className='flex items-center justify-between mb-2'>
-                            <div className='h-5 w-40 bg-slate-200 rounded'></div>
+                            <div className='h-5 w-40 bg-neutral-200 rounded dark-skeleton'></div>
                         </div>
-                        <div className='h-48 bg-slate-200 rounded'></div>
+                        <div className='h-48 bg-neutral-200 rounded dark-skeleton'></div>
                     </div>
                 </div>
                 <div className='md:col-span-2'>
                     <div className='card animate-pulse'>
                         <div className='flex items-center justify-between mb-4'>
-                            <div className='h-6 w-32 bg-slate-200 rounded'></div>
-                            <div className='h-8 w-24 bg-slate-200 rounded'></div>
+                            <div className='h-6 w-32 dark-skeleton rounded'></div>
+                            <div className='h-8 w-24 dark-skeleton rounded'></div>
                         </div>
-                        <div className='h-32 bg-slate-200 rounded'></div>
+                        <div className='h-32 dark-skeleton rounded'></div>
                     </div>
                 </div>
             </div>
