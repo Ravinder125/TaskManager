@@ -1,8 +1,7 @@
-import mongoose, { Schema, trusted } from 'mongoose'; import bcryptjs from 'bcryptjs'; import jwt from 'jsonwebtoken';
+import mongoose, { Schema } from 'mongoose';
+import argon2 from 'argon2';
+import jwt from 'jsonwebtoken';
 
-const fullNameSchema = new Schema({
-
-})
 
 const userSchema = new Schema(
     {
@@ -19,7 +18,7 @@ const userSchema = new Schema(
 userSchema.pre('save', async function (next) {
     try {
         if (!this.isModified('password')) return next();
-        this.password = await bcryptjs.hash(this.password, 10);
+        this.password = await argon2.hash(this.password, 10);
         next();
     } catch (error) {
         next(error);
@@ -28,7 +27,8 @@ userSchema.pre('save', async function (next) {
 
 // Method to check if the provided password is correct
 userSchema.methods.isPasswordCorrect = async function (password) {
-    const isCorrect = await bcryptjs.compare(password, this.password);
+    const isCorrect = await argon2.verify(this.password, password);
+    console.log(isCorrect)
     return isCorrect
 };
 
