@@ -4,14 +4,17 @@ import { API_PATHS } from '../utils/apiPaths';
 import { LuUsers } from 'react-icons/lu';
 import { Modal, AvatarGroup } from './index';
 import { formatName } from '../utils/helper';
+import toast from 'react-hot-toast';
 
 const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
     const [allUsers, setAllUsers] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [tempSelectedUsers, setTempSelectedUsers] = useState([]);
+    const [isLoading, setIsLoading] = useState(false)
 
     const getAllUsers = async () => {
         try {
+            setIsLoading(true)
             const response = await axiosInstance.get(
                 API_PATHS.USERS.GET_ALL_USERS,
                 { withCredentials: true }
@@ -21,6 +24,9 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
             }
         } catch (error) {
             console.error("Error fetching the users", error);
+            toast.error("Please try again, Error fetching the users")
+        } finally {
+            setIsLoading(false)
         }
     };
 
@@ -45,6 +51,8 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
         .filter((user) => selectedUsers?.includes(user?._id))
         .map((user) => user?.profileImageUrl);
 
+    console.log(selectedUsersAvatar)
+
 
     useEffect(() => {
         getAllUsers();
@@ -52,7 +60,9 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
 
     useEffect(() => {
         setTempSelectedUsers(selectedUsers?.length > 0 ? selectedUsers : []);
+        selectedUsersAvatar
     }, [selectedUsers]);
+
 
     if (allUsers || selectedUsers) {
         return (
@@ -72,40 +82,44 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
                     onClose={() => setIsModalOpen(false)}
                     title='Select Users'
                 >
-                    <div className='h-[60vh] overflow-y-auto'>
-                        {allUsers.map((user, idx) => (
-                            <div
-                                key={`user-${idx}`}
-                                className='flex items-center gap-4 p-3 border-b border-neutral-600 cursor-pointer dark:hover:bg-neutral-700'
-                                onClick={() => toggleUserSelection(user?._id)}
-                            >
-                                {user?.profileImageUrl
-                                    ? (
-                                        <img
-                                            src={user.profileImageUrl}
-                                            alt={user.fullName}
-                                            className='w-12 h-12 rounded-full border-1 border-white dark:border-neutral-500'
-                                        />
-                                    ) : (
-                                        <LuUsers className='text-4xl text-primary rounded-full dark:text-dark-primary bg-inherit w-12 h-12 border-2' />
-                                    )
+                    {isLoading ? (
+                        <div className='mx-auto w-fit text-black dark:text-white '>Loading...</div>
+                    ) : (
+                        <div className='h-[60vh] overflow-y-auto'>
+                            {allUsers.map((user, idx) => (
+                                <div
+                                    key={`user-${idx}`}
+                                    className='flex items-center gap-4 p-3 border-b border-neutral-100 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700'
+                                    onClick={() => toggleUserSelection(user?._id)}
+                                >
+                                    {user?.profileImageUrl
+                                        ? (
+                                            <img
+                                                src={user.profileImageUrl}
+                                                alt={user.fullName}
+                                                className='w-12 h-12 rounded-full border-1 border-white dark:border-neutral-500'
+                                            />
+                                        ) : (
+                                            <LuUsers className='text-4xl text-primary rounded-full dark:text-dark-primary bg-inherit w-12 h-12 border-2' />
+                                        )
 
-                                }
-                                <div className='flex-1'>
-                                    <p className='font-medium text-neutral-600 dark:text-neutral-200'>
-                                        {formatName(user?.fullName)}
-                                    </p>
-                                    <p className='text-[13px] text-neutral-500 dark:text-neutral-400'>{user?.email}</p>
+                                    }
+                                    <div className='flex-1'>
+                                        <p className='font-medium text-neutral-600 dark:text-neutral-200'>
+                                            {formatName(user?.fullName)}
+                                        </p>
+                                        <p className='text-[13px] text-neutral-500 dark:text-neutral-400'>{user?.email}</p>
+                                    </div>
+                                    <input
+                                        className='w-4 h-4 text-primary bg-neutral-100 border-neutral-300 rounded-sm outline-none'
+                                        type='checkbox'
+                                        onChange={() => toggleUserSelection(user?._id)}
+                                        checked={tempSelectedUsers.includes(user?._id)}
+                                    />
                                 </div>
-                                <input
-                                    className='w-4 h-4 text-primary bg-neutral-100 border-neutral-300 rounded-sm outline-none'
-                                    type='checkbox'
-                                    onChange={() => toggleUserSelection(user?._id)}
-                                    checked={tempSelectedUsers.includes(user?._id)}
-                                />
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
 
                     <div className='flex justify-between items-center'>
                         <button className='add-btn' onClick={() => setIsModalOpen(false)}>

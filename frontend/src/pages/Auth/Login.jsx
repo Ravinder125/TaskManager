@@ -27,7 +27,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate()
 
-    const { updateUser, setInviteToken } = useContext(UserContext);
+    const { updateUser } = useContext(UserContext);
 
     // Handle login logic
     const handleLogin = async (e) => {
@@ -49,6 +49,7 @@ const Login = () => {
         // Login API Call
         try {
             setLoading(true)
+
             const response = await axiosInstance.post(
                 API_PATHS.AUTH.LOGIN,
                 { email, password }
@@ -56,11 +57,10 @@ const Login = () => {
 
             if (response?.data?.data) {
                 const { data } = response.data;
-                updateUser(data?.user);
-                setInviteToken(data?.inviteToken)
+                updateUser(data);
 
                 // Redirect Based on role
-                if (data?.user?.role === 'admin') {
+                if (data?.role === 'admin') {
                     navigate('/admin/dashboard')
                 } else {
                     navigate('/employee/dashboard')
@@ -96,10 +96,10 @@ const Login = () => {
                 animate="animate"
                 exit="exit"
                 transition={{ duration: 0.4 }}
-                className='flex  flex-col justify-center  p-6 rounded-md shadow-md '
+                className='flex flex-col justify-center p-6 rounded-md shadow-md dark:bg-dark-card '
             >
-                <h3 className='text-xl font-semibold text-black'>Welcome</h3>
-                <p className='text-xs text-slate-700 mt-2 mb-6'>
+                <h3 className='text-xl font-semibold text-black dark:text-neutral-200'>Welcome</h3>
+                <p className='text-xs text-neutral-700 mt-2 mb-6 dark:text-neutral-300'>
                     Please Enter your details to log in
                 </p>
 
@@ -123,9 +123,9 @@ const Login = () => {
 
                     {error && <p className='text-red-500 text-xs pb-2-5'>Error: {error}</p>}
 
-                    <p className='text-center text-xs text-gray-700 mt-3 mb-2'>
+                    <p className='text-center text-xs text-neutral-700 mt-3 mb-2 dark:text-neutral-100'>
                         Don't have an account? {" "}
-                        <Link to='/register' className='font-medium text-primary underline ' >
+                        <Link to='/register' className='font-medium text-primary underline dark:text-dark-primary' >
                             Register
                         </Link>
                     </p>

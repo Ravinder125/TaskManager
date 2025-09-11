@@ -28,7 +28,6 @@ userSchema.pre('save', async function (next) {
 // Method to check if the provided password is correct
 userSchema.methods.isPasswordCorrect = async function (password) {
     const isCorrect = await argon2.verify(this.password, password);
-    console.log(isCorrect)
     return isCorrect
 };
 

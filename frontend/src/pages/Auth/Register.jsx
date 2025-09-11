@@ -94,10 +94,10 @@ const Register = () => {
                 animate="animate"
                 exit="exit"
                 transition={{ duration: 0.4 }}
-                className='sm:mt-6 mx-auto bg-white p-6 rounded-lg shadow-md'
+                className='h-full flex flex-col justify-center p-6 rounded-md shadow-md dark:bg-dark-card overflow-auto'
             >
-                <h3 className='text-2xl text-black font-semibold text-center'>Create an Account</h3>
-                <p className='text-sm text-gray-600 mt-2 mb-6 text-center'>Join us today by entering your details below</p>
+                <h3 className='text-2xl text-black font-semibold text-center dark:text-neutral-200'>Create an Account</h3>
+                <p className='text-xs text-neutral-600 mt-2 mb-6 dark:text-neutral-300 text-center'>Join us today by entering your details below</p>
 
                 <form onSubmit={handleRegister} >
                     {/* <ProfilePhotoSelector
@@ -141,9 +141,9 @@ const Register = () => {
                     </div>
                     {error && <p className='text-red-500 text-xs'>Error: {error}</p>}
 
-                    <p className='text-center text-xs text-gray-700 mt-3 mb-2'>
+                    <p className='text-center text-xs text-neutral-700 mt-3 mb-2 dark:text-neutral-200'>
                         Already have an account?{' '}
-                        <Link to='/login' className='font-medium text-blue-600 underline'>
+                        <Link to='/login' className='font-medium text-blue-600 underline dark:text-dark-primary'>
                             Login here
                         </Link>
                     </p>

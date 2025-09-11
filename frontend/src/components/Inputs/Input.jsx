@@ -20,7 +20,7 @@ const Input = ({
         <div className='flex flex-col gap-y-2'>
             <label
                 htmlFor="Email"
-                className='text-[13px] text-slate-800'
+                className='text-[13px] text-neutral-800 dark:text-neutral-100'
             >
                 {label}
             </label>

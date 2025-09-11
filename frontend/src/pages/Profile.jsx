@@ -166,12 +166,12 @@ const Profile = () => {
                 <div className="grid grid-cols-1  md:grid-cols-4">
                     <div className="form-card col-span-3" >
                         <div className="flex items-center justify-between">
-                            <h2 className="font-semibold text-xl">Your Profile</h2>
+                            <h2 className="font-semibold text-xl dark:text-neutral-300">Your Profile</h2>
                         </div>
 
                         <div className="mt-4 ">
                             <form onSubmit={handleSubmit} >
-                                <div className="grid grid-cols-1  gap-4">
+                                <div className="grid grid-cols-1">
 
                                     <ProfilePhotoSelector setProfilePic={setProfilePic} profilePic={profilePic} />
 
@@ -192,26 +192,7 @@ const Profile = () => {
                                         onChange={({ target }) => setEmail(target.value)}
                                     />
 
-                                    <div className="flex items-center gap-x-2">
-                                        <div className="flex-1">
-                                            <Input
-                                                label='Your invite Code'
-                                                value={inviteToken || ''}
-                                                placeholder='Enter your full name'
-                                                type='password'
-                                                required={false}
-                                            />
-                                        </div>
-
-                                        {user?.role === 'admin' && (
-                                            <button
-                                                className="p-2 mt-2 rounded-lg hover:bg-gray-200 hover:text-black transition-all duration-200 ease-in-out cursor-pointer"
-                                                onClick={() => generateInviteToken()}
-                                            >
-                                                <IoMdRefresh className="text-xl text-slate-600" />
-                                            </button>
-                                        )}
-                                    </div>
+                                    {/* z */}
 
                                     {modalOpen
                                         ? (
@@ -251,15 +232,15 @@ const Profile = () => {
                                                 {passwordError && (<p className="text-rose-600 text-xs">Error: {passwordError}</p>)}
 
                                                 <SubmitButton
-                                                    label='Change Password'
+                                                    label='Change'
                                                     loading={loading}
                                                     onClick={handleChangePassword}
                                                 />
                                             </Modal>
                                         )
-                                        : (<button className="text-left text-[13px] sm:text-sm text-slate-600 pb-2.5">
+                                        : (<button className="text-left text-[13px] sm:text-sm text-neutral-600 pb-2.5 dark:text-neutral-300">
                                             Want to change your password?
-                                            <span onClick={() => setModalOpen(true)} className="text-primary font-medium ml-1 cursor-pointer">Click here</span>
+                                            <span onClick={() => setModalOpen(true)} className="text-primary font-medium ml-1 cursor-pointer dark:text-dark-primary">Click here</span>
                                         </button>)
 
                                     }

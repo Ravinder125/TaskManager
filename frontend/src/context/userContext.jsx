@@ -8,7 +8,6 @@ const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [inviteToken, setInviteToken] = useState("")
 
     // Fetch user profile on mount
     useEffect(() => {
@@ -20,8 +19,7 @@ const UserProvider = ({ children }) => {
                     API_PATHS.AUTH.GET_PROFILE,
                 );
                 if (isMounted) {
-                    setUser(data.data.user);
-                    setInviteToken(data.data.inviteToken)
+                    setUser(data.data);
                 }
             } catch (error) {
                 if (isMounted) {
@@ -60,8 +58,6 @@ const UserProvider = ({ children }) => {
                 updateUser,
                 clearUser,
                 isAuthenticated: !!user,
-                inviteToken,
-                setInviteToken,
             }}
         >
             {children}
