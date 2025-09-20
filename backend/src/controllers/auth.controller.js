@@ -3,12 +3,11 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import { validationResult } from 'express-validator';
 import { User } from '../models/user.model.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
-import redis from '../config/redis.js';
-import { InviteToken } from '../models/inviteToken.model.js';
 import crypto from 'crypto'
 import { isValidObjectId } from 'mongoose';
 import sharp from 'sharp';
 import fs from 'fs'
+import { cache, clearCache } from '../utils/cacheService.js';
 
 
 const generateToken = async (user) => {
@@ -36,8 +35,6 @@ const generateToken = async (user) => {
 
 const isValidId = (id) => isValidObjectId(id)
 
-const profileRoute = '/api/v1/auth/profile'
-
 // @desc    Register a new user
 // @route   POST /api/v1/auth/register
 // @access  Public 
@@ -53,18 +50,18 @@ const registerUser = asyncHandler(async (req, res) => {
         return res.status(400).json(ApiResponse.error(400, 'User already exists'))
     }
 
-    const isTokenValid = await InviteToken.findOne({ token: adminInviteToken })
+    const isTokenValid = await User.findOne({ inviteToken: adminInviteToken }).lean()
+    console.log(isTokenValid)
+
 
     if ((adminInviteToken && !isTokenValid)) {
         return res.status(400).json(ApiResponse.error(400, 'Invite token is expired or invalid'))
     }
 
-    const hashedToken = crypto.randomBytes(32).toString('hex')
-    await InviteToken.create({
-        email,
-        token: adminInviteToken ? adminInviteToken : hashedToken,
-        role: adminInviteToken ? 'employee' : 'admin'
-    })
+    let hashedToken;
+    if (!adminInviteToken) {
+        hashedToken = crypto.randomBytes(32).toString('hex')
+    }
 
     // TODO: Make it simple by removing the fullName split logic
     const user = await User.create({
@@ -75,8 +72,9 @@ const registerUser = asyncHandler(async (req, res) => {
         email,
         password,
         role: adminInviteToken ? 'employee' : 'admin',
+        inviteToken: adminInviteToken || hashedToken
     })
-    const { accessToken, refreshToken, options } = await generateToken(user._id)
+    // const { accessToken, refreshToken, options } = await generateToken(user)
 
     return res
         .status(201)
@@ -87,7 +85,6 @@ const registerUser = asyncHandler(async (req, res) => {
 // @route   POST /api/v1/auth/login
 // @access  Public
 const loginUser = asyncHandler(async (req, res) => {
-    console.log("hi")
     const errors = validationResult(req);
     if (!errors) {
         return res.status(400).json(ApiResponse.error(400, errors.array().join(',')));
@@ -100,8 +97,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
     const { accessToken, refreshToken, options } = await generateToken(userExist)
 
-    const pathKey = `profile:${userExist._id}`
-    await redis.set(pathKey, JSON.stringify(userExist), 'EX', 300) // 5 min expiry
+    await cache.set(`profile:${userExist._id}`, userExist)
 
     return res
         .status(200)
@@ -135,55 +131,34 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 
 const generateInviteToken = asyncHandler(async (req, res) => {
-    if (!isValidId) {
+    if (!isValidId(req.user.id)) {
         return res.status(200).json(ApiResponse.error(400, 'Invalid user ID'))
     }
 
-    const { token } = req.params
-    const user = await User.findById(req.user._id);
     const hashedToken = crypto.randomBytes(32).toString('hex');
 
-    const inviteToken = await InviteToken.updateMany(
-        { token, isExpired: false },
-        { token: hashedToken },
-        { new: true, }
-
+    const user = await User.findByIdAndUpdate(
+        req.user.id,
+        { inviteToken: hashedToken },
     );
 
-    let newInviteToken
-    if (!inviteToken) {
-        newInviteToken = await InviteToken.create({
-            token: token || hashedToken,
-            email: user?.email,
-            role: 'admin'
-        })
-        return newInviteToken
-    }
-
-    const tokenData = await InviteToken.findOne({ email: user.email, isExpired: false })
-    const userId = req.user._id
-    const pathKey = `${profileRoute}:${userId}`
-    await redis.set(pathKey, JSON.stringify({ user, inviteToken: tokenData?.token || '' }), 'EX', 300)
-
-    return res.status(200).json(ApiResponse.success(200, { inviteToken: tokenData.token || '' }, 'Admin invite token successfully generated'))
+    await cache.set(`profile:${user._id}`, user)
+    return res.status(200).json(ApiResponse.success(200, { inviteToken: hashedToken || '' }, 'Admin invite token successfully generated'))
 })
 
 // @desc    Get user profile
 // @route   GET /api/v1/auth/profile
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
-    console.log("profile start")
+    const userId = req.user._id
+
     if (!isValidId(req.user._id)) {
         return res.status(200).json(ApiResponse.error(400, 'Invalid user ID'))
     }
 
-    const userId = req.user._id;
-    const pathKey = `profile:${userId}`
-    // redis.del(pathKey)
-    const profile = await redis.get(pathKey)
-
+    const profile = await cache.get(`profile:${userId}`)
     if (profile) {
-        return res.status(200).json(ApiResponse.success(200, JSON.parse(profile), 'User profile successfully fetched redis'))
+        return res.status(200).json(ApiResponse.success(200, profile, 'User profile successfully fetched redis'))
     }
 
     const user = await User.findById(userId).select('-password -refreshToken')
@@ -191,10 +166,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
         return res.status(404).json(ApiResponse.error(400, 'Admin not found'))
     }
 
-    // let inviteToken = await InviteToken.findOne({ email: user.email })
-    // const resData = { user, inviteToken: inviteToken?.token || '' }
-    await redis.set(pathKey, JSON.stringify(user), 'EX', 300)
-
+    await cache.set(`profile:${user._id}`, user)
     return res.status(200).json(ApiResponse.success(200, user, 'User profile successfully fetched'));
 })
 
@@ -202,12 +174,11 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // @route    GET /api/v1/auth/profile
 // @access   Private
 const updateUserProfile = asyncHandler(async (req, res) => {
-    if (!isValidId(req.user._id)) {
+    const userId = req.user._id;
+
+    if (!isValidId(userId)) {
         return res.status(200).json(ApiResponse.error(400, 'Invalid user ID'))
     }
-
-    const userId = req.user._id;
-    const pathKey = `${profileRoute}:${userId}`
 
     const { email, fullName } = req.body;
     const user = await User.findById(userId);
@@ -223,10 +194,8 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         }
     }
 
-    const inviteToken = await InviteToken.findOne({ email })
-
     await user.save();
-    await redis.set(pathKey, JSON.stringify({ user, inviteToken: inviteToken?.token || '' }), 'EX', 300) // 5 min expiry
+    await cache.set(`profile:${user._id}`, user)
 
     return res.status(200).json(ApiResponse.success(200, user, 'User profile successfully updated'))
 })
@@ -239,13 +208,7 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
         return res.status(200).json(ApiResponse.error(400, 'Invalid user ID'))
     }
 
-    const userId = req.user._id
-    const pathKey = `${profileRoute}:${userId}`
-
     const profileImageLocalPath = req?.file?.path;
-
-
-
     if (!profileImageLocalPath) {
         return res.status(400).json(ApiResponse.error(400, 'Profile Image is required'));
     }
@@ -270,7 +233,7 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
 
     const user = await User
         .findByIdAndUpdate(
-            userId,
+            req.user._id,
             { profileImageUrl: profileImage.url },
             { new: true }
         )
@@ -280,9 +243,7 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
         return res.status(400).json(ApiResponse.error(400, 'User not found'))
     }
 
-    const inviteToken = await InviteToken.findOne({ email: user?.email })
-    await redis.set(pathKey, JSON.stringify({ user, inviteToken: inviteToken?.token || '' }), 'EX', 300)
-
+    await cache.set(`profile:${user._id}`, user)
     return res.status(200).json(ApiResponse.success(200, user?.profileImageUrl, 'User profile image successfully updated'));
 })
 
@@ -311,6 +272,7 @@ const changeUserPassword = asyncHandler(async (req, res) => {
 
     user.password = confirmPassword;
     await user.save();
+
     return res.status(200).json(ApiResponse.success(200, user, 'Password successfully changed'));
 })
 

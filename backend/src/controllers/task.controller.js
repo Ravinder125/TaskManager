@@ -5,6 +5,7 @@ import { Task } from "../models/Task.model.js";
 import { validateObjectId } from "../utils/validateObjectId.js";
 import redis from "../config/redis.js";
 import { isValidObjectId } from "mongoose";
+import { clearCache } from "../utils/cacheService.js";
 
 const isValidId = (id) => isValidObjectId(id);
 
@@ -58,9 +59,15 @@ const createTask = asyncHandler(async (req, res) => {
 
     if (!task) return res.status(400).json(ApiResponse.error(400, 'Error while creating Task'));
 
-    await deletePreviousRedisCache(userId)
-    const pathKey = `${taskRoute}:${userId}:${task?._id}`
-    await redis.set(pathKey, JSON.stringify(task), 'EX', 300)
+    // await deletePreviousRedisCache(userId)
+    // const pathKey = `${taskRoute}:${userId}:${task?._id}`
+    // await redis.set(pathKey, JSON.stringify(task), 'EX', 300)
+    const options = {
+        userId,
+        taskId: task._id,
+    }
+    await clearCache(false, false, options)
+
     return res.status(201).json(ApiResponse.success(201, task, 'Task successfully created'));
 });
 
@@ -71,8 +78,8 @@ const getTaskById = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
     if (!isValidId(taskId)) return res.status(400).json(ApiResponse.error(400, 'Invalid task ID'));
 
-    const pathKey = `${taskRoute}:${req.user._id}:${taskId}`
-    let task = await redis.get(pathKey)
+    const pathKey = `task:${taskId}`
+    let task = await cache.get(pathKey)
     if (task) {
         return res.status(200).json(ApiResponse.success(200, JSON.parse(task)))
     }
@@ -80,7 +87,7 @@ const getTaskById = asyncHandler(async (req, res) => {
     task = await Task.findById(taskId).populate('assignedTo', 'fullName profileImageUrl');
     if (!task) return res.status(404).json(ApiResponse.error(404, 'Task not found'));
 
-    await redis.set(pathKey, JSON.stringify(task), 'EX', 300)
+    await cache.set(pathKey, task);
     return res.status(200).json(ApiResponse.success(200, task, 'Task fetched successfully'));
 });
 

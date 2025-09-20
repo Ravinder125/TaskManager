@@ -34,7 +34,7 @@ const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
                         {hovered === idx && (
                             <motion.span
                                 layoutId='hovered-span'
-                                className='absolute z-0 inset-0 h-full w-full rounded-md bg-neutral-800/6 dark:bg-neutral-700'
+                                className='absolute z-0 inset-0 h-full w-full rounded-md bg-stone-200 dark:bg-stone-700'
                             />
                         )}
                         <div className='relative z-20 flex items-center'>

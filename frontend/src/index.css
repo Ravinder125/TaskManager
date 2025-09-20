@@ -95,11 +95,11 @@
 }
 
 .card {
-  @apply bg-white dark:bg-[var(--dark-bg-card)] p-6 rounded-2xl shadow-md shadow-gray-100 dark:shadow-[var(--dark-card-border)] border-2 border-gray-200 dark:border-[var(--dark-bg-card)];
+  @apply bg-white dark:bg-[var(--dark-bg-card)] p-6 rounded-2xl shadow-md shadow-neutral-100 dark:shadow-[var(--dark-card-border)] border-2 border-neutral-200 dark:border-[var(--dark-bg-card)];
 }
 
 .card-btn {
-  @apply flex items-center gap-3 text-[12px] font-medium text-gray-700 hover:text-primary bg-gray-50 hover:bg-blue-50 px-4 py-3 rounded-lg border border-gray-200/50 cursor-pointer dark:bg-gray-200
+  @apply flex items-center gap-3 text-[12px] font-medium text-neutral-700 hover:text-primary bg-neutral-50 hover:bg-blue-50 px-4 py-3 rounded-lg border border-neutral-200/50 cursor-pointer dark:bg-neutral-200
 }
 
 .card-btn-fill {
@@ -111,19 +111,19 @@
 }
 
 .add-btn {
-  @apply flex items-center gap-3 text-[12px] font-medium text-gray-700 hover:text-primary bg-gray-50 hover:bg-blue-50 px-4 py-3 rounded-lg border border-gray-200/50 cursor-pointer dark:bg-neutral-700 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-600 dark:hover:text-dark-primary;
+  @apply flex items-center gap-3 text-[12px] font-medium text-stone-700 hover:text-primary bg-stone-200 hover:bg-blue-50 px-4 py-3 rounded-lg border border-stone-200/50 cursor-pointer dark:bg-stone-700 dark:border-stone-700 dark:text-stone-100 dark:hover:bg-stone-600 dark:hover:text-dark-primary;
 }
 
 .form-card {
-  @apply bg-white p-6 rounded-lg shadow-md shadow-gray-100 border border-gray-200/50 dark:bg-[var(--dark-bg-card)] dark:shadow-neutral-800 dark:border-neutral-700;
+  @apply bg-white p-6 rounded-lg shadow-md shadow-neutral-100 border border-neutral-200/50 dark:bg-dark-card dark:shadow-neutral-800 dark:border-neutral-700;
 }
 
 .form-input {
-  @apply w-full text-sm text-black outline-none bg-white border border-neutral-200 px-2.5 py-3 rounded-md mt-2 placeholder:text-neutral-500 dark:text-white dark:placeholder:text-neutral-400 dark:border-neutral-600 dark:bg-inherit;
+  @apply w-full text-sm text-black outline-none bg-white border border-neutral-200 px-2.5 py-3 rounded-md mt-2 placeholder:text-neutral-500 dark:text-neutral-100 dark:placeholder:text-neutral-400 dark:border-neutral-600 dark:bg-inherit;
 }
 
 .form-label {
-  @apply text-xs font-medium text-slate-600 dark:text-gray-200;
+  @apply text-xs font-medium text-neutral-600 dark:text-neutral-200;
 }
 
 .download-btn {
@@ -131,7 +131,7 @@
 }
 
 .user-card {
-  @apply bg-white p-4 rounded-xl shadow-md shadow-gray-300 border border-gray-200/50 dark:bg-dark-card dark:shadow-dark-shadow dark:border-dark-border;
+  @apply bg-white p-4 rounded-xl shadow-md shadow-neutral-300 border border-neutral-200/50 dark:bg-dark-card dark:shadow-dark-shadow dark:border-dark-border;
 }
 
 .auth-btn {

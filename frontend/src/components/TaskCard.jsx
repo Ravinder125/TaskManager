@@ -96,9 +96,9 @@ const TaskCard = ({
                                 : 'border-violet-500'
                         }`}
                 >
-                    <h3 className="text-lg md:text-[16px] 2xl:text-lg font-bold mb-1 text-neutral-800 dark:text-neutral-300">{title}</h3>
-                    <p className="text-neutral-500 overflow-hidden line-clamp-2 text-xs mt-4 dark:text-neutral-200">{description}</p>
-                    <p className="text-[13px] text-neutral-700 font-bold mt-2 mb-2 leading-[18px] dark:text-neutral-200">
+                    <h3 className="text-lg md:text-[16px] 2xl:text-lg font-bold mb-1 text-neutral-800 dark:text-neutral-100">{title}</h3>
+                    <p className="text-neutral-500 overflow-hidden line-clamp-2 text-xs mt-4 dark:text-neutral-300">{description}</p>
+                    <p className="text-[13px] text-neutral-700 font-bold mt-2 mb-2 leading-[18px] dark:text-neutral-100">
                         Task Done:{' '}
                         <span className="font-semibold text-neutral-700 dark:text-neutral-100">{completedTodoCount}/{todoCheckList?.length || 0}</span>
                     </p>
@@ -115,7 +115,7 @@ const TaskCard = ({
                         </div>
                         <div>
                             <label className="text-xs text-neutral-500 dark:text-neutral-300">Due Date</label>
-                            <p className="text-sm font-medium text-neutral-700 dark:text-neutral-200">{moment(dueDate).format("Do MMM YYYY")}</p>
+                            <p className="text-sm font-medium text-neutral-700 dark:text-neutral-100">{moment(dueDate).format("Do MMM YYYY")}</p>
                         </div>
                     </div>
 
@@ -124,7 +124,7 @@ const TaskCard = ({
                         {attachmentCount > 0 && (
                             <div className="flex items-center gap-2 text-neutral-500 px-2.5 py-1.5 rounded-lg">
                                 <LuPaperclip className="w-4 h-4" />
-                                <span className="text-xs text-neutral-900 dark:text-neutral-200">{attachmentCount}</span>
+                                <span className="text-xs text-neutral-900 dark:text-neutral-100">{attachmentCount}</span>
                             </div>
                         )}
                     </div>

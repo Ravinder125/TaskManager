@@ -259,7 +259,7 @@ const CreateTasks = () => {
                 <div className='grid grid-cols-1 md:grid-cols-4 my-4 '>
                     <div className='form-card col-span-3 '>
                         <div className='flex justify-between items-center'>
-                            <h2 className='text-xl font-medium text-black dark:text-gray-300'>
+                            <h2 className='text-xl font-medium text-black dark:text-neutral-100'>
                                 {taskId ? 'Update Task' : 'Create Task'}
                             </h2>
                             {taskId && (

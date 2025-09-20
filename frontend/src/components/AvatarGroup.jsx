@@ -13,11 +13,11 @@ const AvatarGroup = ({ avatars = [], maxVisible = 3 }) => {
                         className='w-9 h-9 rounded-full border-1 border-white -ml-3 first:ml-0 dark:border-neutral-400'
                     />
                 ) : (
-                    <LuUser key={idx} className='text-4xl text-primary rounded-full -ml-3 dark:text-dark-primary bg-neutral-700 w-9 h-9 border-2' />
+                    <LuUser key={idx} className='text-4xl text-primary rounded-full bg-slate-200 -ml-3 dark:text-dark-primary dark:bg-slate-700 w-9 h-9 border-2' />
                 )
             )}
             {avatars.length > maxVisible && (
-                <div className='w-9 h-9 flex items-center justify-center bg-blue-50 text-sm font-medium rounded-full border-2 border-white -ml-3'>
+                <div className='w-9 h-9 flex items-center justify-center bg-blue-50 text-sm font-medium rounded-full border-2 border-white -ml-3 dark:bg-blue-300'>
                     +{avatars.length - maxVisible}
                 </div>
             )}
