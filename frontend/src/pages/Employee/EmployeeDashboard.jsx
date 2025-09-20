@@ -60,7 +60,7 @@ function EmployeeDashboard() {
         navigate('/admin/tasks')
     }
 
-    const getDashboarData = async () => {
+    const getDashboardData = async () => {
         try {
             setLoading(true);
 
@@ -80,7 +80,7 @@ function EmployeeDashboard() {
     }
 
     useEffect(() => {
-        getDashboarData();
+        getDashboardData();
     }, [])
 
     if (loading) return <DashboardSkeleton />
@@ -153,7 +153,7 @@ function EmployeeDashboard() {
                         <div className='grid grid-cols-1  md:grid-cols-2 gap-3 my-4  '>
                             <div >
                                 <div className='card '>
-                                    <div className='flex items-center justify-bewteen mb-2'>
+                                    <div className='flex items-center justify-between mb-2'>
                                         <h5 className='font-medium'>Task Distribution</h5>
                                     </div>
 
@@ -180,7 +180,7 @@ function EmployeeDashboard() {
                                     <div className='flex items-center justify-between'>
                                         <h5 className='text-lg font-medium'>Recent Tasks</h5>
 
-                                        <Link to='/employee/tasks' className='card-btn' onClick={onSeeMore}>
+                                        <Link to='/employee/tasks' className='add-btn' onClick={onSeeMore}>
                                             See All <LuArrowRight className='text-base' />
                                         </Link>
                                     </div>

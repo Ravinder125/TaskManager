@@ -51,8 +51,6 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     const isTokenValid = await User.findOne({ inviteToken: adminInviteToken }).lean()
-    console.log(isTokenValid)
-
 
     if ((adminInviteToken && !isTokenValid)) {
         return res.status(400).json(ApiResponse.error(400, 'Invite token is expired or invalid'))

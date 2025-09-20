@@ -92,7 +92,7 @@ const MyTasks = () => {
             <div className='my-8 w-full '>
                 <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
                     <div className='flex flex-col sm:flex-row lg:items-center justify-center sm:gap-4'>
-                        <h2 className='text-2xl font-semibold text-gray-800'>My Tasks</h2>
+                        <h2 className='text-2xl font-semibold text-neutral-800 dark:text-neutral-200'>My Tasks</h2>
                         <button
                             className='flex lg:hidden self-end lg:self-normal download-btn'
                             onClick={handleDownloadReport}
@@ -121,37 +121,39 @@ const MyTasks = () => {
                     )}
                 </div>
 
-                {allTasks.length === 0
-                    ? <NotAssigned />
-                    : (
-                        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 mt-4'>
-                            {allTasks?.map((task, idx) => (
-                                <motion.div
-                                    whileInView={{ scale: 1 }}
-                                    initial={{ scale: 0.9 }}
-                                    transition={{ duration: 0.3, }}
-                                    key={idx}
-                                >
-                                    <TaskCard
-                                        title={task.title}
-                                        description={task.description}
-                                        priority={task.priority}
-                                        status={task.status}
-                                        progress={task.progress}
-                                        dueData={task.dueTo}
-                                        createdAt={task.createdAt}
-                                        assignedTo={task.assignedTo}
-                                        attachmentCount={task.attachments.length}
-                                        completedTodoCount={task.completedTodoCount}
-                                        todoCheckList={task.todoList}
-                                        onClick={() => {
-                                            handleClick(task)
-                                        }}
-                                    />
-                                </motion.div>
-                            ))}
-                        </div>
-                    )}
+                <div className='mt-20'>
+                    {allTasks.length === 0
+                        ? <NotAssigned />
+                        : (
+                            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 mt-4'>
+                                {allTasks?.map((task, idx) => (
+                                    <motion.div
+                                        whileInView={{ scale: 1 }}
+                                        initial={{ scale: 0.9 }}
+                                        transition={{ duration: 0.3, }}
+                                        key={idx}
+                                    >
+                                        <TaskCard
+                                            title={task.title}
+                                            description={task.description}
+                                            priority={task.priority}
+                                            status={task.status}
+                                            progress={task.progress}
+                                            dueData={task.dueTo}
+                                            createdAt={task.createdAt}
+                                            assignedTo={task.assignedTo}
+                                            attachmentCount={task.attachments.length}
+                                            completedTodoCount={task.completedTodoCount}
+                                            todoCheckList={task.todoList}
+                                            onClick={() => {
+                                                handleClick(task)
+                                            }}
+                                        />
+                                    </motion.div>
+                                ))}
+                            </div>
+                        )}
+                </div>
             </div>
         </DashboardLayout>
     )

@@ -52,7 +52,7 @@ const TodoListInput = ({ isUpdate, todoList, setTodoList }) => {
                             onChange={({ target }) => handleInputChange(target, idx)}
                         />
                         <p
-                            className='text-xs  self-start overflow-hidden line-clamp-1  duration-200'
+                            className='text-xs self-start overflow-hidden line-clamp-1  duration-200'
                         >
                             <span className='text-xs text-neutral-600 font-semibold mr-2 dark:text-neutral-300'>
                                 {idx < 9 ? `0${idx + 1}` : idx + 1}

@@ -84,10 +84,9 @@ const getTaskById = asyncHandler(async (req, res) => {
         return res.status(200).json(ApiResponse.success(200, task))
     }
 
-    task = await Task.findById(taskId).populate('assignedTo', 'fullName profileImageUrl');
+    task = await Task.findById(taskId).populate('assignedTo', 'fullName profileImageUrl email');
     if (!task) return res.status(404).json(ApiResponse.error(404, 'Task not found'));
 
-    console.log(task)
     await cache.set(pathKey, task);
     return res.status(200).json(ApiResponse.success(200, task, 'Task fetched successfully'));
 });
@@ -196,15 +195,16 @@ const updateTask = asyncHandler(async (req, res) => {
     const updatedTask = await task.save();
     if (!updatedTask) return res.status(500).json(ApiResponse.error(500, 'Error while updating Task'));
 
-    const pathKey = `${taskRoute}:${req.user._id}:${updateTask?._id}`
-    await deletePreviousRedisCache(req.user._id)
-    await Promise.all(
-        ['all', 'pending', 'in-progress', 'completed'].map(status => {
-            const allTasksPathKey = `${taskRoute}:${req.user._id}:${status}`;
-            redis.del(allTasksPathKey);
-        })
-    )
-    await redis.set(pathKey, JSON.stringify(updateTask), 'EX', 300)
+    const pathKey = `task:${taskId}`
+
+    // await Promise.all(
+    //     ['all', 'pending', 'in-progress', 'completed'].map(status => {
+    //         const allTasksPathKey = `${taskRoute}:${req.user._id}:${status}`;
+    //         redis.del(allTasksPathKey);
+    //     })
+    // )
+    await cache.set(pathKey, updateTask)
+    clearCache(false, false, { userId: req.user._id, taskId })
 
     return res.status(200).json(ApiResponse.success(200, updatedTask, 'Task successfully updated'));
 });
@@ -273,18 +273,18 @@ const updateTodoList = asyncHandler(async (req, res) => {
 
     await task.save();
 
-    const pathKey = `${taskRoute}:${req.user._id}:${task._id}`;
+    const pathKey = `task:${taskId}`;
     await Promise.all(
         ['all', 'pending', 'in-progress', 'completed'].map(status => {
             const allTasksPathKey = `${taskRoute}:${req.user._id}:${status}`;
             return redis.del(allTasksPathKey);
         })
     );
-    await redis.del(pathKey);
-    await deletePreviousRedisCache(req.user._id);
+
 
     const updatedTask = await task.populate('assignedTo', 'fullName email profileImageUrl');
-    await redis.set(pathKey, JSON.stringify(updatedTask), 'EX', 300);
+    await cache.set(pathKey, updatedTask);
+    await clearCache(false, false, { userId: req.user._id, taskId })
 
     return res.status(200).json(ApiResponse.success(200, updatedTask, 'Task todo list successfully updated'));
 });

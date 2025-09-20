@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
-import { AvatarGroup, CreateTaskSkeleton, DashboardLayout, Loading } from '../../components/index'
+import { AvatarGroup, CreateTaskSkeleton, DashboardLayout, Loading, Modal } from '../../components/index'
 import moment from 'moment';
 import { formatName } from '../../utils/helper';
-import { LuArrowBigLeft, LuArrowLeft, LuSquareArrowOutUpRight } from 'react-icons/lu';
+import { LuArrowBigLeft, LuArrowLeft, LuSquareArrowOutUpRight, LuUsers } from 'react-icons/lu';
 
 const ViewTaskDetails = () => {
     const { taskId } = useParams();
     const [task, setTask] = useState(null)
+    const [viewUsers, setViewUsers] = useState(false)
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -17,7 +18,7 @@ const ViewTaskDetails = () => {
     const getStatusTagColor = (status) => {
         switch (status) {
             case 'In progress':
-                return 'text-cyan-500 bg-cyan-50 border broder-cyan-500/10';
+                return 'text-cyan-500 bg-cyan-50 border border-cyan-500/10';
             case 'completed':
                 return 'text-lime-500 bg-lime-50 border border-lime-500/10';
             default:
@@ -34,6 +35,7 @@ const ViewTaskDetails = () => {
             if (response?.data?.data) {
                 setTask(response.data.data)
             }
+            console.log(response.data.data)
         } catch (error) {
             console.error('Error fetching task details:', error);
             setError(error?.response?.data?.message || 'Something went wrong')
@@ -94,12 +96,12 @@ const ViewTaskDetails = () => {
                             <div className='flex flex-col'>
                                 <Link
                                     to='/employee/tasks'
-                                    className='w-fit hover:bg-black/10 hover:text-black text-gray-600 rounded-lg px-2 py-2 transition-all duration-200 ease-in-out'>
+                                    className='w-fit hover:bg-black/10 hover:text-black text-neutral-600 rounded-lg px-2 py-2 transition-all duration-200 ease-in-out dark:text-neutral-300 dark:hover:text-neutral-100 dark:hover:bg-stone-700'>
                                     <LuArrowLeft className='text-xl' />
                                 </Link>
 
-                                <div className='flex items-cneter justify-between'>
-                                    <h2 className='text-sm md:text-xl font-semibold'>
+                                <div className='flex items-center justify-between'>
+                                    <h2 className='text-sm md:text-xl font-semibold '>
                                         {task?.title}
                                     </h2>
 
@@ -118,7 +120,7 @@ const ViewTaskDetails = () => {
                             </div>
 
                             <div className='mt-4'>
-                                <InfoBox label='Descpription' value={task?.description} />
+                                <InfoBox label='Description' value={task?.description} />
                             </div>
 
                             <div className='grid grid-cols-12 gap-4 mt-4'>
@@ -134,37 +136,39 @@ const ViewTaskDetails = () => {
                                         } />
                                 </div>
 
-                                <div className='col-span-6 md:col-span-4'>
-                                    <label className='text-xs font-medium text-slate-500'>
-                                        Assinged To
+                                <div className='col-span-6 md:col-span-4' onClick={() => setViewUsers(true)}>
+                                    <label className='text-xs font-medium text-neutral-500 dark:text-neutral-200'>
+                                        Assigned To
                                     </label>
 
                                     <AvatarGroup avatars={
                                         task?.assignedTo?.map((user) => user?.profileImageUrl)
                                     }
-                                        maxVisible={task?.assignedTo?.length}
+                                        maxVisible={task?.assignedTo?.length >= 5 ? 5 : task?.assignedTo?.length}
                                     />
                                 </div>
                             </div>
 
                             <div className='mt-2'>
-                                <label className='text-xs font-medium text-slate-500'>
+                                <label className='text-xs font-base dark:text-neutral-200m text-neutral-500 dark:text-neutral-300'>
                                     Todo Checklist
                                 </label>
 
                                 {task?.todoList?.map((todo, idx) => (
-                                    <TodoCheclist
-                                        key={`todo_${idx}`}
+                                    <TodoChecklist
+                                        key={`todo_${todo.text}`}
+                                        idx={idx}
                                         text={todo.text}
                                         isChanged={todo?.completed}
                                         onChange={() => updateTodoCheckList(idx)}
+                                        completed={todo.completed}
                                     />
                                 ))}
                             </div>
 
                             {task?.attachments?.length > 0 && (
                                 <div className='mt-2'>
-                                    <label className='text-xs font-medium text-slate-500'>
+                                    <label className='text-xs font-medium text-neutral-500 dark:text-neutral-300'>
                                         Attachments
                                     </label>
                                     {task?.attachments?.map((link, idx) => (
@@ -183,7 +187,46 @@ const ViewTaskDetails = () => {
                     </div>
                 )}
             </div>
-        </DashboardLayout>
+
+            {/* Assigned users */}
+            <Modal
+                isOpen={viewUsers}
+                onClose={() => setViewUsers(false)}
+                title="View Users" >
+                {loading ? (
+                    <div className='mx-auto w-fit text-black dark:text-white '>Loading...</div>
+                ) : (
+                    <div className='h-[60vh] overflow-y-auto'>
+                        {task?.assignedTo?.map((user) => (
+                            <div
+                                key={`user-${user._id}`}
+                                className='flex items-center gap-4 p-3 border-b border-neutral-100 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700'
+                            >
+                                {user?.profileImageUrl
+                                    ? (
+                                        <img
+                                            src={user.profileImageUrl}
+                                            alt={user.fullName}
+                                            className='w-12 h-12 rounded-full border-1 border-white dark:border-neutral-500'
+                                        />
+                                    ) : (
+                                        <LuUsers className='text-4xl text-primary rounded-full dark:text-dark-primary bg-inherit w-12 h-12 border-2' />
+                                    )
+
+                                }
+                                <div className='flex-1'>
+                                    <p className='font-medium text-neutral-600 dark:text-neutral-200'>
+                                        {formatName(user?.fullName)}
+                                    </p>
+                                    <p className='text-[13px] text-neutral-500 dark:text-neutral-400'>{user?.email}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+            </Modal>
+        </DashboardLayout >
     )
 }
 
@@ -192,43 +235,58 @@ export default ViewTaskDetails
 const InfoBox = ({ label, value }) => {
     return (
         <>
-            <label className='text-xs font-medium text-slate-500'>{label}</label>
+            <label className='text-xs font-medium text-neutral-500 dark:text-neutral-300'>{label}</label>
 
-            <p className='text-[11px] md:text-[13px] font-medium text-gray-700 mt-0.5'>
+            <p className='text-[11px] md:text-[13px] font-medium text-neutral-700 mt-0.5 dark:text-neutral-100'>
                 {value}
             </p>
         </>
     )
 }
 
-const TodoCheclist = ({ text, isChanged, onChange }) => {
+const TodoChecklist = ({ text, isChanged, onChange, idx, completed }) => {
     return (
-        <div className='flex items-center gap-3 p-3 mt-2 rounded-md'>
+        <div className='flex gap-2 bg-neutral-200 items-center border border-neutral-300 px-3 py-2 rounded-sm mb-3 mt-2 dark:bg-neutral-700 dark:border-dark-border'
+        >
             <input
-                className='w-4 h-4 text-primary border border-gray-400 rounded-sm cursor-pointer'
+                className='w-4 h-4 text-primary border border-neutral-400 rounded-sm cursor-pointer'
                 type="checkbox"
                 checked={isChanged}
                 onChange={onChange}
             />
 
-            <p className='text-[13px] font-medium text-gray-800'>{text}</p>
-        </div>
+            <p
+                className='text-xs self-start overflow-hidden line-clamp-1  duration-200'
+            >
+                <span className='text-xs text-neutral-600 font-semibold mr-2 dark:text-neutral-300'>
+                    {idx < 9 ? `0${idx + 1}` : idx + 1}
+                </span>
+                <span className='text-black dark:text-neutral-100'
+                    style={{
+                        textDecoration: completed ? "line-through" : "none",
+                    }}
+                >
+                    {text}
+                </span>
+            </p>
+        </div >
     )
 }
 
 const Attachment = ({ link, index, onClick }) => {
     return (
         <div
-            className='flex justify-between bg-gray-50 border-gray-100 px-3 py-2 rounded-md mb-3 mt-2 cursor-pointer'
+            className='flex gap-2 bg-neutral-200 items-center border border-neutral-300 px-3 py-2 rounded-sm mb-3 mt-2 dark:bg-neutral-700 dark:border-dark-border'
+
             onClick={onClick}
         >
             <div className='flex-1 flex items-center gap-3'>
-                <div className='flex items-center text-sm gap-x-2 '>
-                    <span className='font-semibold text-xs text-gray-600'>
+                <div className='flex items-center text-xs gap-x-2 dark:text-neutral-200 text-neutral-900'>
+                    <span className='font-semibold'>
                         {index < 9 ? `0${index + 1}` : index + 1}
                     </span>
 
-                    <p className='text-xs text-black'>{link}</p>
+                    <p className='text-xs '>{link}</p>
                 </div>
 
             </div>

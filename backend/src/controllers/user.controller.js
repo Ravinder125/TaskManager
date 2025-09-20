@@ -15,7 +15,7 @@ const usersRoute = `/api/v1/users`
 // @route   Get /api/v1/users/
 // @access  Private (Admin)
 const getUsers = asyncHandler(async (req, res) => {
-    const userId = req.user._id
+    // const userId = req.user._id
     // const pathKey = `${usersRoute}:${userId}`
     // let usersWithTaskCounts = await redis.get(pathKey)
     // if (usersWithTaskCounts) {
