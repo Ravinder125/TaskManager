@@ -20,7 +20,7 @@ const DashboardLayout = ({ children, activeMenu }) => {
                     </div>
 
                     {/* Main content: full width on small screens, reduced on lg+ */}
-                    <main className='shrink-0 lg:px-2 w-full col-span-1 lg:col-span-12 xl:col-span-10 sm:mx-0 h-[calc(100vh-61px)] overflow-auto'>
+                    <main className='shrink-0 lg:px-2 w-full col-span-1 lg:col-span-12 xl:col-span-10 sm:mx-0 h-[calc(100vh-61px)] overflow-auto scrollbar'>
                         {children}
                     </main>
                 </div>

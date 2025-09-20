@@ -100,7 +100,7 @@ function Dashboard() {
                     duration: 0.3,
                     ease: 'linear'
                 }}
-                className='origin-center mb-5 '
+                className='origin-center mb-5 hide-scrollbar'
             >
                 <div className='card my-5'>
                     <div className='flex flex-col sm:flex-row sm:justify-between md:justify-start md:gap-4 dark:text-neutral-100'>
@@ -176,7 +176,7 @@ function Dashboard() {
                                 </div>
                             </div>
 
-                            <div className='md:col-span-2'>
+                            <div className='md:col-span-2 '>
                                 <div className='card '>
                                     <div className='flex items-center justify-between'>
                                         <h5 className='text-lg font-medium'>Recent Tasks</h5>

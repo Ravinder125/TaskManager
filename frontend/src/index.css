@@ -43,20 +43,20 @@
 
   /* Hide scrollbars  */
   /* Scrollbar styling for light and dark themes */
-  .hide-scrollbar {
+  .scrollbar {
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 #f8fafc;
     /* thumb and track for light theme */
   }
 
-  .dark .hide-scrollbar {
+  .dark .scrollbar {
     scrollbar-color: #3f3f3f #121212;
     /* thumb and track for dark theme */
   }
 
   /* Chrome, Safari, Opera */
-  .hide-scrollbar::-webkit-scrollbar {
-    width: 8px;
+  .scrollbar::-webkit-scrollbar {
+    width: 0px;
     background: #f8fafc;
   }
 
