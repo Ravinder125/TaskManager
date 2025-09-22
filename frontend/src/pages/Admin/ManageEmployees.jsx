@@ -64,7 +64,7 @@ const ManageEmployees = () => {
                         className='flex self-end md:flex w-fit download-btn'
                         onClick={handleDownloadReport}
                     >
-                        <LuFileSpreadsheet className='text-lg' />
+                        <LuFileSpreadsheet className='text-lg mx-2' />
                         <span>Download Report</span>
                     </button>
                 </div>

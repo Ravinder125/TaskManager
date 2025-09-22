@@ -96,19 +96,21 @@ const getTaskById = asyncHandler(async (req, res) => {
 // @access  Admin/User
 const getTasks = asyncHandler(async (req, res) => {
     const userId = req.user._id;
-    const { status } = req.query;
-    const pathKey = `${taskRoute}:${userId}:${status || 'all'}`
+    const { status, search } = req.query;
+    const pathKey = `${userId}:${status || "all"}:${search || ""}`
 
-    const data = await redis.get(pathKey)
+    const data = await cache.get(pathKey)
     if (data) {
         return res
             .status(200)
-            .json(ApiResponse.success(200, JSON.parse(data), 'Task fetched successfully'));
+            .json(ApiResponse.success(200, data, 'Task fetched successfully'));
     }
-
     const isAdmin = req.user.role === 'admin';
     const filter = {
         isDeleted: false,
+        ...(search !== "" && {
+            title: { $regex: `^${search}`, $options: "i" } // ^ means "starts with"
+        }),
         ...(status && { status }),
         ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
     };
@@ -143,7 +145,7 @@ const getTasks = asyncHandler(async (req, res) => {
     };
 
 
-    await redis.set(pathKey, JSON.stringify({ tasks, statusSummary }), 'EX', 300)
+    await cache.set(pathKey, { tasks, statusSummary })
     return res
         .status(200)
         .json(ApiResponse.success(200, { tasks, statusSummary, }, 'Tasks fetched successfully'));

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
     DashboardLayout,
     ManageTasksSkeleton,
@@ -10,7 +10,10 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { LuFileSpreadsheet } from 'react-icons/lu';
-import { motion } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react'
+import { CiSearch } from "react-icons/ci";
+import { IoMdClose } from 'react-icons/io';
+import Search from '../../components/Search';
 
 
 const ManageTasks = () => {
@@ -19,6 +22,8 @@ const ManageTasks = () => {
     const [tabs, setTabs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [filterStatus, setFilterStatus] = useState('all');
+    const [search, setSearch] = useState("")
+    const [searchOpen, setSearchOpen] = useState(false);
 
     const navigate = useNavigate();
 
@@ -30,9 +35,12 @@ const ManageTasks = () => {
                 params: {
                     status: filterStatus === 'all'
                         ? ''
-                        : (filterStatus === 'in Progress'
-                            ? 'in-progress'
-                            : filterStatus)
+                        : (
+                            filterStatus === 'in Progress'
+                                ? 'in-progress'
+                                : filterStatus
+                        ),
+                    search,
                 },
                 withCredentials: true,
             });
@@ -54,6 +62,13 @@ const ManageTasks = () => {
         }
     };
 
+    const handleSearch = () => {
+        if (searchOpen && search?.trim() !== "") {
+            getAllTasks()
+        } else {
+            setSearchOpen(true)
+        }
+    }
 
     const handleClick = (taskData) => {
         if (taskData && taskData._id) {
@@ -87,6 +102,9 @@ const ManageTasks = () => {
         getAllTasks();
     }, [filterStatus])
 
+
+
+
     if (loading) return <ManageTasksSkeleton />
     return (
         <DashboardLayout activeMenu='Manage Tasks'>
@@ -103,13 +121,31 @@ const ManageTasks = () => {
                         </button>
                     </div>
 
+                    <div className='mr-auto'>
+                        <Search
+                            placeholder='Search any task...'
+                            input={search}
+                            setInput={(value) => setSearch(value)}
+                            isOpen={searchOpen}
+                            onClose={() => {
+                                setSearch("")
+                                setSearchOpen(false)
+                            }}
+                            handleSearch={() => handleSearch()}
+                        />
+                    </div>
                     {tabs.length > 0 && (
-                        <div className='flex items-center gap-4 my-10 '>
-                            <TaskStatusTabs
-                                tabs={tabs}
-                                activeTab={filterStatus}
-                                setActiveTab={setFilterStatus}
-                            />
+                        <div className='flex items-center gap-4 lg:my-10'>
+                            <div className='my-2 relative mx-auto'>
+                                <div className={`fixed z-10 top-55 sm:top-45 lg:top-41 xl:top-32 2xl:top-32 left-10 sm:left-[20%] lg:left-[38%] max-[450px]:w-[80%] max-w-fit sm:w-fit overflow-x-auto hide-scrollbar dark:shadow-neutral-700  transition-all duration-1000`}
+                                >
+                                    <TaskStatusTabs
+                                        tabs={tabs}
+                                        activeTab={filterStatus}
+                                        setActiveTab={setFilterStatus}
+                                    />
+                                </div>
+                            </div >
 
                             <button
                                 className='hidden self-end w-fit lg:flex download-btn'
