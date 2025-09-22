@@ -90,7 +90,7 @@ const ManageEmployees = () => {
 
                 <div className='mr-auto w-fit mt-5'>
                     <Search
-                        placeholder='Search any user...'
+                        placeholder='ex : example@gmail.com'
                         input={search}
                         setInput={(value) => setSearch(value)}
                         isOpen={isOpen}
