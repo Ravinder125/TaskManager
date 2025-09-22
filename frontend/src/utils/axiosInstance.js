@@ -33,10 +33,10 @@ axiosInstance.interceptors.response.use(
     (error) => {
         if (error.response) {
             const currentPath = getCurrentPath();
-            const AuthPage = ['/login', '/register']
+            const AuthPage = ['/login', '/register', "/"]
             if (error.response.status === 401 && !AuthPage.includes(currentPath)) {
                 // Redirected to login page
-                window.location.href = '/login';
+                window.location.href = '/';
             } else if (error.response.status === 500) {
                 console.error("Server error, Please try again later.");
             }

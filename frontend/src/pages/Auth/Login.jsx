@@ -7,6 +7,7 @@ import { UserContext } from '../../context/userContext';
 import axiosInstance from '../../utils/axiosInstance';
 import { motion } from 'framer-motion';
 import z from 'zod'
+import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react"
 
 
 const loginSchema = z.object({
@@ -103,6 +104,8 @@ const Login = () => {
                     Please Enter your details to log in
                 </p>
 
+
+
                 <form onSubmit={handleLogin}>
                     <Input
                         value={email}
@@ -135,6 +138,11 @@ const Login = () => {
                     </button>
 
                 </form>
+                {/* <SignedIn >
+                </SignedIn>
+                <SignedOut>
+                    <RedirectToSignIn />
+                </SignedOut> */}
             </motion.div>
         </AuthLayout>
 
