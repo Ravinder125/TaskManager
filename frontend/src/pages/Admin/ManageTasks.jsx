@@ -137,7 +137,7 @@ const ManageTasks = () => {
                     {tabs.length > 0 && (
                         <div className='flex items-center gap-4 lg:my-10'>
                             <div className='my-2 relative mx-auto'>
-                                <div className={`fixed z-10 top-55 sm:top-45 lg:top-41 xl:top-32 2xl:top-32 left-10 sm:left-[20%] lg:left-[38%] max-[450px]:w-[80%] max-w-fit sm:w-fit overflow-x-auto hide-scrollbar dark:shadow-neutral-700  transition-all duration-1000`}
+                                <div className={`fixed z-10 top-55 sm:top-47 lg:top-41 xl:top-32 2xl:top-34 left-10 sm:left-[20%] lg:left-[38%] max-[450px]:w-[80%] max-w-fit sm:w-fit overflow-x-auto hide-scrollbar dark:shadow-neutral-700`}
                                 >
                                     <TaskStatusTabs
                                         tabs={tabs}
@@ -159,9 +159,9 @@ const ManageTasks = () => {
                 </div>
 
                 {allTasks.length === 0
-                    ? <NotAssigned />
+                    ? <NotAssigned text='No Task found!' className='mt-10' />
                     : (
-                        <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 mt-4'>
+                        <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 mt-6'>
                             {allTasks?.map((task, idx) => (
                                 <motion.div
                                     whileInView={{ scale: 1 }}
