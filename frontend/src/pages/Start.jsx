@@ -16,9 +16,9 @@ const Start = () => {
             animate="animate"
             exit="exit"
             transition={{ duration: 0.4 }}
-            className="min-h-screen"
+            className="h-screen overflow-y-auto"
         >
-            <header className="start-container mt-6 flex flex-col sm:flex-row justify-between items-center px-4">
+            <header className="start-container  mt-6 flex flex-col sm:flex-row justify-between items-center px-4">
                 <div>
                     <h3 className="text-3xl font-bold tracking-wide text-primary mb-2">
                         Task Manager
