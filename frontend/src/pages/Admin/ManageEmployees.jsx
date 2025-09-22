@@ -5,15 +5,22 @@ import axiosInstance from '../../utils/axiosInstance'
 import { API_PATHS } from '../../utils/apiPaths'
 import { LuFileSpreadsheet } from 'react-icons/lu'
 import { motion } from 'motion/react'
+import Search from '../../components/Search'
 
 const ManageEmployees = () => {
     const [allUsers, setAllUsers] = useState([])
     const [loading, setLoading] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
+    const [search, setSearch] = useState("")
 
     const getAllUsers = async () => {
         try {
             setLoading(true)
-            const response = await axiosInstance.get(API_PATHS.USERS.GET_ALL_USERS);
+            const response = await axiosInstance.get(API_PATHS.USERS.GET_ALL_USERS, {
+                params: {
+                    search
+                }
+            });
             if (response?.data?.data?.length > 0) {
                 setAllUsers(response.data.data || []);
 
@@ -23,6 +30,18 @@ const ManageEmployees = () => {
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleSearch = () => {
+        const timeout = setTimeout(() => {
+            if (isOpen) {
+                getAllUsers()
+            } else {
+                setIsOpen(true)
+            }
+        }, 100);
+
+        return () => clearTimeout(timeout)
     }
 
     const handleDownloadReport = async () => {
@@ -67,6 +86,20 @@ const ManageEmployees = () => {
                         <LuFileSpreadsheet className='text-lg mx-2' />
                         <span>Download Report</span>
                     </button>
+                </div>
+
+                <div className='mr-auto w-fit mt-5'>
+                    <Search
+                        placeholder='Search any user...'
+                        input={search}
+                        setInput={(value) => setSearch(value)}
+                        isOpen={isOpen}
+                        onClose={() => {
+                            setSearch("")
+                            setIsOpen(false)
+                        }}
+                        handleSearch={() => handleSearch()}
+                    />
                 </div>
 
                 <section className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4'>

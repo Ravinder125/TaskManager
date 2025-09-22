@@ -5,6 +5,7 @@ import { Task } from "../models/Task.model.js";
 import { isValidObjectId } from "mongoose";
 import redis from "../config/redis.js";
 import { InviteToken } from "../models/inviteToken.model.js";
+import { cache } from "../utils/cacheService.js";
 
 
 const isValidId = (id) => isValidObjectId(id)
@@ -15,6 +16,7 @@ const usersRoute = `/api/v1/users`
 // @route   Get /api/v1/users/
 // @access  Private (Admin)
 const getUsers = asyncHandler(async (req, res) => {
+    const { search } = req.query;
     // const userId = req.user._id
     // const pathKey = `${usersRoute}:${userId}`
     // let usersWithTaskCounts = await redis.get(pathKey)
@@ -33,7 +35,22 @@ const getUsers = asyncHandler(async (req, res) => {
     //         .select('-password -refreshToken'))
     // ]);
 
-    const users = await User.find({ role: "employee" }).select(["fullName", "email", "profileImageUrl"]);
+    const pathKey = `users:${req.user._id}:${search}`
+    await cache.del(pathKey)
+    let users = await cache.get(pathKey)
+    if (users) {
+        return res.status(200).json(ApiResponse.success(200, users, 'Users successfully fetched'))
+
+    }
+
+
+    const filter = {
+        role: "employee",
+        ...(search !== "" && {
+            gmail: { $regex: `^${search}`, $options: "i" }
+        })
+    }
+    users = await User.find(filter).select(["fullName", "email", "profileImageUrl"]);
     const usersWithTaskCounts = await Promise.all(users.map(async (user) => {
         const tasksFilter = { assignedTo: user._id }
         const pendingTasks = await Task.countDocuments({ ...tasksFilter, status: 'pending' });
@@ -47,7 +64,7 @@ const getUsers = asyncHandler(async (req, res) => {
         };
     }));
 
-    // await redis.set(pathKey, JSON.stringify(usersWithTaskCounts), 'EX', 300)
+    await cache.set(pathKey, usersWithTaskCounts)
     return res.status(200).json(ApiResponse.success(200, usersWithTaskCounts, 'Users successfully fetched'))
 })
 
