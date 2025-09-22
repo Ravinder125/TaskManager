@@ -18,13 +18,13 @@ const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
 
     return (
 
-        <div className='flex w-full dark:text-gray-300 overflow-x-auto hide-scrollbar dark:shadow-neutral-700 transition-all duration-1000'>
+        <div className='flex w-full dark:text-neutral-300 overflow-x-auto hide-scrollbar dark:shadow-neutral-700 transition-all duration-1000'>
             {tabs.map((tab, idx) => (
                 <button
                     key={idx}
                     className={`relative px-3 md:px-4 py-3 text-sm font-medium ${tab.label === formatName(activeTab)
                         ? 'text-primary dark:text-dark-primary'
-                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200'
+                        : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-300 dark:hover:text-white'
                         } cursor-pointer`}
                     onClick={() => setActiveTab(formatName(tab.label))}
                     onMouseEnter={() => setHovered(idx)}
@@ -40,8 +40,8 @@ const TaskStatusTabs = ({ tabs, activeTab, setActiveTab, }) => {
                         <span className='text-xs'> {tab.label}</span>
                         <span
                             className={`text-xs ml-2 px-2 py-0.5 rounded-full ${tab.label === formatName(activeTab)
-                                ? 'bg-primary text-white dark:text-gray-200 dark:bg-[var(--dark-primary)]'
-                                : 'bg-gray-200/70 text-gray-600'
+                                ? 'bg-primary text-white dark:text-neutral-200 dark:bg-dark-primary'
+                                : 'bg-gray-200/70 dark:bg-gray-600 text-neutral-600 dark:text-neutral-200'
                                 }`}
                         >
                             {tab.count}

@@ -36,11 +36,15 @@ const Search = ({
             <div className='flex
                              gap-1'>
                 <CiSearch
-                    className="text-2xl bg-neutral-200 hover:bg-neutral-300 rounded-md w-fit h-[2.4rem] p-[4px] cursor-pointer dark:bg-neutral-600 dark:hover:bg-neutral-700 dark:text-neutral-300 text-neutral-100"
+                    className="text-2xl text-neutral-500 hover:text-black hover:bg-neutral-300 rounded-md w-fit h-[2.4rem] p-[4px] cursor-pointer dark:bg-neutral-600 dark:hover:bg-neutral-500 
+                    dark:hover:text-neutral-50
+                    dark:text-neutral-300 transition-all duration-200"
                     onClick={handleSearch}
                 />
                 {isOpen && (
-                    <IoCloseOutline className='text-2xl bg-neutral-200 hover:bg-neutral-300 rounded-md w-fit h-[2.4rem] p-[4px] cursor-pointer dark:bg-neutral-600 dark:hover:bg-neutral-700 dark:text-neutral-300 text-neutral-100'
+                    <IoCloseOutline className='text-2xl text-neutral-500 hover:text-black hover:bg-neutral-300 rounded-md w-fit h-[2.4rem] p-[4px] cursor-pointer 
+                    dark:bg-neutral-600 dark:hover:bg-neutral-500 
+                    dark:hover:text-neutral-50 dark:text-neutral-300  transition-all duration-200'
                         onClick={onClose}
                     />
                 )}
