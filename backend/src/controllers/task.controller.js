@@ -1,26 +1,13 @@
-import { asyncHandler } from "../utils/asynchandler.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
 import { validationResult } from "express-validator";
-import { Task } from "../models/Task.model.js";
-import { validateObjectId } from "../utils/validateObjectId.js";
-import redis from "../config/redis.js";
 import { isValidObjectId } from "mongoose";
+import redis from "../config/redis.js";
+import { Task } from "../models/Task.model.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asynchandler.js";
 import { cache, clearCache } from "../utils/cacheService.js";
+import { validateObjectId } from "../utils/validateObjectId.js";
 
 const isValidId = (id) => isValidObjectId(id);
-
-const taskRoute = '/api/v1/tasks/tasks'
-const deletePreviousRedisCache = async (userId) => {
-    const dashboardRoute = '/api/v1/dashboard'
-
-    await Promise.all(
-        ['all', 'pending', 'in-progress', 'completed'].map(status => {
-            const allTasksRoute = `${taskRoute}:${userId}:${status}`;
-            redis.del(`${allTasksRoute}`);
-        })
-    )
-    await redis.del(`${dashboardRoute}:${userId}`)
-}
 
 // @desc    Create a new task (Admin only)
 // @route   POST /api/tasks
@@ -59,14 +46,7 @@ const createTask = asyncHandler(async (req, res) => {
 
     if (!task) return res.status(400).json(ApiResponse.error(400, 'Error while creating Task'));
 
-    // await deletePreviousRedisCache(userId)
-    // const pathKey = `${taskRoute}:${userId}:${task?._id}`
-    // await redis.set(pathKey, JSON.stringify(task), 'EX', 300)
-    const options = {
-        userId,
-        taskId: task._id,
-    }
-    await clearCache(false, false, options)
+    await clearCache(false, false, { userId, taskId: task._id })
 
     return res.status(201).json(ApiResponse.success(201, task, 'Task successfully created'));
 });
@@ -199,14 +179,8 @@ const updateTask = asyncHandler(async (req, res) => {
 
     const pathKey = `task:${taskId}`
 
-    // await Promise.all(
-    //     ['all', 'pending', 'in-progress', 'completed'].map(status => {
-    //         const allTasksPathKey = `${taskRoute}:${req.user._id}:${status}`;
-    //         redis.del(allTasksPathKey);
-    //     })
-    // )
     await cache.set(pathKey, updateTask)
-    clearCache(false, false, { userId: req.user._id, taskId })
+    await clearCache(false, false, { userId: req.user._id, taskId })
 
     return res.status(200).json(ApiResponse.success(200, updatedTask, 'Task successfully updated'));
 });
@@ -276,15 +250,9 @@ const updateTodoList = asyncHandler(async (req, res) => {
     await task.save();
 
     const pathKey = `task:${taskId}`;
-    await Promise.all(
-        ['all', 'pending', 'in-progress', 'completed'].map(status => {
-            const allTasksPathKey = `${taskRoute}:${req.user._id}:${status}`;
-            return redis.del(allTasksPathKey);
-        })
-    );
-
 
     const updatedTask = await task.populate('assignedTo', 'fullName email profileImageUrl');
+
     await cache.set(pathKey, updatedTask);
     await clearCache(false, false, { userId: req.user._id, taskId })
 
@@ -306,12 +274,16 @@ const toggleDeleteTask = asyncHandler(async (req, res) => {
         { isDeleted: !task.isDeleted },
         { new: true });
 
-    const pathKey = `${taskRoute}:${req.user._id}:${task._id}`
-    await deletePreviousRedisCache(req.user._id)
-    await redis.del(pathKey)
+    const pathKey = `task:${taskId}`
+
+    await cache.set(pathKey, updateTask)
+    await clearCache(false, false, { userId: req.user._id, taskId })
+
     return res.status(200).json(ApiResponse.success(200, null, 'Task deletion toggled successfully'));
 });
 
+
+// Currently not in used controllers 
 
 // @desc    Add todo to task
 // @route   POST /api/tasks/:taskId/todos
@@ -396,15 +368,8 @@ const updateTodoText = asyncHandler(async (req, res) => {
 });
 
 export {
-    createTask,
-    updateTask,
+    addTodoToTask, createTask, getTaskById, getTasks, removeTodoFromTask, toggleDeleteTask, updateTask,
     updateTaskStatus,
-    updateTodoList,
-    toggleDeleteTask,
-    getTasks,
-    getTaskById,
-    updateTodoStatus,
-    addTodoToTask,
-    removeTodoFromTask,
-    updateTodoText,
+    updateTodoList, updateTodoStatus, updateTodoText
 };
+

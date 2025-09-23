@@ -23,10 +23,9 @@ export const clearCache = async (userId, taskId, tasks = {}) => {
         await Promise.all(
             [
                 ...['all', 'pending', 'in-progress', 'completed'].map(status => {
-                    cache.del(`${tasks.userId}:${status}`);
+                    cache.del(`${tasks.userId}:${status}:`);
                 }),
                 cache.del(`dashboard:${tasks.userId}`),
-                cache.del(`task:${tasks.taskId}`)
             ]
         )
     }

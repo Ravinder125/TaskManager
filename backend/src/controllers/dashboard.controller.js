@@ -1,9 +1,8 @@
-import { asyncHandler } from "../utils/asynchandler.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
 import { Task } from "../models/Task.model.js";
-import redis from "../config/redis.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asynchandler.js";
+import { cache } from "../utils/cacheService.js";
 
-const dashboardRoute = '/api/v1/dashboard'
 
 // @desc    Get Admin Dashboard Data (Admin only)
 // @route   GET /api/v1/dashboard-data
@@ -11,12 +10,12 @@ const dashboardRoute = '/api/v1/dashboard'
 const getAdminDashboard = asyncHandler(async (req, res) => {
     // Stats
     const userId = req.user._id
-    const pathKey = `${dashboardRoute}:${userId}`
-    const data = await redis.get(pathKey)
+    const pathKey = `dashboard:${userId}`
+    const data = await cache.get(pathKey)
     if (data) {
         return res
             .status(200)
-            .json(ApiResponse.success(200, JSON.parse(data), "Admin dashboard fetched successfully (redis)"));
+            .json(ApiResponse.success(200, data, "Admin dashboard fetched successfully (redis)"));
     }
 
     const filter = {
@@ -97,8 +96,7 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
         recentTasks,
     }
 
-    await redis.set(pathKey, JSON.stringify(responseData), 'EX', 300); // cache for 5 minutes
-
+    await cache.set(pathKey, responseData);
 
     return res.status(200).json(ApiResponse.success(200, responseData, "Admin dashboard fetched successfully"));
 });
@@ -108,11 +106,11 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
 // @access  Admin 
 const getUserDashboard = asyncHandler(async (req, res) => {
     const userId = req.user._id; // Only fetch employee data
-    const pathKey = `${dashboardRoute}:${userId}`
-    const data = await redis.get(pathKey);
+    const pathKey = `dashboard:${userId}`
+    const data = await cache.get(pathKey);
     if (data) {
         return res
-            .status(200).json(ApiResponse.success(200, JSON.parse(data), 'Employee dashboard  successfully fetched'))
+            .status(200).json(ApiResponse.success(200, data, 'Employee dashboard  successfully fetched'))
     }
 
     // Fetch statistics for user-spacific tasks
@@ -175,7 +173,7 @@ const getUserDashboard = asyncHandler(async (req, res) => {
         },
         recentTasks
     }
-    await redis.set(pathKey, JSON.stringify(responseData), 'EX', 300)
+    await cache.set(pathKey, responseData)
 
     return res.status(200).json(ApiResponse.success(200, responseData, 'Employee dashboard successfully fetched'))
 })
@@ -183,5 +181,5 @@ const getUserDashboard = asyncHandler(async (req, res) => {
 
 export {
     getAdminDashboard,
-    getUserDashboard,
-}
+    getUserDashboard
+};

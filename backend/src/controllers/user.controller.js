@@ -17,15 +17,6 @@ const usersRoute = `/api/v1/users`
 // @access  Private (Admin)
 const getUsers = asyncHandler(async (req, res) => {
     const { search } = req.query;
-    // const userId = req.user._id
-    // const pathKey = `${usersRoute}:${userId}`
-    // let usersWithTaskCounts = await redis.get(pathKey)
-    // if (usersWithTaskCounts) {
-    //     return res
-    //         .status(200)
-    //         .json(ApiResponse.success(200, JSON.parse(usersWithTaskCounts), 'Users successfully fetched'))
-    // }
-
     // const inviteToken = await InviteToken.findOne({ email: req.user.email });
     // const usersEmail = await InviteToken.find({ token: inviteToken });
     // console.log(usersEmail)
@@ -36,35 +27,42 @@ const getUsers = asyncHandler(async (req, res) => {
     // ]);
 
     const pathKey = `users:${req.user._id}:${search}`
-    await cache.del(pathKey)
     let users = await cache.get(pathKey)
     if (users) {
         return res.status(200).json(ApiResponse.success(200, users, 'Users successfully fetched'))
 
     }
 
-
     const filter = {
         role: "employee",
-        ...(search !== "" && {
-            gmail: { $regex: `^${search}`, $options: "i" }
+        ...(search && {
+            email: { $regex: `^${search}`, $options: "i" }
         })
     }
-    users = await User.find(filter).select(["fullName", "email", "profileImageUrl"]);
-    const usersWithTaskCounts = await Promise.all(users.map(async (user) => {
-        const tasksFilter = { assignedTo: user._id }
-        const pendingTasks = await Task.countDocuments({ ...tasksFilter, status: 'pending' });
-        const inProgressTasks = await Task.countDocuments({ ...tasksFilter, status: 'in-progress' });
-        const completedTasks = await Task.countDocuments({ ...tasksFilter, status: 'completed' });
-        return {
-            ...user._doc, // spread operator to include all user properties
-            pendingTasks,
-            inProgressTasks,
-            completedTasks,
-        };
-    }));
+    users = await User
+        .find(filter)
+        .select(["fullName", "email", "profileImageUrl"]);
+
+    const usersWithTaskCounts = await Promise.all(
+        users.map(async (user) => {
+            const tasksFilter = { assignedTo: user._id }
+            const pendingTasks = await Task.countDocuments({ ...tasksFilter, status: 'pending' });
+            const inProgressTasks = await Task.countDocuments({ ...tasksFilter, status: 'in-progress' });
+            const completedTasks = await Task.countDocuments({ ...tasksFilter, status: 'completed' });
+            return {
+                ...user._doc, // spread operator to include all user properties
+                pendingTasks,
+                inProgressTasks,
+                completedTasks,
+            };
+        }));
+
+    if (users?.length === 0) {
+        return res.status(400).json(ApiResponse.error(400, usersWithTaskCounts, 'No user found'))
+    }
 
     await cache.set(pathKey, usersWithTaskCounts)
+
     return res.status(200).json(ApiResponse.success(200, usersWithTaskCounts, 'Users successfully fetched'))
 })
 
