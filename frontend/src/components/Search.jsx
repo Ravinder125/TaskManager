@@ -28,7 +28,7 @@ const Search = ({
                 placeholder={placeholder}
                 value={input}
                 onChange={({ target }) => setInput(target.value)}
-                className={`border-none outline-none overflow-hidden transition-all duration-300 ease-in-out dark:placeholder:text-neutral-200
+                className={`border-none outline-none overflow-hidden transition-all duration-300 ease-in-out dark:placeholder:text-neutral-400
       ${isOpen ? "w-full px-4 py-2 opacity-100" : "w-0 px-0 py-0 opacity-0"}`}
                 style={{ minWidth: 0 }} // prevents flexbox from forcing width
 
