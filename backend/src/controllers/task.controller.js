@@ -60,8 +60,9 @@ const getTaskById = asyncHandler(async (req, res) => {
 
     const pathKey = `task:${taskId}`
     let task = await cache.get(pathKey)
+
     if (task) {
-        return res.status(200).json(ApiResponse.success(200, task))
+        return res.status(200).json(ApiResponse.success(200, task, "Task fetched successfully"))
     }
 
     task = await Task.findById(taskId).populate('assignedTo', 'fullName profileImageUrl email');
@@ -277,7 +278,13 @@ const toggleDeleteTask = asyncHandler(async (req, res) => {
     const pathKey = `task:${taskId}`
 
     await cache.set(pathKey, updateTask)
-    await clearCache(false, false, { userId: req.user._id, taskId })
+    await clearCache(
+        false,
+        false,
+        {
+            userId: req.user._id, taskId,
+            search: { title: task.title, status: task.status }
+        })
 
     return res.status(200).json(ApiResponse.success(200, null, 'Task deletion toggled successfully'));
 });

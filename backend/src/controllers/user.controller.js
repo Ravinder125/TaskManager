@@ -27,16 +27,21 @@ const getUsers = asyncHandler(async (req, res) => {
     // ]);
 
     const pathKey = `users:${req.user._id}:${search}`
+    await cache.del(pathKey)
     let users = await cache.get(pathKey)
     if (users) {
         return res.status(200).json(ApiResponse.success(200, users, 'Users successfully fetched'))
 
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     const filter = {
         role: "employee",
         ...(search && {
-            email: { $regex: `^${search}`, $options: "i" }
+            [emailRegex.test(search) ? "email" : "fullName"]: {
+                $regex: `^${search}`, $options: "i"
+            }
         })
     }
     users = await User

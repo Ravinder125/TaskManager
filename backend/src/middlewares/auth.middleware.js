@@ -7,7 +7,6 @@ import { promisify } from 'util'
 const verifyJwt = promisify(jwt.verify)
 
 const isAuthenticated = asyncHandler(async (req, res, next) => {
-    console.log("auth")
     const token = req.cookies?.accessToken || req.headers?.authorization?.split(' ')[1]
 
     if (!token) return res.status(401).json(ApiResponse.error(401, 'Unauthorized request'))
