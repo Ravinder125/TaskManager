@@ -10,9 +10,6 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { LuFileSpreadsheet } from 'react-icons/lu';
-import { AnimatePresence, motion } from 'motion/react'
-import { CiSearch } from "react-icons/ci";
-import { IoMdClose } from 'react-icons/io';
 import Search from '../../components/Search';
 
 
@@ -163,7 +160,7 @@ const ManageTasks = () => {
                     : (
                         <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 mt-6'>
                             {allTasks?.map((task, idx) => (
-                                <motion.div
+                                <div
                                     whileInView={{ scale: 1 }}
                                     initial={{ scale: 0.9 }}
                                     transition={{
@@ -188,7 +185,7 @@ const ManageTasks = () => {
                                             handleClick(task)
                                         }}
                                     />
-                                </motion.div>
+                                </div>
                             ))}
                         </section>
                     )}

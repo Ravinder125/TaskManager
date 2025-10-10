@@ -1,3 +1,4 @@
+import { LuFileSpreadsheet } from "react-icons/lu"
 import { DashboardLayout } from "../index"
 
 const ManageTasksSkeleton = () => {
@@ -7,11 +8,19 @@ const ManageTasksSkeleton = () => {
                 <div className='my-8  w-full animate-pulse '>
                     <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
                         <div className='flex flex-col sm:flex-row lg:items-center justify-center sm:gap-4'>
-                            <h2 className=' font-semibold dark-skeleton w-33 h-8 rounded'></h2>
-                            <button className='flex lg:hidden self-end lg:self-normal dark-skeleton rounded h-8 w-20'></button>
+                            <h2 className='text-2xl font-semibold text-neutral-800 dark:text-neutral-300'>My Tasks</h2>
+                            <button
+                                className='flex lg:hidden self-end lg:self-normal download-btn'
+                            >
+                                <LuFileSpreadsheet className='text-xl ' />
+                                <span className='text-[13px] sm:text-normal'>Download Report</span>
+                            </button>
                         </div>
 
-                        <div className="grid grid-cols-4 w-full mt-5 justify-center items-center gap-4">
+                        <div className='mr-auto h-8 w-20 
+                        bg-neutral-200 dark:bg-neutral-600 rounded-md'>
+                        </div>
+                        <div className="sm:w-1/2 mx-auto grid grid-cols-4 w-full mt-5 justify-center items-center gap-4">
                             {[1, 2, 3, 4].map((_, idx) => (
                                 <div key={idx} className="dark-skeleton h-6 w-full rounded "></div>
                             ))}

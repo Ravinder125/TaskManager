@@ -57,7 +57,7 @@ const Modal = ({ children, isOpen, onClose, title }) => {
                                 </button>
                             </div>
                             {/* Modal body */}
-                            <div className='p-4 md:p-5 space-y-4'>
+                            <div className='p-4 md:p-5 space-y-4 scrollbar'>
                                 {children}
                             </div>
                         </div>

@@ -85,7 +85,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
                     {isLoading ? (
                         <div className='mx-auto w-fit text-black dark:text-white '>Loading...</div>
                     ) : (
-                        <div className='h-[60vh] overflow-y-auto'>
+                        <div className='h-[60vh] overflow-y-auto scrollbar'>
                             {allUsers.map((user, idx) => (
                                 <div
                                     key={`user-${idx}`}
