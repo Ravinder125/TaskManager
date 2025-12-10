@@ -19,7 +19,6 @@ const API_PATHS = {
         UPDATE_USER: (userId) => `/api/v1/users/${userId}`, // Update user details
         DELETE_USER: (userId) => `/api/v1/users/${userId}`, // Delete a user
     },
-
     TASKS: {
         GET_ALL_TASKS: "/api/v1/tasks", // Get all tasks (Admin: all, User: only assigned tasks)
         CREATE_TASK: "/api/v1/tasks", // Create a task (Admin only)
