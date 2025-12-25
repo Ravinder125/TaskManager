@@ -80,7 +80,10 @@ const getTasks = asyncHandler(async (req, res) => {
     const { status, search } = req.query;
     const pathKey = `${userId}:${status || "all"}:${search || ""}`
 
+
     const data = await cache.get(pathKey)
+    console.log(data)
+    cache.del(pathKey)
     if (data) {
         return res
             .status(200)
@@ -89,13 +92,12 @@ const getTasks = asyncHandler(async (req, res) => {
     const isAdmin = req.user.role === 'admin';
     const filter = {
         isDeleted: false,
-        ...(search !== "" && {
+        ...(typeof search === "string" && search.trim() !== "" && {
             title: { $regex: `^${search}`, $options: "i" } // ^ means "starts with"
         }),
         ...(status && { status }),
         ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
     };
-
     let tasks = await Task
         .find(filter)
         .populate(isAdmin ? 'assignedTo' : 'createdBy assignedTo', 'fullName email profileImageUrl');
