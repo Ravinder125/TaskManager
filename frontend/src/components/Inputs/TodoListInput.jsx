@@ -41,7 +41,7 @@ const TodoListInput = ({ isUpdate, todoList, setTodoList }) => {
                         duration={todoListAnimation.duration}
                         exit={todoListAnimation.exit}
                         key={idx}
-                        className='flex gap-2 bg-neutral-200 items-center border border-neutral-300 px-3 py-2 rounded-sm mb-3 mt-2 dark:bg-neutral-700 dark:border-dark-border'
+                        className='flex gap-2 bg-neutral-100 items-center border border-neutral-300 px-3 py-2 rounded-sm mb-3 mt-2 dark:bg-neutral-700 dark:border-dark-border'
                     >
                         <input
                             className='self-start'

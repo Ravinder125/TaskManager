@@ -31,7 +31,7 @@ const AddAttachmentsInput = ({ attachments, setAttachments }) => {
                         exit={todoListAnimation.exit}
                         transition={todoListAnimation.transition}
                         key={idx}
-                        className='flex justify-between bg-neutral-200 border px-3 py-2 rounded-sm mb-3 mt-2  border-neutral-300 dark:bg-neutral-700 dark:border-dark-border'
+                        className='flex justify-between bg-neutral-100 border px-3 py-2 rounded-sm mb-3 mt-2  border-neutral-300 dark:bg-neutral-700 dark:border-dark-border'
                     >
                         <div className='flex-1 flex items-center gap-3 '>
                             <LuPaperclip className='text-gray-400' />
