@@ -7,7 +7,6 @@ import { UserContext } from '../../context/userContext';
 import axiosInstance from '../../utils/axiosInstance';
 import { motion } from 'framer-motion';
 import z from 'zod'
-import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react"
 
 
 const loginSchema = z.object({
