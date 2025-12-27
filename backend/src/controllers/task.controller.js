@@ -82,8 +82,6 @@ const getTasks = asyncHandler(async (req, res) => {
 
 
     const data = await cache.get(pathKey)
-    console.log(data)
-    cache.del(pathKey)
     if (data) {
         return res
             .status(200)

@@ -1,33 +1,35 @@
 import React, { useState } from 'react'
-import { AuthLayout, Input, Loading, ProfilePhotoSelector } from '../../components/index';
+import { AuthLayout, Input, Loading, ProfilePhotoSelector, SelectDropdown } from '../../components/index';
 import { validateEmail } from '../../utils/helper';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_PATHS } from '../../utils/apiPaths';
 import axiosInstance from '../../utils/axiosInstance';
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
+import { motion, Reorder } from 'framer-motion';
 import z from 'zod'
 
 const registerSchema = z.object({
-    fullName: z.
-        string()
-        .nonempty({ message: "Enter you full name" })
-        .min(3, { message: "Full name must 3 characters long" }),
+    fullName: z
+        .string()
+        .nonempty({ message: "Enter your full name" })
+        .min(3, { message: "Full name must be at least 3 characters long" }),
     email: z
         .string()
         .nonempty({ message: "Email is required" })
         .email({ message: "Invalid email" }),
     password: z
         .string()
-        .min(8, { message: "Password must be 8 characters long" })
-})
+        .min(8, { message: "Password must be at least 8 characters long" }),
+    role: z
+        .enum(["admin", "employee"]).default("employee")
+});
 
 const Register = () => {
     // const [profilePic, setProfilePic] = useState(null);
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [adminInviteToken, setAdminInviteToken] = useState('');
+    const [role, setRole] = useState('');
     const [loading, setLoading] = useState(false)
 
     const [error, setError] = useState(null);
@@ -43,11 +45,11 @@ const Register = () => {
                 fullName,
                 email,
                 password,
-                adminInviteToken
+                role
             }
 
             const result = registerSchema.safeParse({
-                fullName, email, password
+                fullName, email, password,role
             })
 
             if (!result.success) {
@@ -67,6 +69,7 @@ const Register = () => {
                 navigate('/login')
             }
         } catch (error) {
+            console.log(error)
             if (error.response && error.response.data.message) {
                 setError(`Error: ${error.response.data.message}`)
                 toast.error(error.response.data.message)
@@ -106,7 +109,7 @@ const Register = () => {
                     <div className='grid md:grid-cols-2 grid-cols-1 gap-2 '>
 
                         <Input
-                            label='Full Name'
+                            label='Full Name *'
                             value={fullName}
                             placeholder='John Snow'
                             type='text'
@@ -114,7 +117,7 @@ const Register = () => {
                             onChange={({ target }) => setFullName(target.value)}
                         />
                         <Input
-                            label='Email'
+                            label='Email *'
                             value={email}
                             placeholder='john@gmail.com'
                             type='email'
@@ -122,20 +125,38 @@ const Register = () => {
                             onChange={({ target }) => setEmail(target.value)}
                         />
                         <Input
-                            label='Password'
+                            label='Password *'
                             value={password}
                             placeholder='Min 8 characters'
                             type='password'
                             required={true}
                             onChange={({ target }) => setPassword(target.value)}
                         />
-                        <Input
-                            label='Admin Invite Token'
-                            value={adminInviteToken}
+                        {/* <Input
+                            label={`I'm a *`}
+                            value={role}
                             placeholder='Enter invite token if you have one'
-                            type='text'
+                            type='select'
                             required={false}
-                            onChange={({ target }) => setAdminInviteToken(target.value)}
+                            onChange={({ target }) => setRole(target.value)}
+                        /> */}
+
+                        <SelectDropdown
+                            options={[
+                                {
+                                    value: "admin",
+                                    label: "Admin"
+                                },
+                                {
+                                    value: "employee",
+                                    label: "Employee"
+                                },
+                            ]}
+                            onChange={(role) => setRole(role)}
+                            placeholder="Select role"
+                            value={role}
+                            label="role *"
+                            // style={{ "marginTop": 4 }}
                         />
 
                     </div>

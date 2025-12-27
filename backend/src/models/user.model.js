@@ -10,7 +10,7 @@ const userSchema = new Schema(
         password: { type: String, required: true, trim: true, minlength: [8, "Password must be at least 8 characters long"], select: false },
         refreshToken: { type: String, trim: true, select: false },
         profileImageUrl: { type: String, trim: true, },
-        inviteToken: { type: String, required: true, trim: true },
+        // inviteToken: { type: String, required: true, trim: true },
         role: { type: String, enum: ['admin', 'employee'], default: 'employee' },
     }, { timestamps: true });
 

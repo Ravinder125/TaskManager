@@ -8,7 +8,7 @@ import {
     getUserProfile,
     updateUserProfile,
     updateUserProfileImage,
-    generateInviteToken,
+    // generateInviteToken,
     changeUserPassword
 } from '../controllers/auth.controller.js'
 import { isAuthenticated, adminOnly } from '../middlewares/auth.middleware.js';
@@ -24,9 +24,15 @@ router
         upload.single('profileImage'),
         [
             body('email').isEmail().withMessage('Email is invalid'),
-            // body('AdminEmail').isEmail().withMessage('Admin email is invalid'),
-            body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
-            body('comfirmPassword').isLength({ min: 8 }).withMessage('Comfirm password must be at least 8 characters long')
+            body('password')
+                .notEmpty().withMessage("Confirm password is required")
+                .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+            body('confirmPassword')
+                .notEmpty().withMessage("Confirm password is required")
+                .isLength({ min: 8 }).withMessage('Confirm password must be at least 8 characters long'),
+            body('role')
+                .notEmpty().withMessage('Role is required')
+                .isIn(['employee', 'admin']).withMessage('Role must be either user or admin')
         ],
         registerUser
     )
@@ -37,7 +43,7 @@ router
         [
             body('email').isEmail().withMessage('Email is invalid'),
             body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
-            body('confirmPassword').isLength({ min: 8 }).withMessage('Confirm password must be at least 8 characters long'),
+            // body('confirmPassword').isLength({ min: 8 }).withMessage('Confirm password must be at least 8 characters long'),
         ],
         loginUser
     )
@@ -63,8 +69,8 @@ router
     .route('/upload-image')
     .patch(isAuthenticated, upload.single('profileImage'), updateUserProfileImage)
 
-router
-    .route('/invite/:token')
-    .get(isAuthenticated, adminOnly, generateInviteToken)
+// router
+//     .route('/invite/:token')
+//     .get(isAuthenticated, adminOnly, generateInviteToken)
 
 export default router

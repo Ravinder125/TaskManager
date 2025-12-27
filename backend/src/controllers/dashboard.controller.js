@@ -12,6 +12,7 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
     const userId = req.user._id
     const pathKey = `dashboard:${userId}`
     const data = await cache.get(pathKey)
+
     if (data) {
         return res
             .status(200)
@@ -76,7 +77,7 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
     }, {});
 
     // Recent 10 tasks
-    const recentTasks = await Task.find()
+    const recentTasks = await Task.find(filter)
         .sort({ createdAt: -1 })
         .limit(10)
         .select('title status priority dueTo createdAt');
@@ -108,6 +109,7 @@ const getUserDashboard = asyncHandler(async (req, res) => {
     const userId = req.user._id; // Only fetch employee data
     const pathKey = `dashboard:${userId}`
     const data = await cache.get(pathKey);
+
     if (data) {
         return res
             .status(200).json(ApiResponse.success(200, data, 'Employee dashboard  successfully fetched'))

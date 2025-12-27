@@ -14,7 +14,6 @@ const generateToken = async (user) => {
     try {
         const accessToken = await user.generateAccessToken()
         const refreshToken = await user.generateRefreshToken()
-
         if (!accessToken || !refreshToken) throw new Error('Error while generating access or refreshToken token')
         user.refreshToken = refreshToken
         user.save({ validateBeforeSave: false })
@@ -44,21 +43,10 @@ const registerUser = asyncHandler(async (req, res) => {
         return res.status(400).json(ApiResponse.error(400, 'Validation error'));
     }
 
-    const { fullName, email, password, adminInviteToken } = req.body;
+    const { fullName, email, password, role } = req.body;
     const userExist = await User.findOne({ email });
     if (userExist) {
         return res.status(400).json(ApiResponse.error(400, 'User already exists'))
-    }
-
-    const isTokenValid = await User.findOne({ inviteToken: adminInviteToken }).lean()
-
-    if ((adminInviteToken && !isTokenValid)) {
-        return res.status(400).json(ApiResponse.error(400, 'Invite token is expired or invalid'))
-    }
-
-    let hashedToken;
-    if (!adminInviteToken) {
-        hashedToken = crypto.randomBytes(32).toString('hex')
     }
 
     // TODO: Make it simple by removing the fullName split logic
@@ -69,8 +57,8 @@ const registerUser = asyncHandler(async (req, res) => {
         },
         email,
         password,
-        role: adminInviteToken ? 'employee' : 'admin',
-        inviteToken: adminInviteToken || hashedToken
+        role: role,
+        // inviteToken: adminInviteToken || hashedToken
     })
     // const { accessToken, refreshToken, options } = await generateToken(user)
 
@@ -93,6 +81,8 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!userExist || !(await userExist.isPasswordCorrect(password))) {
         return res.status(401).json(ApiResponse.error(401, 'Email or password is invalid'))
     }
+
+
     const { accessToken, refreshToken, options } = await generateToken(userExist)
 
     await cache.set(`profile:${userExist._id}`, userExist)
@@ -128,21 +118,21 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 
-const generateInviteToken = asyncHandler(async (req, res) => {
-    if (!isValidId(req.user.id)) {
-        return res.status(200).json(ApiResponse.error(400, 'Invalid user ID'))
-    }
+// const generateInviteToken = asyncHandler(async (req, res) => {
+//     if (!isValidId(req.user.id)) {
+//         return res.status(200).json(ApiResponse.error(400, 'Invalid user ID'))
+//     }
 
-    const hashedToken = crypto.randomBytes(32).toString('hex');
+//     const hashedToken = crypto.randomBytes(32).toString('hex');
 
-    const user = await User.findByIdAndUpdate(
-        req.user.id,
-        { inviteToken: hashedToken },
-    );
+//     const user = await User.findByIdAndUpdate(
+//         req.user.id,
+//         { inviteToken: hashedToken },
+//     );
 
-    await cache.set(`profile:${user._id}`, user)
-    return res.status(200).json(ApiResponse.success(200, { inviteToken: hashedToken || '' }, 'Admin invite token successfully generated'))
-})
+//     await cache.set(`profile:${user._id}`, user)
+//     return res.status(200).json(ApiResponse.success(200, { inviteToken: hashedToken || '' }, 'Admin invite token successfully generated'))
+// })
 
 // @desc    Get user profile
 // @route   GET /api/v1/auth/profile
@@ -281,6 +271,6 @@ export {
     getUserProfile,
     updateUserProfile,
     updateUserProfileImage,
-    generateInviteToken,
+    // generateInviteToken,
     changeUserPassword,
 }
