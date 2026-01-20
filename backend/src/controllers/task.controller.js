@@ -183,7 +183,20 @@ const updateTask = asyncHandler(async (req, res) => {
     await cache.set(pathKey, updateTask)
     await clearCache(false, false, { userId: req.user._id, taskId })
 
-    return res.status(200).json(ApiResponse.success(200, updatedTask, 'Task successfully updated'));
+    const responseData = {
+        title: updateTask.title,
+        description: updateTask.description,
+        todoList: updateTask.todoList,
+        assignedTo: updateTask.assignedTo,
+        attachments: updateTask.attachments,
+        dueTo: updateTask.dueTo,
+        status: updateTask.status,
+        priority: updateTask.priority,
+    }
+
+    return res
+        .status(200)
+        .json(ApiResponse.success(200, responseData, 'Task successfully updated'));
 });
 
 // @desc    Update task status

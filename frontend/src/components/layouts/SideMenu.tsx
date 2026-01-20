@@ -1,0 +1,80 @@
+import { useContext, useEffect, useState } from 'react'
+import { UserContext } from '../../context/userContext'
+import { Link, useNavigate } from 'react-router-dom';
+import { SIDE_MENU_DATA, SIDE_MENU_EMPLOYEE_DATA, } from '../../utils/data';
+import { LuUser } from 'react-icons/lu';
+import { FaUserEdit } from "react-icons/fa";
+import { formatName } from '../../utils/helper';
+import { SIDE_MENU_TYPE } from '../../types/task.type';
+import { WithActiveMenu } from '../../types/layout.type';
+
+const SideMenu = ({ activeMenu }: WithActiveMenu) => {
+    const { user, } = useContext(UserContext);
+    const [sideMenuData, setSideMenuData] = useState<SIDE_MENU_TYPE[]>([]);
+
+    const navigate = useNavigate();
+
+    const handleClick = (route: string) => {
+        navigate(route)
+    };
+
+
+    useEffect(() => {
+        if (user) {
+            setSideMenuData(user?.role === 'admin' ? SIDE_MENU_DATA : SIDE_MENU_EMPLOYEE_DATA);
+        }
+    }, [user])
+    return (
+        <aside className='z-100 mx-auto w-62 max-w-70 min-[1080px]:w-full h-[calc(98vh-61px)] top-[61px] rounded-md bg-white border-r border-gray-200/50 sticky shadow-md dark:bg-dark-card dark:border-dark-border '>
+            <div className='flex rounded-2xl bg-inherit flex-col items-center justify-center mb-7 pt-5'>
+                <div className='relative '>
+                    {user?.profileImageUrl
+                        ? <img
+                            src={user?.profileImageUrl}
+                            alt="Profile Image"
+                            className='w-20 h-20 bg-slate-400 rounded-full '
+                        />
+                        : <LuUser className='text-4xl text-primary rounded-full w-20 h-20  border-2' />
+                    }
+                </div>
+
+                {user?.role === 'admin' && (
+                    <div className='text-[10px]  font-medium text-white bg-primary px-3 py-0.5 rounded mt-1'>
+                        Admin
+                    </div>
+                )}
+
+                <div className='leading-4 mt-2 text-center'>
+                    <h5 className='text-gray-700 font-medium mt-3 dark:text-white'>
+                        {user?.fullName && formatName(user?.fullName)}
+                    </h5>
+                    <p className='text-[12px] text-gray-400'>{user?.email || ''}</p>
+                </div>
+
+                <button className='rounded-md font-medium  px-4 py-1 bg-blue-500 hover:bg-primary transition-bg duration-300 ease-in-out  text-white mt-4 mb-8'>
+                    <Link to='/profile' className='flex gap-2 items-center'>
+                <FaUserEdit />
+                        <span>Profile</span>
+                    </Link>
+                </button>
+                <div className='w-full dark:text-gray-100'>
+                    {sideMenuData.map((item, idx) => (
+                        <button
+                            key={`menu_${idx}`}
+                            className={`w-full  flex items-center gap-4 text-[15px] 
+                    ${activeMenu == item.label
+                                    ? "text-primary bg-linear-to-r from-blue-100/50 dark:from-blue-400/40  dark:to-blue-800/50 to-blue-100/50 border-r-3 dark:text-[var(--dark-primary)]"
+                                    : ''} py-3 px-6 mb-3 cursor-pointer`}
+                            onClick={() => handleClick(item.path)}
+                        >
+                            <item.icon className={`text-xl ${item.label === 'Logout' ? 'text-rose-600 dark:text-rose-400' : ''} `} />
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </aside >
+    )
+}
+
+export default SideMenu
