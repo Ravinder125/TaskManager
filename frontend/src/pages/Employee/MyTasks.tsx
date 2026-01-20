@@ -151,7 +151,8 @@ const MyTasks = () => {
                     {tabs.length > 0 && (
                         <div className='flex items-center gap-4 lg:my-10'>
                             <div className='my-2 relative mx-auto'>
-                                <div className={`fixed z-10 top-55 sm:top-47 lg:top-41 xl:top-32 2xl:top-34 left-10 sm:left-[20%] lg:left-[38%] max-[450px]:w-[80%] max-w-fit sm:w-fit overflow-x-auto hide-scrollbar dark:shadow-neutral-700`}
+                                <div
+                                    className="sticky top-0 z-40  max-[450px]:w-[80%] sm:w-fit max-w-fit  overflow-x-auto hide-scrollbar  bg-white dark:bg-neutral-900  shadow-sm dark:shadow-neutral-700"
                                 >
                                     <TaskStatusTabs
                                         tabs={tabs}
