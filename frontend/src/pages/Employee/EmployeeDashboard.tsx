@@ -73,24 +73,12 @@ function EmployeeDashboard() {
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
-
-            // const response = await axiosInstance.get<AxiosResponse<DashboardData>>(
-            //     API_PATHS.DASHBOARD.GET_DASHBOARD_DATA,
-            //     { withCredentials: true }
-            // );
-            // if (response.data) {
-            //     setDashboardData(response.data.data);
-            //     prepareChartData(response.data.data.charts || null)
-            // }
-
             const { data } = await getEmployeeDashboardData()
             setDashboardData(data)
 
             if (data !== null) {
                 prepareChartData(data.charts)
             }
-            (data)
-                (data)
         } catch (error) {
             console.error('Error fetching dashboard data:', error)
         } finally {
@@ -200,7 +188,7 @@ function EmployeeDashboard() {
                                     <div className='flex items-center justify-between'>
                                         <h5 className='text-lg font-medium'>Recent Tasks</h5>
 
-                                        <Link to='/admin/tasks' className='add-btn' onClick={onSeeMore}>
+                                        <Link to='/employee/tasks' className='add-btn' onClick={onSeeMore}>
                                             See All <LuArrowRight className='text-base' />
                                         </Link>
                                     </div>
