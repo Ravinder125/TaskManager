@@ -20,9 +20,7 @@ import Search from '../../components/Inputs/Search';
 
 // types
 import type {
-    ApiResponseType,
     ManageTask,
-    ManageTasksData,
     StatusValueType,
     Tab
 } from '../../types/task.type';
@@ -58,8 +56,12 @@ const ManageTasks = () => {
             const params: {
                 search?: string,
                 status?: string,
-                page: number
-            } = { page: paginationData.page };
+                page: number,
+                limit: number,
+            } = {
+                page: paginationData.page,
+                limit: paginationData.limit
+            };
             if (filterStatus === "all") {
                 params.status = ""
             } else if (filterStatus === "in Progress") {
@@ -126,7 +128,7 @@ const ManageTasks = () => {
 
     useEffect(() => {
         getAllTasks();
-    }, [filterStatus, paginationData.page])
+    }, [filterStatus, paginationData.page, paginationData.limit])
 
 
     if (loading) return <ManageTasksSkeleton />
@@ -159,8 +161,16 @@ const ManageTasks = () => {
                         />
                     </div>
                     {tabs.length > 0 && (
-                        <nav className='flex items-center gap-4 lg:my-10'>
-                            <div className='my-2 relative mx-auto'>
+                        <nav className='w-full items-center gap-4 lg:my-10'>
+
+                            <button
+                                className='hidden self-end w-fit lg:flex download-btn'
+                                onClick={handleDownloadReport}
+                            >
+                                <LuFileSpreadsheet className='text-xl' />
+                                <span>Download Report</span>
+                            </button>
+                            <div className='my-2 w-[100%] sm:w-auto relative mx-auto'>
                                 <div
                                     className="sticky top-0 z-20  max-[450px]:w-[80%] sm:w-fit max-w-fit  overflow-x-auto hide-scrollbar  bg-white dark:bg-neutral-900  shadow-sm dark:shadow-neutral-700">
                                     <TaskStatusTabs
@@ -170,14 +180,6 @@ const ManageTasks = () => {
                                     />
                                 </div>
                             </div >
-
-                            <button
-                                className='hidden self-end w-fit lg:flex download-btn'
-                                onClick={handleDownloadReport}
-                            >
-                                <LuFileSpreadsheet className='text-xl' />
-                                <span>Download Report</span>
-                            </button>
                         </nav>
                     )}
                 </header>
@@ -220,6 +222,10 @@ const ManageTasks = () => {
                             setPaginationData(prev => ({ ...prev, "page": page }))
                         }
                         }
+                        onLimitChange={(limit: number) => {
+                            setPaginationData(prev => ({ ...prev, "limit": limit }))
+                        }}
+                        isLimitChangeable={true}
                     />
                 </footer>
             </div>

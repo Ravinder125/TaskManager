@@ -146,3 +146,7 @@
 .dark-skeleton {
   @apply bg-neutral-200 dark:bg-neutral-500
 }
+
+.first-last-page {
+  @apply text-2xl cursor-pointer text-neutral-600 dark:text-neutral-200 disabled:text-neutral-400
+}
