@@ -26,6 +26,9 @@ import type {
     StatusValueType,
     Tab
 } from '../../types/task.type';
+import PaginationComp from '../../components/common/PaginationComp';
+import { Pagination } from '../../types/api.type';
+import { getTasksApi } from '../../features/api/task.api';
 
 
 
@@ -39,6 +42,12 @@ const ManageTasks = () => {
     const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
     const [search, setSearch] = useState<string>("")
     const [searchOpen, setSearchOpen] = useState<boolean>(false);
+    const [paginationData, setPaginationData] = useState<Pagination>({
+        limit: 10,
+        page: 1,
+        totalItems: 0,
+        totalPages: 1
+    })
 
     const navigate = useNavigate();
 
@@ -46,24 +55,25 @@ const ManageTasks = () => {
     const getAllTasks = async () => {
         try {
             setLoading(true)
-            const response = await axiosInstance.get<ApiResponseType<ManageTasksData>>(API_PATHS.TASKS.GET_ALL_TASKS, {
-                params: {
-                    status: filterStatus === 'all'
-                        ? ''
-                        : (
-                            filterStatus === 'in Progress'
-                                ? 'in-progress'
-                                : filterStatus
-                        ),
-                    search,
-                },
-                withCredentials: true,
-            });
+            const params: {
+                search?: string,
+                status?: string,
+                page: number
+            } = { page: paginationData.page };
+            if (filterStatus === "all") {
+                params.status = ""
+            } else if (filterStatus === "in Progress") {
+                params.status = "in-progress"
+            } else {
+                params.status = filterStatus
+            }
 
-            setAllTasks(response.data.data.tasks)
-
+            const response = await getTasksApi(params)
+            const { tasks, pagination, statusSummary } = response.data
+            setAllTasks(tasks)
+            setPaginationData(pagination)
             // Map statusSummary data will fixed labels and order
-            const statusSummary = response.data?.data?.statusSummary
+
             const statusArray: Tab[] = [
                 { label: 'All', count: statusSummary.allTasks || 0 },
                 { label: 'Pending', count: statusSummary.pendingTasks || 0 },
@@ -116,14 +126,14 @@ const ManageTasks = () => {
 
     useEffect(() => {
         getAllTasks();
-    }, [filterStatus])
+    }, [filterStatus, paginationData.page])
 
 
     if (loading) return <ManageTasksSkeleton />
     return (
         <DashboardLayout activeMenu='Manage Tasks'>
             <div className='my-8 xl:my-0 w-full '>
-                <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
+                <header className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
                     <div className='flex flex-col sm:flex-row lg:items-center justify-center sm:gap-4'>
                         <h2 className='text-2xl font-semibold text-neutral-800 dark:text-neutral-300'>My Tasks</h2>
                         <button
@@ -149,10 +159,10 @@ const ManageTasks = () => {
                         />
                     </div>
                     {tabs.length > 0 && (
-                        <div className='flex items-center gap-4 lg:my-10'>
+                        <nav className='flex items-center gap-4 lg:my-10'>
                             <div className='my-2 relative mx-auto'>
                                 <div
-                                    className="sticky top-0 z-40  max-[450px]:w-[80%] sm:w-fit max-w-fit  overflow-x-auto hide-scrollbar  bg-white dark:bg-neutral-900  shadow-sm dark:shadow-neutral-700">
+                                    className="sticky top-0 z-20  max-[450px]:w-[80%] sm:w-fit max-w-fit  overflow-x-auto hide-scrollbar  bg-white dark:bg-neutral-900  shadow-sm dark:shadow-neutral-700">
                                     <TaskStatusTabs
                                         tabs={tabs}
                                         activeTab={filterStatus}
@@ -168,9 +178,9 @@ const ManageTasks = () => {
                                 <LuFileSpreadsheet className='text-xl' />
                                 <span>Download Report</span>
                             </button>
-                        </div>
+                        </nav>
                     )}
-                </div>
+                </header>
 
                 {allTasks.length === 0
                     ? <NotAssigned text='No Task found!' className='mt-10' />
@@ -202,6 +212,16 @@ const ManageTasks = () => {
                             ))}
                         </section>
                     )}
+
+                <footer className='my-6 mb-20'>
+                    <PaginationComp
+                        {...paginationData}
+                        onPageChange={(page) => {
+                            setPaginationData(prev => ({ ...prev, "page": page }))
+                        }
+                        }
+                    />
+                </footer>
             </div>
         </DashboardLayout >
     )

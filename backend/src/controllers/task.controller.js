@@ -77,46 +77,66 @@ const getTaskById = asyncHandler(async (req, res) => {
 // @access  Admin/User
 const getTasks = asyncHandler(async (req, res) => {
     const userId = req.user._id;
-    const { status, search } = req.query;
+    const { status, search, sort = "asc", priority } = req.query;
+
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || 10
+    const skip = (page - 1) * limit
+
     const pathKey = `${userId}:${status || "all"}:${search || ""}`
 
 
-    const data = await cache.get(pathKey)
-    if (data) {
-        return res
-            .status(200)
-            .json(ApiResponse.success(200, data, 'Task fetched successfully'));
-    }
-    const isAdmin = req.user.role === 'admin';
-    const filter = {
-        isDeleted: false,
-        ...(typeof search === "string" && search.trim() !== "" && {
-            title: { $regex: `^${search}`, $options: "i" } // ^ means "starts with"
-        }),
-        ...(status && { status }),
-        ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
-    };
-    let tasks = await Task
-        .find(filter)
+    // const data = await cache.get(pathKey)
+    // if (data) {
+    //     return res
+    //         .status(200)
+    //         .json(ApiResponse.success(200, data, 'Task fetched successfully'));
+    // }
+
+    const baseQuery = { isDeleted: false };
+    const isAdmin = req.user.role === "admin"
+    const userRole = isAdmin ? { createdBy: userId } : { assignedTo: userId }
+
+    baseQuery[isAdmin ? "createdBy" : "assignedTo"] = userId
+    if (search?.trim()) baseQuery.title = { $regex: search, $options: "i" }
+    if (status?.trim()) baseQuery.status = status
+    if (priority?.trim()) baseQuery.priority = priority
+
+    const fetchTasks = Task
+        .find(baseQuery)
+        .sort(sort && { sort: sort === "asc" ? 1 : -1 })
+        .limit(limit)
+        .skip(skip)
         .populate(isAdmin ? 'assignedTo' : 'createdBy assignedTo', 'fullName email profileImageUrl');
+
+    let [tasks, totalTasks] = await Promise.all([
+        fetchTasks,
+        Task.countDocuments(baseQuery)
+    ]
+    )
+    const totalPages = Math.ceil(totalTasks / limit)
 
     tasks = await Promise.all(
         tasks.map(task => {
-            const completedTodoCount = task.todoList.filter(todo => todo.completed)?.length;
+            const completedTodoCount = task.todoList.filter(todo => todo?.completed)?.length;
             return { ...task._doc, completedTodoCount };
+        },
+
+        )
+    );
+    const StatusArray = ["", "pending", "in-progress", "completed"]
+
+    const [allTasks, pendingTasks, inProgressTasks, completedTasks] = await Promise.all(
+        StatusArray.map((s) => {
+            const filter = {
+                ...userRole,
+                ...(s?.trim() ? { status: s.trim() } : {}),
+                isDeleted: false
+            };
+            return Task.countDocuments(filter);
         })
     );
-    const summaryFilter = {
-        isDeleted: false,
-        ...(isAdmin ? { createdBy: userId } : { assignedTo: userId })
-    };
 
-    const [allTasks, pendingTasks, inProgressTasks, completedTasks] = await Promise.all([
-        Task.countDocuments(summaryFilter),
-        Task.countDocuments({ ...summaryFilter, status: 'pending' }),
-        Task.countDocuments({ ...summaryFilter, status: 'in-progress' }),
-        Task.countDocuments({ ...summaryFilter, status: 'completed' })
-    ]);
 
     const statusSummary = {
         allTasks,
@@ -125,11 +145,22 @@ const getTasks = asyncHandler(async (req, res) => {
         completedTasks
     };
 
+    const responseData = {
+        tasks,
+        statusSummary,
+        pagination: {
+            limit,
+            totalPages,
+            page,
+            totalTasks
+        }
+    }
 
-    await cache.set(pathKey, { tasks, statusSummary })
+    await cache.set(pathKey, responseData)
+
     return res
         .status(200)
-        .json(ApiResponse.success(200, { tasks, statusSummary, }, 'Tasks fetched successfully'));
+        .json(ApiResponse.success(200, responseData, 'Tasks fetched successfully'));
 });
 
 // @desc    Update a task

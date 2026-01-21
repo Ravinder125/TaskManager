@@ -1,5 +1,5 @@
 
-import { ApiResponse } from "../../types/api.type";
+import { ApiResponse, GetTasksResponse } from "../../types/api.type";
 import { ManageTask, TaskType } from "../../types/task.type";
 import { API_PATHS } from "../../utils/apiPaths";
 import { networkRequest } from "../../utils/networkRequest";
@@ -16,19 +16,12 @@ export const createTaskApi = async (
 };
 
 
-export interface GetTasksResponse {
-    tasks: ManageTask[];
-    statusSummary: {
-        allTasks: number;
-        pendingTasks: number;
-        inProgressTasks: number;
-        completedTasks: number;
-    };
-}
 
 export const getTasksApi = async (params?: {
     status?: string;
     search?: string;
+    page?: number;
+    limit?: number;
 }): Promise<ApiResponse<GetTasksResponse>> => {
     return await networkRequest<ApiResponse<GetTasksResponse>>({
         method: "GET",
@@ -57,11 +50,6 @@ export const updateTaskApi = async (
         data: payload,
     });
 };
-
-
-/* ================= DELETE ================= */
-
-
 
 export const toggleDeleteTaskApi = async (
     taskId: string

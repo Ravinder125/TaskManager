@@ -1,3 +1,4 @@
+import { ManageTask } from "./task.type";
 
 
 
@@ -23,4 +24,15 @@ export interface Pagination {
     limit: number;
     totalPages: number;
     totalItems: number;
+}
+
+export interface GetTasksResponse {
+    tasks: ManageTask[];
+    statusSummary: {
+        allTasks: number;
+        pendingTasks: number;
+        inProgressTasks: number;
+        completedTasks: number;
+    };
+    pagination: Pagination
 }
