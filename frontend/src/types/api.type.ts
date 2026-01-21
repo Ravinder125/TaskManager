@@ -36,3 +36,10 @@ export interface GetTasksResponse {
     };
     pagination: Pagination
 }
+
+export interface Params {
+    search?: string,
+    status?: string,
+    page: number,
+    limit: number
+}

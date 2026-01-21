@@ -3,33 +3,24 @@ import { IoCloseOutline } from "react-icons/io5";
 
 interface SearchProps {
     input: string,
-    setInput: (value: string) => void,
-    isOpen: boolean,
-    onClose: () => void,
-    handleSearch: () => void
     placeholder?: string
+    setInput: (value: string) => void,
+    onClose: () => void,
+    onOpen: () => void,
+    isOpen: boolean,
 }
 
 const Search = ({
     input,
+    placeholder = "For which task are you looking for..",
     setInput,
     isOpen,
     onClose,
-    handleSearch,
-    placeholder = "For which task are you looking for.."
+    onOpen
 }: SearchProps) => {
     return (
 
-        <div className={`w-full flex items-center text-black ml-auto bg-gray-200 focus:rounded-sm sm:w-fit dark:bg-neutral-600 rounded-lg ${isOpen ? "gap-2" : "hover:bg-gray-300"} dark:text-white dark:bg-gray-700`}
-            onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                    handleSearch() // trigger on Enter press
-                }
-                if (e.key === "Escape") {
-                    onClose() // close on Esc trigger
-                    setInput("")
-                }
-            }}
+        <div className={`w-full flex items-center text-black ml-auto bg-neutral-100 border border-neutral-200 focus:rounded sm:w-fit dark:border-neutral-700 dark:bg-neutral-200 rounded-lg ${isOpen ? "gap-2 shadow-[0_3px_10px_rgb(0,0,0,0.2)]" : "hover:bg-neutral-300"} dark:text-white dark:bg-neutral-800`}
         >
             <input
                 type="text"
@@ -45,19 +36,22 @@ const Search = ({
             />
             <div className='flex
                              gap-1'>
-                <CiSearch
-                    className="text-2xl text-neutral-500 hover:text-black hover:bg-neutral-300 rounded-md w-fit h-[2.4rem] p-[4px] cursor-pointer dark:bg-neutral-600 dark:hover:bg-neutral-500 
-                    dark:hover:text-neutral-50
-                    dark:text-neutral-300 transition-all duration-200"
-                    onClick={handleSearch}
-                />
-                {isOpen && (
-                    <IoCloseOutline className='text-2xl text-neutral-500 hover:text-black hover:bg-neutral-300 rounded-md w-fit h-[2.4rem] p-[4px] cursor-pointer 
-                    dark:bg-neutral-600 dark:hover:bg-neutral-500 
-                    dark:hover:text-neutral-50 dark:text-neutral-300  transition-all duration-200'
-                        onClick={onClose}
-                    />
-                )}
+                {isOpen
+                    ? (
+                        <IoCloseOutline className='text-2xl text-neutral-500 hover:text-black hover:bg-neutral-300 rounded-md w-fit h-[2.4rem] p-[4px] cursor-pointer 
+                        dark:bg-neutral-800 dark:hover:bg-neutral-700 
+                        dark:hover:text-neutral-50 dark:text-neutral-300  transition-all duration-200'
+                            onClick={onClose}
+                        />
+                    ) : (
+                        <CiSearch
+                            className="text-2xl text-neutral-500 hover:text-black hover:bg-neutral-300 rounded-md w-fit h-[2.4rem] p-[4px] cursor-pointer dark:bg-neutral-800 dark:hover:bg-neutral-700 
+                                        dark:hover:text-neutral-50
+                                        dark:text-neutral-300 transition-all duration-200"
+                            onClick={onOpen}
+                        />
+
+                    )}
             </div>
 
         </div >

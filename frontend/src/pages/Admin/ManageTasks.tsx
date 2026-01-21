@@ -25,8 +25,10 @@ import type {
     Tab
 } from '../../types/task.type';
 import PaginationComp from '../../components/common/PaginationComp';
-import { Pagination } from '../../types/api.type';
+import { Pagination, Params } from '../../types/api.type';
 import { getTasksApi } from '../../features/api/task.api';
+import { useDebounce } from '../../utils/useDebounce';
+
 
 
 
@@ -49,19 +51,18 @@ const ManageTasks = () => {
 
     const navigate = useNavigate();
 
+    const limit = 10
+
+    const debounceSearch = useDebounce(search)
 
     const getAllTasks = async () => {
         try {
             setLoading(true)
-            const params: {
-                search?: string,
-                status?: string,
-                page: number,
-                limit: number,
-            } = {
+            let params: Params = {
                 page: paginationData.page,
                 limit: paginationData.limit
             };
+
             if (filterStatus === "all") {
                 params.status = ""
             } else if (filterStatus === "in Progress") {
@@ -69,6 +70,16 @@ const ManageTasks = () => {
             } else {
                 params.status = filterStatus
             }
+
+            if (debounceSearch?.trim()) {
+                params = {
+                    page: 1,
+                    limit: limit
+                }
+                params.search = debounceSearch
+
+            }
+
 
             const response = await getTasksApi(params)
             const { tasks, pagination, statusSummary } = response.data
@@ -89,14 +100,6 @@ const ManageTasks = () => {
             setLoading(false);
         }
     };
-
-    const handleSearch = () => {
-        if (searchOpen && search?.trim() !== "") {
-            getAllTasks()
-        } else {
-            setSearchOpen(true)
-        }
-    }
 
     const handleClick = (taskData: ManageTask) => {
         if (taskData && taskData._id) {
@@ -128,7 +131,7 @@ const ManageTasks = () => {
 
     useEffect(() => {
         getAllTasks();
-    }, [filterStatus, paginationData.page, paginationData.limit])
+    }, [filterStatus, paginationData.page, paginationData.limit, debounceSearch])
 
 
     if (loading) return <ManageTasksSkeleton />
@@ -157,7 +160,7 @@ const ManageTasks = () => {
                                 setSearch("")
                                 setSearchOpen(false)
                             }}
-                            handleSearch={() => handleSearch()}
+                            onOpen={() => setSearchOpen(true)}
                         />
                     </div>
                     {tabs.length > 0 && (
