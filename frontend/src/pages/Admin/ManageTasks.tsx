@@ -131,14 +131,19 @@ const ManageTasks = () => {
 
     useEffect(() => {
         getAllTasks();
-    }, [filterStatus, paginationData.page, paginationData.limit, debounceSearch])
+    }, [
+        filterStatus,
+        paginationData.page,
+        paginationData.limit,
+        debounceSearch
+    ])
 
 
     if (loading) return <ManageTasksSkeleton />
     return (
         <DashboardLayout activeMenu='Manage Tasks'>
-            <div className='my-8 xl:my-0 w-full '>
-                <header className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
+            <div className='my-8 w-full '>
+                <header className='flex flex-col gap-6 lg:items-center lg:justify-between'>
                     <div className='flex flex-col sm:flex-row lg:items-center justify-center sm:gap-4'>
                         <h2 className='text-2xl font-semibold text-neutral-800 dark:text-neutral-300'>My Tasks</h2>
                         <button
@@ -167,7 +172,7 @@ const ManageTasks = () => {
                         <nav className='w-full items-center gap-4 lg:my-10'>
 
                             <button
-                                className='hidden self-end w-fit lg:flex download-btn'
+                                className='hidden ml-auto w-fit lg:flex download-btn'
                                 onClick={handleDownloadReport}
                             >
                                 <LuFileSpreadsheet className='text-xl' />
@@ -191,7 +196,7 @@ const ManageTasks = () => {
                     ? <NotAssigned text='No Task found!' className='mt-10' />
                     : (
                         <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 mt-6'>
-                            {allTasks?.map((task, idx) => (
+                            {allTasks?.map((task) => (
                                 <div
                                     key={task._id}
                                     className='transform-scale hover:scale-1.1 transition-scale duration-300'
