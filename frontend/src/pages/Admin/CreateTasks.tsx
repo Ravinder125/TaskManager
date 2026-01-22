@@ -1,6 +1,6 @@
 // Third party
 import { LuTrash2 } from 'react-icons/lu';
-import { createTaskSchema } from '../../features/zodSchemas/Admin/create.schema';
+import { createTaskSchema } from '../../features/zodSchemas/create.schema';
 import { toast } from 'react-hot-toast';
 
 // Components

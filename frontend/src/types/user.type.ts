@@ -1,3 +1,4 @@
+import { UpdateUserPayload } from "./api.type";
 
 export interface UserFullName {
     firstName: string
@@ -5,20 +6,19 @@ export interface UserFullName {
 }
 
 export type UserType = {
-    createdAt: Date;
-    updatedAt: Date;
+    // createdAt: Date;
+    // updatedAt: Date;
     role: "admin" | "employee";
     email: string;
-    password: string;
     fullName: UserFullName;
-    profileImageUrl: string;
+    profileImageUrl: string | undefined;
 }
 
 export type UserContextType = {
     user: UserType | null,
     loading: boolean,
     error: string | null,
-    updateUser: Function,
+    updateUser: (user: UserType) => void,
     clearUser: Function,
     isAuthenticated: boolean,
 }
@@ -42,4 +42,7 @@ export interface SelectUsersProps {
     setSelectedUsers: React.Dispatch<
         React.SetStateAction<AssignedUser[]>
     >;
+}
+
+export interface ManageAllUsers extends UserTaskSummary, AssignedUser {
 }

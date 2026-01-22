@@ -15,6 +15,7 @@ import { API_PATHS } from "../utils/apiPaths";
 import { uploadImage } from "../utils/uploadImag";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
+import { updateUserApi } from "../features/api/user.api";
 
 /* -------------------- TYPES -------------------- */
 
@@ -42,7 +43,6 @@ const Profile = () => {
 
     const { user, updateUser } = userContext;
 
-    /* -------------------- STATE -------------------- */
 
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
@@ -94,25 +94,31 @@ const Profile = () => {
                 formatName(user.fullName) !== fullName
             ) {
                 const [firstName = "", lastName = ""] = fullName.split(" ");
+                const payload = {
+                    fullName: {
+                        firstName,
+                        lastName
+                    },
+                    email: (email || user?.email)!
+                }
 
-                const response = await axiosInstance.put(
-                    API_PATHS.AUTH.UPDATE_PROFILE,
-                    {
-                        fullName: {
-                            firstName,
-                            lastName
-                        },
-                        email: email || user?.email
-                    }
-                );
+                if (!validateEmail(email)) {
+                    toast.error("Email is not validated")
+                    return;
+                } else if (!firstName?.trim()) {
+                    toast.error("Full name is required")
+                    return;
+                }
+                
+                const response = await updateUserApi(payload)
 
-                if (response?.data?.data) {
+                if (response.data) {
                     updateUser({
-                        fullName: response.data.data.fullName ?? user.fullName,
-                        email: response.data.data.email ?? user.email,
-                        profileImageUrl: profilePic ?? user.profileImageUrl,
-                        role: user.role
-                    });
+                        fullName: response.data.fullName ?? user?.fullName,
+                        email: response.data.email ?? user?.email,
+                        profileImageUrl: profilePic ?? user?.profileImageUrl,
+                        role: user?.role!,
+                    })
 
                     toast.success("Profile successfully updated");
                 }

@@ -2,74 +2,89 @@ import { asyncHandler } from "../utils/asynchandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { Task } from "../models/Task.model.js";
-import { isValidObjectId } from "mongoose";
 import redis from "../config/redis.js";
-import { InviteToken } from "../models/inviteToken.model.js";
 import { cache } from "../utils/cacheService.js";
 
 
-const isValidId = (id) => isValidObjectId(id)
-
-const usersRoute = `/api/v1/users`
 
 // @desc    Get all users (Admin only)
 // @route   Get /api/v1/users/
 // @access  Private (Admin)
 const getUsers = asyncHandler(async (req, res) => {
-    const { search } = req.query;
-    // const inviteToken = await InviteToken.findOne({ email: req.user.email });
-    // const usersEmail = await InviteToken.find({ token: inviteToken });
-    // console.log(usersEmail)
-    // const users = await Promise.all([
-    //     usersEmail?.map(email => User
-    //         .findOne({ email, role: "employee" })
-    //         .select('-password -refreshToken'))
-    // ]);
+    const { search = "", sort = "asc" } = req.query;
 
-    const pathKey = `users:${req.user._id}:${search}`
-    await cache.del(pathKey)
-    let users = await cache.get(pathKey)
-    if (users) {
-        return res.status(200).json(ApiResponse.success(200, users, 'Users successfully fetched'))
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
+    const cacheKey = `users:${req.user._id}:${page}:${limit}:${search}:${sort}`;
+
+    const cachedUsers = await cache.get(cacheKey);
+    if (cachedUsers) {
+        return res
+            .status(200)
+            .json(ApiResponse.success(200, cachedUsers, "Users successfully fetched"));
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    const filter = {
-        role: "employee",
-        ...(search && {
-            [emailRegex.test(search) ? "email" : "fullName"]: {
-                $regex: `^${search}`, $options: "i"
-            }
-        })
+    const query = { role: "employee" };
+    if (search?.trim()) {
+        query.email = { $regex: search.trim(), $options: "i" };
     }
-    users = await User
-        .find(filter)
-        .select(["fullName", "email", "profileImageUrl"]);
+
+    const sortOrder = sort === "asc" ? 1 : -1;
+
+    const users = await User.find(query)
+        .select("fullName email profileImageUrl")
+        .sort({ createdAt: sortOrder })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+    if (users.length === 0) {
+        return res
+            .status(404)
+            .json(ApiResponse.error(404, [], "No users found"));
+    }
 
     const usersWithTaskCounts = await Promise.all(
         users.map(async (user) => {
-            const tasksFilter = { assignedTo: user._id }
-            const pendingTasks = await Task.countDocuments({ ...tasksFilter, status: 'pending' });
-            const inProgressTasks = await Task.countDocuments({ ...tasksFilter, status: 'in-progress' });
-            const completedTasks = await Task.countDocuments({ ...tasksFilter, status: 'completed' });
+            const baseTaskFilter = { assignedTo: user._id };
+
+            const [pendingTasks, inProgressTasks, completedTasks] =
+                await Promise.all([
+                    Task.countDocuments({ ...baseTaskFilter, status: "pending" }),
+                    Task.countDocuments({ ...baseTaskFilter, status: "in-progress" }),
+                    Task.countDocuments({ ...baseTaskFilter, status: "completed" }),
+                ]);
+
             return {
-                ...user._doc, // spread operator to include all user properties
+                ...user,
                 pendingTasks,
                 inProgressTasks,
                 completedTasks,
             };
-        }));
+        })
+    );
 
-    if (users?.length === 0) {
-        return res.status(400).json(ApiResponse.error(400, usersWithTaskCounts, 'No user found'))
-    }
+    const totalUsers = await User.countDocuments(query);
+    const totalPages = Math.ceil(totalUsers / limit)
+    const responseData = {
+        users: usersWithTaskCounts,
+        pagination: {
+            totalItems: totalUsers,
+            page,
+            limit,
+            totalPages
+        }
 
-    await cache.set(pathKey, usersWithTaskCounts)
+    };
 
-    return res.status(200).json(ApiResponse.success(200, usersWithTaskCounts, 'Users successfully fetched'))
-})
+    await cache.set(cacheKey, responseData);
+
+    return res
+        .status(200)
+        .json(ApiResponse.success(200, responseData, "Users successfully fetched"));
+});
 
 // @desc     Get user by id
 // @route    Get /api/v1/users/:id

@@ -1,11 +1,11 @@
 import { UserFullName } from "../types/user.type";
 
-const validateEmail = (email) => {
+const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 }
 
-const addThousandsSeprator = (num) => {
+const addThousandsSeprator = (num: number) => {
     if (num == null || isNaN(num)) return '';
 
     const [integerPart, fractionalPart] = num.toString().split('.');

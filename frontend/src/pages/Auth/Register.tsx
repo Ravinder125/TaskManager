@@ -20,7 +20,7 @@ import axiosInstance from '../../utils/axiosInstance';
 
 // API
 import { API_PATHS } from '../../utils/apiPaths';
-import { registerSchema } from '../../features/zodSchemas/Auth/auth.schema';
+import { registerSchema } from '../../features/zodSchemas/auth.schema';
 import { validateFields } from '../../utils/validateFields';
 import { RegisterFormData, RoleOptions } from '../../types/auth.type';
 

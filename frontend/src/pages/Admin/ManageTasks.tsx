@@ -86,7 +86,6 @@ const ManageTasks = () => {
             const { tasks, pagination, statusSummary } = response.data
             setAllTasks(tasks)
             setPaginationData(pagination)
-            // Map statusSummary data will fixed labels and order
 
             const statusArray: Tab[] = [
                 { label: 'All', count: statusSummary.allTasks || 0 },

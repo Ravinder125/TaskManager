@@ -1,4 +1,5 @@
 import { ManageTask } from "./task.type";
+import { UserFullName } from "./user.type";
 
 
 
@@ -42,4 +43,10 @@ export interface Params {
     status?: string,
     page: number,
     limit: number
+}
+
+export interface UpdateUserPayload {
+    fullName: UserFullName,
+    email: string,
+    profileImageUrl?: string | undefined,
 }

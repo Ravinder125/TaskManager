@@ -14,44 +14,52 @@ import { useEffect, useState } from 'react'
 import Search from '../../components/Inputs/Search'
 
 // Types
-import { AssignedUser, UserTaskSummary } from '../../types/user.type'
+import { AssignedUser, ManageAllUsers, UserTaskSummary } from '../../types/user.type'
 
 // Api
 import { API_PATHS } from '../../utils/apiPaths'
+import { useDebounce } from '../../utils/useDebounce'
+import { getAllUsersApi } from '../../features/api/user.api'
+import { Pagination, Params } from '../../types/api.type'
+import PaginationComp from '../../components/common/PaginationComp'
 
 const ManageEmployees = () => {
-    const [allUsers, setAllUsers] = useState<UserTaskSummary[] | []>([])
+    const [allUsers, setAllUsers] = useState<ManageAllUsers[] | []>([])
     const [loading, setLoading] = useState<boolean>(false)
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [search, setSearch] = useState<string>("")
+    const [paginationData, setPaginationData] = useState<Pagination>({
+        limit: 10,
+        page: 1,
+        totalItems: 0,
+        totalPages: 1
+    })
+
+    const debounceSearch = useDebounce(search, 1000)
+    const limit = 10
 
     const getAllUsers = async () => {
         try {
             setLoading(true)
-            const response = await axiosInstance.get<AxiosResponse<UserTaskSummary[]>>(API_PATHS.USERS.GET_ALL_USERS, {
-                params: {
-                    search
+            let params: Params = { limit: paginationData.limit, page: paginationData.page }
+            if (debounceSearch?.trim()) {
+                params = {
+                    page: 1,
+                    limit: limit
                 }
-            });
-            setAllUsers(response.data.data ?? [])
+                params.search = debounceSearch.trim()
 
+            }
+
+            const response = await getAllUsersApi(params)
+            const { users, pagination } = response.data
+            setAllUsers(users)
+            setPaginationData(pagination)
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {
             setLoading(false)
         }
-    }
-
-    const handleSearch = () => {
-        const timeout = setTimeout(() => {
-            if (isOpen) {
-                getAllUsers()
-            } else {
-                setIsOpen(true)
-            }
-        }, 100);
-
-        return () => clearTimeout(timeout)
     }
 
     const handleDownloadReport = async () => {
@@ -80,7 +88,7 @@ const ManageEmployees = () => {
         return () => {
             setAllUsers([]);
         }
-    }, [])
+    }, [debounceSearch, paginationData.page, paginationData.limit])
 
     if (loading) return <ManageEmployeeSkeleton />
     return (
@@ -100,7 +108,7 @@ const ManageEmployees = () => {
 
                 <div className='mr-auto w-fit mt-5'>
                     <Search
-                        placeholder='ex : example@gmail.com'
+                        placeholder='ex. john1@gmail.com'
                         input={search}
                         setInput={(value) => setSearch(value)}
                         isOpen={isOpen}
@@ -108,7 +116,7 @@ const ManageEmployees = () => {
                             setSearch("")
                             setIsOpen(false)
                         }}
-                        handleSearch={() => handleSearch()}
+                        onOpen={() => setIsOpen(true)}
                     />
                 </div>
 
@@ -124,6 +132,20 @@ const ManageEmployees = () => {
                         </motion.div>
                     ))}
                 </section>
+
+                <footer className='my-6 mb-20'>
+                    <PaginationComp
+                        {...paginationData}
+                        onPageChange={(page) => {
+                            setPaginationData(prev => ({ ...prev, "page": page }))
+                        }
+                        }
+                        onLimitChange={(limit: number) => {
+                            setPaginationData(prev => ({ ...prev, "limit": limit }))
+                        }}
+                        isLimitChangeable={true}
+                    />
+                </footer>
             </div>
         </DashboardLayout>
     )

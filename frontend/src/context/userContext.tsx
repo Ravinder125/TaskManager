@@ -1,7 +1,8 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
 import axiosInstance from '../utils/axiosInstance';
 import { API_PATHS } from '../utils/apiPaths';
-import { UserContextType } from '../types/user.type';
+import { UserContextType, UserType } from '../types/user.type';
+import { UpdateUserPayload } from '../types/api.type';
 
 
 
@@ -12,11 +13,11 @@ export const UserContext = createContext<UserContextType>({
     error: "",
     isAuthenticated: false,
     loading: false,
-    updateUser: (userData: object) => userData
+    updateUser: (user: UserType) => user
 });
 
 const UserProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<UserType | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -49,8 +50,8 @@ const UserProvider = ({ children }) => {
     }, [setUser]);
 
     // Update user info (e.g. after profile edit)
-    const updateUser = useCallback((userData) => {
-        setUser(userData);
+    const updateUser = useCallback((userData: UserType) => {
+        setUser(prev => ({ ...prev!, ...{ ...userData } }))
     }, []);
 
     // Clear user session (e.g. on logout)

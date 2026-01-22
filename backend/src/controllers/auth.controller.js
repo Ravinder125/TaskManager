@@ -3,11 +3,10 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import { validationResult } from 'express-validator';
 import { User } from '../models/user.model.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
-import crypto from 'crypto'
 import { isValidObjectId } from 'mongoose';
 import sharp from 'sharp';
 import fs from 'fs'
-import { cache, clearCache } from '../utils/cacheService.js';
+import { cache } from '../utils/cacheService.js';
 
 
 const generateToken = async (user) => {
@@ -64,7 +63,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(ApiResponse.success(201, user, `${user.role} successfully created`))
+        .json(ApiResponse.success(201, {}, `${user.role} successfully created`))
 })
 
 // @desc    Login a user
@@ -76,32 +75,41 @@ const loginUser = asyncHandler(async (req, res) => {
         return res.status(400).json(ApiResponse.error(400, errors.array().join(',')));
     }
     const { email, password } = req.body;
-    const userExist = await User.findOne({ email }).select('+password');
+    const userExist = await User.findOne({ email }).select('+password email fullName profileImageUrl role');
 
     if (!userExist || !(await userExist.isPasswordCorrect(password))) {
         return res.status(401).json(ApiResponse.error(401, 'Email or password is invalid'))
     }
 
+    const responseData = {
+        fullName: userExist.fullName,
+        role: userExist.role,
+        email: userExist.email,
+        _id: userExist._id,
+        profileImageUrl: userExist.profileImageUrl
+    }
+
+    await cache.set(`profile:${userExist._id}`, responseData)
 
     const { accessToken, refreshToken, options } = await generateToken(userExist)
 
-    await cache.set(`profile:${userExist._id}`, userExist)
 
     return res
         .status(200)
         .cookie('accessToken', accessToken, options)
         .cookie('refreshToken', refreshToken, options)
-        .json(
-            ApiResponse.success(
-                200,
-                userExist,
-                `${userExist.role} successfully logged in`))
+        .json(ApiResponse.success(
+            200,
+            responseData,
+            `${userExist.role} successfully logged in`
+        )
+        )
 })
 
 // @desc    Logout a user
 // @route   GET /api/v1/auth/logout
 // @access  Private
-const logoutUser = asyncHandler(async (req, res) => {
+const logoutUser = asyncHandler(async (_, res) => {
     const options = {
         httpOnly: true,
         secure: true,
@@ -114,7 +122,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(ApiResponse.success(200, null, "User successfully logged out"));
+        .json(ApiResponse.success(200, {}, "User successfully logged out"));
 });
 
 
@@ -140,16 +148,12 @@ const logoutUser = asyncHandler(async (req, res) => {
 const getUserProfile = asyncHandler(async (req, res) => {
     const userId = req.user._id
 
-    if (!isValidId(req.user._id)) {
-        return res.status(200).json(ApiResponse.error(400, 'Invalid user ID'))
-    }
-
     const profile = await cache.get(`profile:${userId}`)
     if (profile) {
         return res.status(200).json(ApiResponse.success(200, profile, 'User profile successfully fetched redis'))
     }
 
-    const user = await User.findById(userId).select('-password -refreshToken')
+    const user = await User.findById(userId).select("email fullName role profileImageUrl")
     if (!user) {
         return res.status(404).json(ApiResponse.error(400, 'Admin not found'))
     }
@@ -164,12 +168,8 @@ const getUserProfile = asyncHandler(async (req, res) => {
 const updateUserProfile = asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
-    if (!isValidId(userId)) {
-        return res.status(200).json(ApiResponse.error(400, 'Invalid user ID'))
-    }
-
     const { email, fullName } = req.body;
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select("email fullName role profileImageUrl");
     if (!user) {
         return res.status(404).json(ApiResponse.error(404, 'User not found'))
     }
@@ -261,7 +261,7 @@ const changeUserPassword = asyncHandler(async (req, res) => {
     user.password = confirmPassword;
     await user.save();
 
-    return res.status(200).json(ApiResponse.success(200, user, 'Password successfully changed'));
+    return res.status(200).json(ApiResponse.success(200, {}, 'Password successfully changed'));
 })
 
 export {

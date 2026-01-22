@@ -5,7 +5,7 @@ import { API_PATHS } from '../../utils/apiPaths';
 import { UserContext } from '../../context/userContext';
 import axiosInstance from '../../utils/axiosInstance';
 import { motion } from 'framer-motion';
-import { loginSchema } from '../../features/zodSchemas/Auth/auth.schema';
+import { loginSchema } from '../../features/zodSchemas/auth.schema';
 import { validateFields } from '../../utils/validateFields';
 
 
