@@ -49,38 +49,39 @@ const ManageTasks = () => {
         totalPages: 1
     })
 
-    const navigate = useNavigate();
 
     const limit = 10
 
     const debounceSearch = useDebounce(search)
 
+    const navigate = useNavigate();
+
     const getAllTasks = async () => {
+        let params: Params = {
+            page: paginationData.page,
+            limit: paginationData.limit
+        };
+
+        if (filterStatus === "all") {
+            params.status = ""
+        } else if (filterStatus === "in Progress") {
+            params.status = "in-progress"
+        } else {
+            params.status = filterStatus
+        }
+
+        if (debounceSearch?.trim()) {
+            params = {
+                page: 1,
+                limit: limit
+            }
+            params.search = debounceSearch
+
+        }
+
         try {
+
             setLoading(true)
-            let params: Params = {
-                page: paginationData.page,
-                limit: paginationData.limit
-            };
-
-            if (filterStatus === "all") {
-                params.status = ""
-            } else if (filterStatus === "in Progress") {
-                params.status = "in-progress"
-            } else {
-                params.status = filterStatus
-            }
-
-            if (debounceSearch?.trim()) {
-                params = {
-                    page: 1,
-                    limit: limit
-                }
-                params.search = debounceSearch
-
-            }
-
-
             const response = await getTasksApi(params)
             const { tasks, pagination, statusSummary } = response.data
             setAllTasks(tasks)

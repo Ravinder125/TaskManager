@@ -83,15 +83,15 @@ const getTasks = asyncHandler(async (req, res) => {
     const limit = Number(req.query.limit) || 10
     const skip = (page - 1) * limit
 
-    const pathKey = `${userId}:${status || "all"}:${search || ""}`
+    const pathKey = `${userId}:${status || "all"}:${search || ""}:${page}:${limit}:${sort}`
 
 
-    // const data = await cache.get(pathKey)
-    // if (data) {
-    //     return res
-    //         .status(200)
-    //         .json(ApiResponse.success(200, data, 'Task fetched successfully'));
-    // }
+    const data = await cache.get(pathKey)
+    if (data) {
+        return res
+            .status(200)
+            .json(ApiResponse.success(200, data, 'Task fetched successfully'));
+    }
 
     const baseQuery = { isDeleted: false };
     const isAdmin = req.user.role === "admin"
