@@ -1,12 +1,22 @@
+import { Request, Response, NextFunction } from "express";
 import { ApiResponse } from "./ApiResponse.js";
 
-export const asyncHandler = (fn) => {
-    return async (req, res, next) => {
-        try {
-            await fn(req, res, next);
-        } catch (error) {
-            res.status(500).json(ApiResponse.error(500, error.message,));
-            next(error);
-        }
-    };
-}
+type AsyncFn = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => Promise<unknown>;
+
+export const asyncHandler =
+  (fn: AsyncFn) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await fn(req, res, next);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal Server Error";
+
+      res.status(500).json(ApiResponse.error(500, message));
+      next(error);
+    }
+  };
