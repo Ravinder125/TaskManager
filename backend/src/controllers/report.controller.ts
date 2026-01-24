@@ -4,7 +4,7 @@ import { User } from "../models/user.model.js";
 import { Task } from "../models/Task.model.js";
 import excelJS from "exceljs";
 import { generateCatchKey } from "../utils/generateCatcheKey.js";
-import redis from "../config/redis.js";
+import redis from "../config/redis.config.js";
 
 // Set headers and write workbook
 const setHeaders = (filename, res, workbook) => {

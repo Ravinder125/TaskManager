@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 import { isValidObjectId } from "mongoose";
-import redis from "../config/redis.js";
+import redis from "../config/redis.config.js";
 import { Task } from "../models/Task.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asynchandler.js";

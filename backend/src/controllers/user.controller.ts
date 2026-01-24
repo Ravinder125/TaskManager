@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asynchandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { Task } from "../models/Task.model.js";
-import redis from "../config/redis.js";
+import redis from "../config/redis.config.js";
 import { cache } from "../utils/cacheService.js";
 
 
