@@ -5,7 +5,6 @@ import { Task } from "../models/Task.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asynchandler.js";
 import { cache, clearCache } from "../utils/cacheService.js";
-import { validateObjectId } from "../utils/validateObjectId.js";
 
 const isValidId = (id) => isValidObjectId(id);
 

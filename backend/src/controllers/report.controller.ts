@@ -2,12 +2,11 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asynchandler.js";
 import { User } from "../models/user.model.js";
 import { Task } from "../models/Task.model.js";
-import excelJS from "exceljs";
-import { generateCatchKey } from "../utils/generateCatcheKey.js";
+import excelJS, { Workbook } from "exceljs";
 import redis from "../config/redis.config.js";
 
 // Set headers and write workbook
-const setHeaders = (filename, res, workbook) => {
+const setHeaders = (filename:string, res:Response, workbook:Workbook) => {
     res.setHeader(
         "Content-Type",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
