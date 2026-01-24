@@ -54,7 +54,6 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }: SelectUsersProps) => {
 
     useEffect(() => {
         getAllUsers();
-        console.log(allUsers)
     }, []);
 
     useEffect(() => {

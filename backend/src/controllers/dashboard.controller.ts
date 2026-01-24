@@ -139,7 +139,6 @@ const getAdminDashboard = asyncHandler(
             },
             recentTasks,
         };
-        console.log(responseData)
 
         await cache.set(pathKey, responseData);
 
