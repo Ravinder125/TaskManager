@@ -1,187 +1,305 @@
+import { Request, Response } from "express";
 import { Task } from "../models/task.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asynchandler.js";
 import { cache } from "../utils/cacheService.js";
 
+/* =======================
+   Types
+======================= */
 
-// @desc    Get Admin Dashboard Data (Admin only)
-// @route   GET /api/v1/dashboard-data
-// @access  Admin 
-const getAdminDashboard = asyncHandler(async (req, res) => {
-    // Stats
-    const userId = req.user._id
-    const pathKey = `dashboard:${userId}`
-    const data = await cache.get(pathKey)
+type TaskDistribution = {
+    pending: number;
+    inProgress: number;
+    completed: number;
+    all: number;
+};
 
-    if (data) {
+type TaskPriorityLevels = {
+    low: number;
+    medium: number;
+    high: number;
+};
+
+/* =======================
+   Admin Dashboard
+======================= */
+
+const getAdminDashboard = asyncHandler(
+    async (req: Request, res: Response) => {
+        const userId = req.user._id;
+        const pathKey = `dashboard:${userId}`;
+
+        const cached = await cache.get(pathKey);
+        if (cached) {
+            return res
+                .status(200)
+                .json(
+                    ApiResponse.success(
+                        200,
+                        cached,
+                        "Admin dashboard fetched successfully (redis)"
+                    )
+                );
+        }
+
+        const filter = {
+            isDeleted: false,
+            createdBy: userId,
+        };
+
+        const taskStatuses = ["pending", "in-progress", "completed"] as const;
+        const [pendingTasks, inProgressTasks, completedTasks, totalTasks, overDueTasks] = await Promise.all([
+
+            ...taskStatuses.map((p: string) => {
+                return Task.countDocuments({
+                    ...filter,
+                    status: p
+                })
+            }),
+            Task.countDocuments(filter),
+            Task.countDocuments({
+                dueTo: { $lt: new Date() },
+                status: { $ne: "completed" },
+                ...filter,
+            })
+        ])
+
+        // const pendingTasks = await Task.countDocuments({
+        //         ...filter,
+        //         status: "pending",
+        //     });
+        // const inProgressTasks = await Task.countDocuments({
+        //     ...filter,
+        //     status: "in-progress",
+        // });
+        // const completedTasks = await Task.countDocuments({
+        //     ...filter,
+        //     status: "completed",
+        // });
+
+        // const overDueTasks = await Task.countDocuments({
+        //     dueTo: { $lt: new Date() },
+        //     status: { $ne: "completed" },
+        //     ...filter,
+        // });
+
+        /* -------- Task Status Distribution -------- */
+
+
+        const taskDistributionRaw: Array<{
+            _id: string;
+            count: number;
+        }> = await Task.aggregate([
+            { $match: filter },
+            { $group: { _id: "$status", count: { $sum: 1 } } },
+        ]);
+
+        const taskDistribution = taskStatuses.reduce<TaskDistribution>(
+            (acc, status) => {
+                const key =
+                    status === "in-progress" ? "inProgress" : status;
+                const found = taskDistributionRaw.find(
+                    (item) => item._id === status
+                );
+                acc[key] = found ? found.count : 0;
+                return acc;
+            },
+            {
+                pending: 0,
+                inProgress: 0,
+                completed: 0,
+                all: totalTasks,
+            }
+        );
+
+        /* -------- Task Priority Distribution -------- */
+
+        const taskPriorities = ["low", "medium", "high"] as const;
+
+        const taskPriorityLevelRaw: Array<{
+            _id: string;
+            count: number;
+        }> = await Task.aggregate([
+            { $match: filter },
+            { $group: { _id: "$priority", count: { $sum: 1 } } },
+        ]);
+
+        const taskPriorityLevels = taskPriorities.reduce<TaskPriorityLevels>(
+            (acc, priority) => {
+                acc[priority] =
+                    taskPriorityLevelRaw.find(
+                        (item) => item._id === priority
+                    )?.count ?? 0;
+                return acc;
+            },
+            { low: 0, medium: 0, high: 0 }
+        );
+
+        /* -------- Recent Tasks -------- */
+
+        const recentTasks = await Task.find(filter)
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .select("title status priority dueTo createdAt");
+
+        const responseData = {
+            statistics: {
+                totalTasks,
+                pendingTasks,
+                inProgressTasks,
+                completedTasks,
+                overDueTasks,
+            },
+            charts: {
+                taskDistribution,
+                taskPriorityLevels,
+            },
+            recentTasks,
+        };
+
+        await cache.set(pathKey, responseData);
+
         return res
             .status(200)
-            .json(ApiResponse.success(200, data, "Admin dashboard fetched successfully (redis)"));
+            .json(
+                ApiResponse.success(
+                    200,
+                    responseData,
+                    "Admin dashboard fetched successfully"
+                )
+            );
     }
+);
 
-    const filter = {
-        isDeleted: false,
-        createdBy: userId
-    }
-    const totalTasks = await Task.countDocuments(filter);
-    const pendingTasks = await Task.countDocuments({ status: 'pending', ...filter });
-    const inProgressTasks = await Task.countDocuments({ status: 'in-progress', ...filter });
-    const completedTasks = await Task.countDocuments({ status: 'completed', ...filter });
+/* =======================
+   User Dashboard
+======================= */
 
-    const overDueTasks = await Task.countDocuments({
-        dueTo: { $lt: new Date() },
-        status: { $ne: 'completed' },
-    });
+const getUserDashboard = asyncHandler(
+    async (req: Request, res: Response) => {
+        const userId = req.user._id;
+        const pathKey = `dashboard:${userId}`;
 
-    // Task status distribution
-    const taskStatuses = ['pending', 'in-progress', 'completed'];
-    const taskDistributionRaw = await Task.aggregate([
-        { $match: filter },
-        {
-            $group: {
-                _id: "$status",
-                count: { $sum: 1 },
-            },
-        },
-    ]);
-
-
-    const taskDistribution = taskStatuses.reduce((acc, status) => {
-        let formattedKey = status;
-        if (status === 'in-progress') {
-            formattedKey = 'inProgress';
+        const cached = await cache.get(pathKey);
+        if (cached) {
+            return res
+                .status(200)
+                .json(
+                    ApiResponse.success(
+                        200,
+                        cached,
+                        "Employee dashboard successfully fetched"
+                    )
+                );
         }
-        const found = taskDistributionRaw.find(item => item._id === status);
-        acc[formattedKey] = found ? found.count : 0;
-        return acc;
-    }, {});
 
-    taskDistribution["all"] = totalTasks;
+        const filter = {
+            assignedTo: userId,
+            isDeleted: false,
+        };
 
-    // Task priority distribution
-    const taskPriorities = ['low', 'medium', 'high'];
-    const taskPriorityLevelRaw = await Task.aggregate([
-        { $match: filter },
-        {
-            $group: {
-                _id: "$priority",
-                count: { $sum: 1 },
+        const taskStatuses = ["pending", "in-progress", "completed"] as const;
+        const [pendingTasks, inProgressTasks, completedTasks, totalTasks, overDueTasks] = await Promise.all([
+
+            ...taskStatuses.map((p: string) => {
+                return Task.countDocuments({
+                    ...filter,
+                    status: p
+                })
+            }),
+            Task.countDocuments(filter),
+            Task.countDocuments({
+                dueTo: { $lt: new Date() },
+                status: { $ne: "completed" },
+                ...filter,
+            })
+        ])
+        /* -------- Status Distribution -------- */
+
+        const taskDistributionRaw: Array<{
+            _id: string;
+            count: number;
+        }> = await Task.aggregate([
+            { $match: filter },
+            { $group: { _id: "$status", count: { $sum: 1 } } },
+        ]);
+
+        const taskDistribution = taskStatuses.reduce<TaskDistribution>(
+            (acc, status) => {
+                const key =
+                    status === "in-progress" ? "inProgress" : status;
+                const found = taskDistributionRaw.find(
+                    (item) => item._id === status
+                );
+                acc[key] = found ? found.count : 0;
+                return acc;
             },
-        },
-    ]);
+            {
+                pending: 0,
+                inProgress: 0,
+                completed: 0,
+                all: totalTasks,
+            }
+        );
 
-    const taskPriorityLevels = taskPriorities.reduce((acc, priority) => {
-        acc[priority] =
-            taskPriorityLevelRaw.find(item => item._id === priority)?.count || 0;
-        return acc;
-    }, {});
+        /* -------- Priority Distribution -------- */
 
-    // Recent 10 tasks
-    const recentTasks = await Task.find(filter)
-        .sort({ createdAt: -1 })
-        .limit(10)
-        .select('title status priority dueTo createdAt');
+        const taskPriorities = ["low", "medium", "high"] as const;
 
-    const responseData = {
-        statistics: {
-            totalTasks,
-            pendingTasks,
-            inProgressTasks,
-            completedTasks,
-            overDueTasks,
-        },
-        charts: {
-            taskDistribution,
-            taskPriorityLevels,
-        },
-        recentTasks,
-    }
+        const taskPriorityLevelRaw: Array<{
+            _id: string;
+            count: number;
+        }> = await Task.aggregate([
+            { $match: filter },
+            { $group: { _id: "$priority", count: { $sum: 1 } } },
+        ]);
 
-    await cache.set(pathKey, responseData);
+        const taskPriorityLevels = taskPriorities.reduce<TaskPriorityLevels>(
+            (acc, priority) => {
+                acc[priority] =
+                    taskPriorityLevelRaw.find(
+                        (item) => item._id === priority
+                    )?.count ?? 0;
+                return acc;
+            },
+            { low: 0, medium: 0, high: 0 }
+        );
 
-    return res.status(200).json(ApiResponse.success(200, responseData, "Admin dashboard fetched successfully"));
-});
+        /* -------- Recent Tasks -------- */
 
-// @desc    Get Employee Dashboard Data 
-// @route   GET /api/v1/user-dashboard-data
-// @access  Admin 
-const getUserDashboard = asyncHandler(async (req, res) => {
-    const userId = req.user._id; // Only fetch employee data
-    const pathKey = `dashboard:${userId}`
-    const data = await cache.get(pathKey);
+        const recentTasks = await Task.find(filter)
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .select("title status priority description createdAt dueTo");
 
-    if (data) {
+        const responseData = {
+            statistics: {
+                totalTasks,
+                completedTasks,
+                pendingTasks,
+                inProgressTasks,
+                overDueTasks,
+            },
+            charts: {
+                taskDistribution,
+                taskPriorityLevels,
+            },
+            recentTasks,
+        };
+
+        await cache.set(pathKey, responseData);
+
         return res
-            .status(200).json(ApiResponse.success(200, data, 'Employee dashboard  successfully fetched'))
+            .status(200)
+            .json(
+                ApiResponse.success(
+                    200,
+                    responseData,
+                    "Employee dashboard successfully fetched"
+                )
+            );
     }
+);
 
-    // Fetch statistics for user-spacific tasks
-    const filter = { assignedTo: userId, isDeleted: false }
-    const totalTasks = await Task.countDocuments(filter);
-    const pendingTasks = await Task.countDocuments({ ...filter, status: 'pending' });
-    const completedTasks = await Task.countDocuments({ ...filter, status: 'completed' });
-    const overDueTasks = await Task.countDocuments({
-        ...filter,
-        dueTo: { $lt: new Date() },
-        status: { $ne: 'completed' }
-    })
-
-    // Task distribution by status
-    const tasksStatuses = ['pending', 'in-progress', 'completed'];
-    const taskDistributionRaw = await Task.aggregate([
-        { $match: filter },
-        { $group: { _id: '$status', count: { $sum: 1 } } },
-    ]);
-
-    const taskDistribution = tasksStatuses.reduce((acc, status) => {
-        let formattedKey = status;
-        if (status === 'in-progress') {
-            formattedKey = 'inProgress';
-        }
-        const found = taskDistributionRaw.find(item => item._id === status);
-        acc[formattedKey] = found ? found.count : 0;
-        return acc;
-    }, {});
-
-    taskDistribution['all'] = totalTasks;
-
-    // Task distribution by level
-    const taskPriorities = ['low', 'medium', 'high']
-    const taskPriorityLevelRaw = await Task.aggregate([
-        { $match: filter },
-        { $group: { _id: '$priority', count: { $sum: 1 } } },
-    ])
-    const taskPriorityLevels = taskPriorities.reduce((acc, priority) => {
-        acc[priority] = taskPriorityLevelRaw.find(task => task._id === priority)?.count || 0
-        return acc
-    }, {})
-
-    // fetch recent 10 tasks
-    const recentTasks = await Task.find({ ...filter })
-        .sort({ createdAt: -1 })
-        .limit(10)
-        .select('title status priority description createdAt dueTo ')
-
-    const responseData = {
-        statistics: {
-            totalTasks,
-            completedTasks,
-            pendingTasks,
-            overDueTasks,
-        },
-        charts: {
-            taskDistribution,
-            taskPriorityLevels,
-        },
-        recentTasks
-    }
-    await cache.set(pathKey, responseData)
-
-    return res.status(200).json(ApiResponse.success(200, responseData, 'Employee dashboard successfully fetched'))
-})
-
-
-export {
-    getAdminDashboard,
-    getUserDashboard
-};
+export { getAdminDashboard, getUserDashboard };
