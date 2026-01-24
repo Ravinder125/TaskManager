@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import axiosInstance from '../../utils/axiosInstance';
-import { API_PATHS } from '../../utils/apiPaths';
 import { LuUsers } from 'react-icons/lu';
 import { Modal, AvatarGroup } from '../index';
 import { formatName } from '../../utils/helper';
 import toast from 'react-hot-toast';
 import { AssignedUser, SelectUsersProps } from '../../types/user.type';
+import { getAllUsersApi } from '../../features/api/user.api';
 
 const SelectUsers = ({ selectedUsers, setSelectedUsers }: SelectUsersProps) => {
     const [allUsers, setAllUsers] = useState<AssignedUser[]>([]);
@@ -16,14 +15,8 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }: SelectUsersProps) => {
     const getAllUsers = async () => {
         try {
             setIsLoading(true);
-            const response = await axiosInstance.get(
-                API_PATHS.USERS.GET_ALL_USERS,
-                { withCredentials: true }
-            );
-
-            if (response?.data?.data?.length > 0) {
-                setAllUsers(response.data.data);
-            }
+            const response = await getAllUsersApi();
+            setAllUsers(response.data.users)
         } catch (error) {
             console.error('Error fetching the users', error);
             toast.error('Please try again, Error fetching the users');
@@ -57,10 +50,11 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }: SelectUsersProps) => {
         .filter((user) =>
             selectedUsers.some((assigned) => assigned._id === user._id)
         )
-        .map((user) => user.profileImageUrl);
+        .map((user) => user?.profileImageUrl);
 
     useEffect(() => {
         getAllUsers();
+        console.log(allUsers)
     }, []);
 
     useEffect(() => {

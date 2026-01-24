@@ -8,7 +8,7 @@ type GetAllUsersResponse = {
     pagination: Pagination
 }
 
-export const getAllUsersApi = async (params: Params): Promise<ApiResponse<GetAllUsersResponse>> => {
+export const getAllUsersApi = async (params?: Params): Promise<ApiResponse<GetAllUsersResponse>> => {
     return await networkRequest<ApiResponse<GetAllUsersResponse>>({
         method: "GET",
         url: API_PATHS.USERS.GET_ALL_USERS,

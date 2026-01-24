@@ -130,9 +130,7 @@ const CreateTasks = () => {
             if (!taskId?.trim()) throw new Error("Task Id is provided")
             setLoading(true);
 
-            const response = await updateTaskApi(taskId, data!)
-            console.log(response)
-
+            await updateTaskApi(taskId, data!)
             toast.success('Task successfully updated');
             navigate('/admin/tasks');
         } catch (error) {
@@ -153,7 +151,6 @@ const CreateTasks = () => {
             const response = await getTaskByIdApi(taskId);
             if (response.data) {
                 const taskInfo = response.data;
-                console.log(taskInfo)
                 setTaskData({
                     title: taskInfo.title,
                     description: taskInfo.description,
