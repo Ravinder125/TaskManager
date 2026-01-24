@@ -30,6 +30,7 @@ const getAdminDashboard = asyncHandler(
         const userId = req.user._id;
         const pathKey = `dashboard:${userId}`;
 
+
         const cached = await cache.get(pathKey);
         if (cached) {
             return res
@@ -64,25 +65,6 @@ const getAdminDashboard = asyncHandler(
                 ...filter,
             })
         ])
-
-        // const pendingTasks = await Task.countDocuments({
-        //         ...filter,
-        //         status: "pending",
-        //     });
-        // const inProgressTasks = await Task.countDocuments({
-        //     ...filter,
-        //     status: "in-progress",
-        // });
-        // const completedTasks = await Task.countDocuments({
-        //     ...filter,
-        //     status: "completed",
-        // });
-
-        // const overDueTasks = await Task.countDocuments({
-        //     dueTo: { $lt: new Date() },
-        //     status: { $ne: "completed" },
-        //     ...filter,
-        // });
 
         /* -------- Task Status Distribution -------- */
 
@@ -157,6 +139,7 @@ const getAdminDashboard = asyncHandler(
             },
             recentTasks,
         };
+        console.log(responseData)
 
         await cache.set(pathKey, responseData);
 

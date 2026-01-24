@@ -165,7 +165,6 @@ const logoutUser = asyncHandler(
 
         res.clearCookie("accessToken", options);
         res.clearCookie("refreshToken", options);
-
         return res
             .status(200)
             .json(

@@ -7,5 +7,5 @@ export const createTaskSchema = [
     body("assignedTo").isArray({ min: 1 }).withMessage("Task is yet not assigned to anyone"),
     body("attachments").optional().isArray().withMessage("Attachments must be a array"),
     body("dueTo").optional().isISO8601().withMessage("Due date must be a valid date"),
-    body("priority").isIn(["high", "medium", "low"]).withMessage("Priority options can be HIGH, MEDIUM and LOW")
+    body("priority").optional().isIn(["high", "medium", "low"]).withMessage("Priority options can be HIGH, MEDIUM and LOW")
 ]

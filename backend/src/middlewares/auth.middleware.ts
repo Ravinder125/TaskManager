@@ -56,7 +56,6 @@ export const isAuthenticated = asyncHandler(
       email: decodedToken.email,
       role: decodedToken.role,
     };
-
     next();
   }
 );
