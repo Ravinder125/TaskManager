@@ -1,6 +1,6 @@
-export const DB_NAME = "Ems"
+export const DB_NAME: string = "Ems"
 
-export const REQUIRED_ENV = [
+export const REQUIRED_ENV: string[] = [
     "MONGO_URI",
     "ORIGIN",
     "PORT",

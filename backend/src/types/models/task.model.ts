@@ -1,26 +1,25 @@
-import mongoose, { Schema } from "mongoose";
-import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
+import {
+    type HydratedDocument,
+} from "mongoose";
 
-const todoSchema = new Schema({
-    text: { type: String, required: true, trim: true },
-    completed: { type: Boolean, default: false }
-});
+export type UserRole = "admin" | "employee";
 
-const TaskSchema = new Schema({
-    title: { type: String, required: true, trim: true },
-    description: { type: String, required: true, trim: true },
-    todoList: [todoSchema],
-    assignedTo: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }],
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    attachments: [{ type: String }],
-    dueTo: { type: Date, default: new Date },
-    completedAt: { type: Date },
-    status: { type: String, enum: ['completed', 'pending', 'in-progress'], default: 'pending' },
-    progress: { type: Number, default: 0 },
-    priority: { type: String, enum: ['high', 'medium', 'low'], default: 'medium' },
-    isDeleted: { type: Boolean, default: false }
-}, { timestamps: true });
+export interface IUser {
+    fullName: {
+        firstName: string;
+        lastName?: string;
+    };
+    email: string;
+    password: string;
+    refreshToken?: string;
+    profileImageUrl?: string;
+    role: UserRole;
+}
 
-TaskSchema.plugin(mongooseAggregatePaginate);
+export interface IUserMethods {
+    isPasswordCorrect(password: string): Promise<boolean>;
+    generateRefreshToken(): string;
+    generateAccessToken(): string;
+}
 
-export const Task = mongoose.model('Task', TaskSchema);
+export type UserDocument = HydratedDocument<IUser, IUserMethods>;
