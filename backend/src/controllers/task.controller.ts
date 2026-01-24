@@ -249,6 +249,36 @@ const updateTask = asyncHandler(async (req: Request, res: Response) => {
         );
 });
 
+const toggleDeleteTask = asyncHandler(async (req, res) => {
+    const { taskId } = req.params;
+    if (!validateObjectId(taskId)) {
+        return res
+            .status(400)
+            .json(ApiResponse.error(400, "Invalid task ID"));
+    }
+    const task = await Task.findById(taskId)
+    if (!task) {
+        return res
+            .status(400)
+            .json(ApiResponse.error(400, "No task found"));
+    }
+    const toggleDelete = await Task.findByIdAndUpdate(taskId, { isDeleted: !task?.isDeleted })
+
+    if (!toggleDelete) {
+        return res
+            .status(500)
+            .json(ApiResponse.error(500, "Internal server error"))
+    }
+
+    const message = toggleDelete.isDeleted
+        ? "Task successfully deleted"
+        : "Task successfully recovered"
+
+    return res
+        .status(200)
+        .json(ApiResponse.success(200, {}, message))
+})
+
 /* ======================================================
    Exports
 ====================================================== */
@@ -257,4 +287,5 @@ export {
     getTaskById,
     getTasks,
     updateTask,
+    toggleDeleteTask
 };

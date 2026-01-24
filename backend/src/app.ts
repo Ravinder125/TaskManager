@@ -10,7 +10,6 @@ import userRoutes from "./routes/user.routes.js";
 import taskRoutes from "./routes/task.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import reportRoutes from "./routes/report.routes.js";
-import clerkRoutes from "./routes/clerk.routes.js";
 import { ENV } from "./config/env.config.js";
 
 const app: Application = express();
@@ -43,7 +42,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 
-app.use("/api/webhooks", clerkRoutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/tasks", taskRoutes);

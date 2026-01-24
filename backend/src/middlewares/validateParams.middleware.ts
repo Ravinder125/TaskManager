@@ -1,17 +1,33 @@
+import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-const validateParams = (req, res, next) => {
-    if (req.params) {
-        const isInvalid = Object.values(req.params).some((param) => mongoose.Types.ObjectId.isValid(param))
-        if (!isInvalid) return res.status(400).json(ApiResponse.error(400, 'Invalid parameter ID(s)'))
-    } else {
-        return res.status(400).json(ApiResponse.error(400, 'Id is required'))
-    }
+const validateParams = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const params = Object.values(req.params);
 
-    next();
+  if (!params.length) {
+    return res
+      .status(400)
+      .json(ApiResponse.error(400, "Id is required"));
+  }
 
+  const hasInvalidId = params.some(
+    (param) => !mongoose.Types.ObjectId.isValid(param.toString())
+  );
+
+  if (hasInvalidId) {
+    return res
+      .status(400)
+      .json(
+        ApiResponse.error(400, "Invalid parameter ID(s)")
+      );
+  }
+
+  next();
 };
 
-
-export { validateParams }
+export { validateParams };
