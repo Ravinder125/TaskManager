@@ -86,9 +86,9 @@ const ManageTasks = () => {
             const { tasks, pagination, statusSummary } = response.data
             setAllTasks(tasks)
             setPaginationData(pagination)
-
+console.log(tasks)
             const statusArray: Tab[] = [
-                { label: 'All', count: statusSummary.allTasks || 0 },
+                { label: 'All', count: statusSummary.totalTasks || 0 },
                 { label: 'Pending', count: statusSummary.pendingTasks || 0 },
                 { label: 'In Progress', count: statusSummary.inProgressTasks || 0 },
                 { label: 'Completed', count: statusSummary.completedTasks || 0 },

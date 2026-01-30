@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
+import { query, validationResult } from "express-validator";
 import { Task } from "../models/task.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asynchandler.js";
@@ -134,11 +134,11 @@ const getTasks = asyncHandler(async (req: Request, res: Response) => {
 
     const cacheKey = `${userId}:${status ?? "all"}:${search ?? ""}:${page}:${limit}:${sort}`;
     const cached = await cache.get(cacheKey);
-    if (cached) {
-        return res
-            .status(200)
-            .json(ApiResponse.success(200, cached, "Tasks fetched successfully"));
-    }
+    // if (cached) {
+    //     return res
+    //         .status(200)
+    //         .json(ApiResponse.success(200, cached, "Tasks fetched successfully"));
+    // }
 
     const isAdmin = req.user.role === "admin";
 
@@ -165,8 +165,19 @@ const getTasks = asyncHandler(async (req: Request, res: Response) => {
             .populate("assignedTo", "fullName email profileImageUrl"),
         Task.countDocuments(baseQuery),
     ]);
+    const statuses = ["pending", "in-progress", "completed"] as const;
 
+    const [pendingTasks, inProgressTasks, completedTasks] =
+        await Promise.all(
+            statuses.map((status) =>
+                Task.countDocuments({ ...baseQuery, status })
+            )
+        );
+
+
+    console.log(pendingTasks, totalTasks)
     const totalPages = Math.ceil(totalTasks / limit);
+
 
     const enrichedTasks = tasks.map((task) => {
         const completedTodoCount =
@@ -180,6 +191,12 @@ const getTasks = asyncHandler(async (req: Request, res: Response) => {
 
     const responseData = {
         tasks: enrichedTasks,
+        statusSummary: {
+            totalTasks,
+            pendingTasks,
+            inProgressTasks,
+            completedTasks
+        },
         pagination: {
             page,
             limit,

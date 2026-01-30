@@ -14,6 +14,11 @@ import { ENV } from "./config/env.config.js";
 
 const app: Application = express();
 
+if (ENV.NODE_ENV !== "development" && !ENV.ORIGIN) {
+  throw new Error("ENV.ORIGIN is required in production");
+}
+
+
 const allowedOrigin: string = ENV.NODE_ENV === "development"
   ? "http://localhost:5173"
   : ENV.ORIGIN;

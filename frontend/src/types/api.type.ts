@@ -30,7 +30,7 @@ export interface Pagination {
 export interface GetTasksResponse {
     tasks: ManageTask[];
     statusSummary: {
-        allTasks: number;
+        totalTasks: number;
         pendingTasks: number;
         inProgressTasks: number;
         completedTasks: number;

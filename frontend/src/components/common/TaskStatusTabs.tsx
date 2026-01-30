@@ -16,7 +16,7 @@ const TaskStatusTabs = ({
     setActiveTab,
 }: TaskStatusTabsProps) => {
     const [hovered, setHovered] = useState<number | null>(null)
-
+    console.log(hovered)
     return (
         <div
             className="

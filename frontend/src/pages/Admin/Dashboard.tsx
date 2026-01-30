@@ -27,7 +27,6 @@ import { addThousandsSeprator, formatName } from '../../utils/helper';
 import { DashboardCharts, DashboardData, DistributionData, PriorityLevelData } from '../../types/dashboard.type';
 
 // Api
-import { API_PATHS } from '../../utils/apiPaths';
 import { getDashboardData } from '../../features/api/dashboard.api';
 
 const COLORS = ['#8051FF', '#00B8DB', '#7BCE00']
@@ -74,23 +73,12 @@ function Dashboard() {
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
-
-            // const response = await axiosInstance.get<AxiosResponse<DashboardData>>(
-            //     API_PATHS.DASHBOARD.GET_DASHBOARD_DATA,
-            //     { withCredentials: true }
-            // );
-            // if (response.data) {
-            //     setDashboardData(response.data.data);
-            //     prepareChartData(response.data.data.charts || null)
-            // }
-
             const { data } = await getDashboardData()
             setDashboardData(data)
 
             if (data !== null) {
                 prepareChartData(data.charts)
             }
-            (data)
         } catch (error) {
             console.error('Error fetching dashboard data:', error)
         } finally {

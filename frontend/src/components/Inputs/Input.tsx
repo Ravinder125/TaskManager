@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, HTMLInputTypeAttribute, useState } from 'react'
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa6'
 
 interface InputProps {
@@ -6,7 +6,7 @@ interface InputProps {
     onChange: (value: string) => void;
     label: string;
     placeholder?: string;
-    type: string;
+    type: HTMLInputTypeAttribute;
     required?: boolean;
 }
 
