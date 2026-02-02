@@ -1,7 +1,7 @@
 import { API_PATHS } from "./apiPaths";
 import axiosInstance from "./axiosInstance";
 
-export const uploadImage = async (imageFile) => {
+export const uploadImage = async (imageFile: string) => {
     const formData = new FormData();
     // Append image file to form data
     formData.append('profileImage', imageFile)
