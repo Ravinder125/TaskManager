@@ -1,9 +1,9 @@
-import { Request, Response } from "express";
-import { asyncHandler } from "../utils/asynchandler.js";
-import { User } from "../models/user.model.js";
-import { Task } from "../models/task.model.js";
 import excelJS, { Workbook } from "exceljs";
-import redis from "../config/redis.config.js";
+import { Request, Response } from "express";
+import { Task } from "../models/task.model.js";
+import { User } from "../models/user.model.js";
+import { asyncHandler } from "../utils/asynchandler.js";
+import { cache } from "../utils/cacheService.js";
 
 /* =======================
    Helpers
@@ -48,7 +48,7 @@ const generateCacheKey = (path: string): string => {
 const exportUsersReport = asyncHandler(
     async (req: Request, res: Response) => {
         const pathKey = generateCacheKey(req.path);
-        const cached = await redis.get(pathKey);
+        const cached = await cache.get(pathKey);
 
         if (cached) {
             const workbook = new excelJS.Workbook();
@@ -125,7 +125,7 @@ const exportUsersReport = asyncHandler(
             });
         });
 
-        await redis.set(pathKey, "generated", "EX", 300);
+        await cache.set(pathKey, "generated", );
 
         return setHeaders("users_report", res, workbook);
     }
@@ -196,3 +196,4 @@ const exportTasksReport = asyncHandler(
 );
 
 export { exportTasksReport, exportUsersReport };
+
