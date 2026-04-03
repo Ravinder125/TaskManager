@@ -4,69 +4,95 @@ import redis from "../config/redis.config.js";
  * Cache helper
  */
 export const cache = {
-    get: async <T = unknown>(key: string): Promise<T | null> => {
-        const data = await redis.get(key);
-        if (!data) return null; // prevent JSON.parse crash
+  get: async <T = unknown>(key: string): Promise<T | null> => {
+    const data = await redis.get(key);
 
-        try {
-            return JSON.parse(data) as T;
-        } catch (err) {
-            console.error("Failed to parse cache:", err);
-            return null;
-        }
-    },
+    if (!data) return null;
 
-    set: async (
-        key: string,
-        data: unknown,
-        time: number = 300
-    ): Promise<"OK" | null> => {
-        return redis.set(key, JSON.stringify(data), "EX", time);
-    },
+    try {
+      return JSON.parse(data) as T;
+    } catch (error) {
+      console.error("Redis parse error:", error);
+      return null;
+    }
+  },
 
-    del: async (key: string): Promise<number> => {
-        return redis.del(key);
-    },
+  set: async (
+    key: string,
+    value: unknown,
+    ttl: number = 300
+  ): Promise<string | null> => {
+    return redis.set(
+      key,
+      JSON.stringify(value),
+      {EX: ttl}
+    );
+  },
+
+  del: async (key: string): Promise<number> => {
+    return redis.del(key);
+  },
+};
+
+/**
+ * Types
+ */
+type TaskCacheContext = {
+  userId: string;
+  search?: {
+    status?: string;
+    title?: string;
+  };
 };
 
 /**
  * Cache invalidation helper
  */
-type TaskCacheContext = {
-    userId: string;
-    search?: {
-        status?: string;
-        title?: string;
-    };
-};
-
 export const clearCache = async (
-    userId?: string,
-    taskId?: string,
-    tasks?: TaskCacheContext
+  userId?: string,
+  taskId?: string,
+  tasks?: TaskCacheContext
 ): Promise<void> => {
-    if (userId) {
-        await cache.del(`profile:${userId}`);
-        return;
-    }
 
-    if (taskId) {
-        await cache.del(`task:${taskId}`);
-        return;
-    }
+  /* Profile cache */
+  if (userId) {
+    await cache.del(`profile:${userId}`);
+    return;
+  }
 
-    if (tasks?.userId) {
-        await Promise.all([
-            ...["all", "pending", "in-progress", "completed"].map((status) => {
-                if (tasks.search?.status === status) {
-                    return cache.del(
-                        `${tasks.userId}:${status}:${tasks.search?.title ?? ""}`
-                    );
-                }
+  /* Single task cache */
+  if (taskId) {
+    await cache.del(`task:${taskId}`);
+    return;
+  }
 
-                return cache.del(`${tasks.userId}:${status}:`);
-            }),
-            cache.del(`dashboard:${tasks.userId}`),
-        ]);
-    }
+  /* Task list cache */
+  if (tasks?.userId) {
+    const statuses = [
+      "all",
+      "pending",
+      "in-progress",
+      "completed",
+    ];
+
+    await Promise.all([
+      ...statuses.map((status) => {
+
+        /* If specific filtered cache */
+        if (tasks.search?.status === status) {
+          return cache.del(
+            `${tasks.userId}:${status}:${tasks.search?.title ?? ""}`
+          );
+        }
+
+        /* Otherwise clear base status cache */
+        return cache.del(
+          `${tasks.userId}:${status}:`
+        );
+      }),
+
+      /* Dashboard cache */
+      cache.del(`dashboard:${tasks.userId}`),
+    ]);
+  }
 };
