@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import useUserAuth from "../hooks/useUserAuth";
-import { UserContext } from "@/context/userContext";
+import {UserContext} from '../context/userContext'
 import {
     DashboardLayout,
     Input,
