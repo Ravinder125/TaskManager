@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import { UserContext } from '../../context/userContext'
 import { Navbar } from '../index'
 import { SideMenu } from '../index'
-import { DashboardLayoutProps } from '../../types/layout.type'
+import type { DashboardLayoutProps } from '../../types/layout.type'
 
 // NOTE : Implement activeMenu options like "Dashboard" | "CreateTask | "Etc"
 

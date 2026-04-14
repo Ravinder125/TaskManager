@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { SideMenu } from '../index';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi'
 import ThemeSwitch from '../common/ThemeSwitch';
-import { WithActiveMenu } from '../../types/layout.type';
+import  { WithActiveMenu } from '../../types/layout.type';
 
 
 

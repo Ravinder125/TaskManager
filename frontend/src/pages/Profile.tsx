@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import useUserAuth from "../hooks/useUserAuth";
-import { UserContext } from "../context/userContext";
+import { UserContext } from "@/context/userContext";
 import {
     DashboardLayout,
     Input,
@@ -206,7 +206,7 @@ const Profile = () => {
                             <form onSubmit={handleSubmit} >
                                 <div className="grid grid-cols-1">
 
-                                    <ProfilePhotoSelector setProfilePic={setProfilePic} profilePic={profilePic} />
+                                    <ProfilePhotoSelector setProfilePic={setProfilePic} profilePic={profilePic!} />
 
                                     <Input
                                         label='Your Name'

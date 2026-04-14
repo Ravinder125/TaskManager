@@ -1,11 +1,9 @@
-import { API_PATHS_TYPE } from "../types/task.type";
+import type { API_PATHS_TYPE } from "../types/task.type";
 
-const BASE_URL = "https://taskmanager-5-pwv3.onrender.com"; // Update the port if your backend runs on a different port
-// const BASE_URL = "http://localhost:4000"
+// const BASE_URL = import.meta.env;
+const BASE_URL = "http://localhost:4000"
 
-// utils/apiPaths.js
-
-
+if (!BASE_URL) throw new Error("Base Url is missing")
 
 
 const API_PATHS: API_PATHS_TYPE = {

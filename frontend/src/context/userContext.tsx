@@ -1,25 +1,25 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
 import axiosInstance from '../utils/axiosInstance';
 import { API_PATHS } from '../utils/apiPaths';
-import { UserContextType, UserType } from '../types/user.type';
-import { UpdateUserPayload } from '../types/api.type';
+import type { UserContextType, UserType } from '../types/user.type';
+// import { UpdateUserPayload } from '../types/api.type';
 
 
 
 
 export const UserContext = createContext<UserContextType>({
     user: null,
-    clearUser: () => { },
     error: "",
     isAuthenticated: false,
     loading: false,
-    updateUser: (user: UserType) => user
+    clearUser: () => { },
+    updateUser: (user: UserType) => user,
 });
 
-const UserProvider = ({ children }) => {
+const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<UserType | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string>("");
 
     // Fetch user profile on mount
     useEffect(() => {
@@ -33,7 +33,7 @@ const UserProvider = ({ children }) => {
                 if (isMounted) {
                     setUser(data.data);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 if (isMounted) {
                     setError(error);
                     clearUser(); // logout or session expired

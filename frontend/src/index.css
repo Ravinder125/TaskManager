@@ -24,7 +24,6 @@
 }
 
 
-
 @layer base {
   html {
     font-family: var(--font-family);
@@ -87,13 +86,16 @@
   @apply dark:bg-neutral-800
 }
 
-.input-box {
-  @apply w-full flex justify-between gap-3 text-sm text-black bg-slate-100/50 rounded px-4 py-3 mb-4 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white dark:bg-neutral-700 dark:border-dark-border;
-}
+
 
 .btn-primary {
   @apply w-full text-sm font-medium text-white bg-primary shadow-lg shadow-purple-600/5 p-[10px] rounded-md my-1 hover:bg-blue-600/15 hover:text-blue-600 cursor-pointer;
 }
+
+.input-box {
+  @apply w-full flex justify-between gap-3 text-sm text-black bg-slate-100/50 rounded px-4 py-3 mb-4 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white dark:bg-neutral-700 dark:border-dark-border;
+}
+
 
 .card {
   @apply bg-white dark:bg-[var(--dark-bg-card)] p-6 rounded-2xl shadow-md shadow-neutral-100 dark:shadow-[var(--dark-card-border)] border-2 border-neutral-200 dark:border-[var(--dark-bg-card)];
@@ -149,4 +151,8 @@
 
 .first-last-page {
   @apply text-2xl cursor-pointer text-neutral-600 dark:text-neutral-200 disabled:text-neutral-400
+}
+
+@utility btn-started {
+  @apply text-sm border-1 border-primary px-4 py-2 rounded-3xl bg-primary text-neutral-200 hover:opacity-95 transition-all duration-200;
 }

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type ActiveMenu = 'Create Task' | 'Dashboard' | 'Team Members' | 'Manage Tasks' | 'My Tasks'
 

@@ -54,7 +54,7 @@ const Login = () => {
                     navigate('/employee/dashboard')
                 }
             }
-        } catch (error) {
+        } catch (error:any) {
             if (error.response && error.response.data.message) {
                 setError(`Error: ${error.response.data.message}`)
             } else {

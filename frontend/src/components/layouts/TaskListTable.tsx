@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { formatName } from '../../utils/helper';
-import { PriorityValueType, StatusValueType } from '../../types/task.type';
-import { TaskListTableProps } from '../../types/dashboard.type';
+import type { PriorityValueType, StatusValueType } from '../../types/task.type';
+import type { TaskListTableProps } from '../../types/dashboard.type';
 
 const TaskListTable = ({ tableData }: TaskListTableProps) => {
     const getStatusBadgeColor = (status: StatusValueType) => {

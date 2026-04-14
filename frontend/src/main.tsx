@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import UserProvider from './context/userContext.js'
 import { ThemeProvider } from './context/themeContext.js'
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <ThemeProvider>
