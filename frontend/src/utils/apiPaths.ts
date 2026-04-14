@@ -1,10 +1,11 @@
 import type { API_PATHS_TYPE } from "../types/task.type";
 
 // const BASE_URL = import.meta.env;
-const BASE_URL = "http://localhost:4000"
+const BASE_URL = import.meta.env.VITE_NODE_ENV !== "production"
+                    ? "http://localhost:4000"
+                    : import.meta.env.VITE_NODE_ENV
 
 if (!BASE_URL) throw new Error("Base Url is missing")
-
 
 const API_PATHS: API_PATHS_TYPE = {
     AUTH: {
