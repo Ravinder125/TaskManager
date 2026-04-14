@@ -3,7 +3,7 @@ import type { API_PATHS_TYPE } from "../types/task.type";
 // const BASE_URL = import.meta.env;
 const BASE_URL = import.meta.env.VITE_NODE_ENV !== "production"
                     ? "http://localhost:4000"
-                    : import.meta.env.VITE_NODE_ENV
+                    : import.meta.env.VITE_API_BASE_URL
 
 if (!BASE_URL) throw new Error("Base Url is missing")
 
