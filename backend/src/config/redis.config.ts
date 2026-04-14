@@ -1,5 +1,6 @@
 import { createClient } from 'redis';
 import { ENV } from './env.config.js';
+import { logger } from './logger.js';
 
 const client = createClient({
     username: ENV.REDIS_USERNAME,
@@ -10,7 +11,8 @@ const client = createClient({
     }
 });
 
-client.on('error', (err:any) => console.log('Redis Client Error', err));
+client.on('error', (err:any) => logger.error('Redis Client Error', err));
+client.on("connect", ()=> logger.info("Redis successfully connected"))
 
 await client.connect();
 
